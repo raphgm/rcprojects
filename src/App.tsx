@@ -1,0 +1,199 @@
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { ProjectGrid } from './components/ProjectGrid';
+import { LearnView } from './components/LearnView';
+import { LessonView } from './components/LessonView';
+import { LabView } from './components/LabView';
+import { Footer } from './components/Footer';
+import { TrustedBy } from './components/TrustedBy';
+import { Features } from './components/Features';
+import { PricingView } from './components/PricingView';
+import { HowItWorks } from './components/HowItWorks';
+import { Testimonials } from './components/Testimonials';
+import { AnimatePresence } from 'motion/react';
+import { courseContents } from './data/courseContent';
+import { labContents } from './data/labContent';
+import { Lesson, LabContent } from './types/content';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { db } from './firebase';
+import { doc, getDocFromServer } from 'firebase/firestore';
+
+export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
+export type CloudProvider = 'aws' | 'gcp' | 'azure';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<'projects' | 'learn' | 'pricing'>('projects');
+  const [activeLesson, setActiveLesson] = useState<{ lessons: Lesson[], title: string } | null>(null);
+  const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string, mode: 'real' | 'cli' } | null>(null);
+  const [completedLabs, setCompletedLabs] = useState<string[]>([]);
+  const [linuxFlavor, setLinuxFlavor] = useState<LinuxFlavor>('ubuntu');
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>('aws');
+
+  useEffect(() => {
+    async function testConnection() {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if(error instanceof Error && error.message.includes('the client is offline')) {
+          console.error("Please check your Firebase configuration. ");
+        }
+      }
+    }
+    testConnection();
+  }, []);
+
+  const startCourse = (courseId: string, courseTitle: string) => {
+    setActiveLab(null); // Clear active lab
+    const content = courseContents.find(c => c.courseId === courseId);
+    if (content) {
+      setActiveLesson({ lessons: content.lessons, title: courseTitle });
+    } else {
+      // Fallback for demo purposes if content not found
+      setActiveLesson({
+        lessons: [
+          {
+            id: 'demo-lesson',
+            title: `Introduction to ${courseTitle}`,
+            content: `# Welcome to ${courseTitle}\n\nThis is a placeholder lesson for the demo. In a real application, this would contain detailed educational content, diagrams, and interactive exercises.\n\n## What you will learn\n- Core concepts of ${courseTitle}\n- Best practices and industry standards\n- Hands-on implementation techniques`,
+            demoType: 'terminal',
+            demoConfig: { initialMessage: `Sandbox environment for ${courseTitle} initialized...` }
+          }
+        ],
+        title: courseTitle
+      });
+    }
+  };
+
+  const startLab = (projectId: string, projectTitle: string, mode: 'real' | 'cli' = 'real') => {
+    setActiveLesson(null); // Clear active lesson
+    const content = labContents.find(l => l.projectId === projectId);
+    if (content) {
+      setActiveLab({ lab: content, title: projectTitle, mode });
+    } else {
+      // Fallback for demo purposes
+      setActiveLab({
+        lab: {
+          projectId,
+          environment: 'linux',
+          steps: [
+            { id: 'step-1', title: 'Initialize Environment', instruction: `Prepare the environment for ${projectTitle}.`, hint: 'Check if you have the necessary CLI tools installed.' },
+            { id: 'step-2', title: 'Core Implementation', instruction: `Execute the main tasks for ${projectTitle}.`, hint: 'Follow the architecture diagram provided in the documentation.' },
+            { id: 'step-3', title: 'Verification', instruction: 'Verify that all components are working as expected.', hint: 'Use the check commands to validate your deployment.' }
+          ]
+        },
+        title: projectTitle,
+        mode
+      });
+    }
+  };
+
+  const completeLab = (projectId: string) => {
+    if (!completedLabs.includes(projectId)) {
+      setCompletedLabs(prev => [...prev, projectId]);
+    }
+  };
+
+
+  return (
+    <ErrorBoundary>
+      <div className="min-h-screen bg-white font-sans selection:bg-zinc-900 selection:text-white">
+      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+      <main>
+        {activeTab === 'projects' && (
+          <Hero 
+            onStart={() => {
+              const element = document.getElementById('projects-section');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }} 
+            onViewSkillTrees={() => setActiveTab('learn')}
+          />
+        )}
+        
+        {activeTab === 'projects' && <TrustedBy />}
+        
+        {activeTab === 'projects' && <HowItWorks />}
+        
+        {activeTab === 'projects' && (
+          <div id="projects-section" className="py-24">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+              <h2 className="text-2xl font-bold text-zinc-900">Featured Projects</h2>
+              <p className="text-zinc-500 text-sm mt-2">Hands-on experience with real-world scenarios.</p>
+            </div>
+            <ProjectGrid onStartLab={startLab} completedLabs={completedLabs} />
+          </div>
+        )}
+
+        {activeTab === 'learn' && (
+          <LearnView onStartCourse={startCourse} onStartLab={startLab} completedLabs={completedLabs} />
+        )}
+
+        {activeTab === 'pricing' && (
+          <PricingView />
+        )}
+
+        {activeTab === 'projects' && <Features />}
+
+        {activeTab === 'projects' && <Testimonials />}
+        
+        {/* Newsletter Section */}
+        <section className="py-24 bg-zinc-50 border-y border-zinc-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-[3rem] p-12 md:p-20 border border-zinc-200 shadow-xl relative overflow-hidden">
+              <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                  <h3 className="text-3xl md:text-5xl font-bold text-zinc-900 mb-6 tracking-tight">Stay ahead of the <br /><span className="text-brand-blue font-mono font-medium tracking-tight">cloud curve.</span></h3>
+                  <p className="text-zinc-500 text-lg leading-relaxed max-w-md">
+                    Get weekly labs, cloud engineering tips, and platform updates delivered straight to your inbox.
+                  </p>
+                </div>
+                <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
+                  <input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    className="flex-1 px-8 py-5 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all"
+                    required
+                  />
+                  <button className="px-10 py-5 bg-zinc-900 text-white rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20">
+                    Subscribe
+                  </button>
+                </form>
+              </div>
+              {/* Decorative background */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+      <Footer onTabChange={setActiveTab} />
+
+      <AnimatePresence>
+        {activeLesson && (
+          <LessonView 
+            key="lesson-view"
+            lessons={activeLesson.lessons}
+            courseTitle={activeLesson.title}
+            onClose={() => setActiveLesson(null)}
+            linuxFlavor={linuxFlavor}
+            onFlavorChange={setLinuxFlavor}
+            cloudProvider={cloudProvider}
+            onCloudProviderChange={setCloudProvider}
+          />
+        )}
+        {activeLab && (
+          <LabView 
+            key="lab-view"
+            lab={activeLab.lab}
+            projectTitle={activeLab.title}
+            mode={activeLab.mode}
+            onClose={() => setActiveLab(null)}
+            onComplete={() => completeLab(activeLab.lab.projectId)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+    </ErrorBoundary>
+  );
+}
+
