@@ -211,31 +211,129 @@ Azure DevOps provides a comprehensive suite of services for the entire lifecycle
           }
         }
       },
-      // Programmatically generate 99 more lessons for DevOps Introduction
-      ...Array.from({ length: 99 }, (_, i) => ({
+      // Curated DevOps Engineering missions — each is interactive and active
+      ...[
+        { topic: 'CI/CD Pipelines', cmd: 'git status', focus: 'Continuous Integration & Continuous Delivery with GitHub Actions and Azure Pipelines.' },
+        { topic: 'Infrastructure as Code', cmd: 'terraform plan', focus: 'Declarative infrastructure provisioning with Terraform and Bicep.' },
+        { topic: 'Configuration Management', cmd: 'ansible --version', focus: 'Idempotent configuration with Ansible and PowerShell DSC.' },
+        { topic: 'Containerization', cmd: 'docker ps', focus: 'Packaging applications with Docker and OCI images.' },
+        { topic: 'Container Orchestration', cmd: 'kubectl get nodes', focus: 'Running containers at scale with Kubernetes (AKS).' },
+        { topic: 'Helm Charts', cmd: 'helm list', focus: 'Templating and versioning Kubernetes manifests with Helm.' },
+        { topic: 'GitOps', cmd: 'flux get sources git', focus: 'Declarative cluster state with Flux and ArgoCD.' },
+        { topic: 'Secrets Management', cmd: 'az keyvault secret list --vault-name demo', focus: 'Storing secrets securely in Azure Key Vault and HashiCorp Vault.' },
+        { topic: 'Monitoring & Metrics', cmd: 'kubectl top nodes', focus: 'Collecting metrics with Prometheus and Azure Monitor.' },
+        { topic: 'Log Aggregation', cmd: 'kubectl logs -l app=web --tail=20', focus: 'Centralized logs with Log Analytics and the ELK stack.' },
+        { topic: 'Distributed Tracing', cmd: 'curl http://jaeger:16686/api/traces', focus: 'End-to-end tracing with OpenTelemetry and Jaeger.' },
+        { topic: 'Alerting & On-Call', cmd: 'az monitor alert list', focus: 'Actionable alerts and rotation with PagerDuty.' },
+        { topic: 'SRE Principles', cmd: 'echo "SLO: 99.9%"', focus: 'SLIs, SLOs, error budgets, and toil reduction.' },
+        { topic: 'Chaos Engineering', cmd: 'chaos-mesh apply', focus: 'Resilience testing with Chaos Mesh and Azure Chaos Studio.' },
+        { topic: 'Blue/Green Deployments', cmd: 'kubectl rollout status deploy/web', focus: 'Zero-downtime releases with Blue/Green strategy.' },
+        { topic: 'Canary Releases', cmd: 'kubectl get canary', focus: 'Progressive delivery with Flagger and Argo Rollouts.' },
+        { topic: 'Feature Flags', cmd: 'curl https://api.flags/v1/flags', focus: 'Runtime gating with LaunchDarkly and Azure App Configuration.' },
+        { topic: 'Service Mesh', cmd: 'istioctl proxy-status', focus: 'Traffic management and mTLS with Istio and Linkerd.' },
+        { topic: 'API Gateways', cmd: 'curl https://api.example.com/healthz', focus: 'Routing, throttling, and auth with Azure API Management.' },
+        { topic: 'Load Balancing', cmd: 'az network lb list', focus: 'Layer-4 and Layer-7 load balancing strategies.' },
+        { topic: 'Auto-scaling', cmd: 'kubectl get hpa', focus: 'Horizontal and vertical pod autoscaling on AKS.' },
+        { topic: 'Cost Optimization', cmd: 'az consumption usage list', focus: 'FinOps tagging, reservations, and rightsizing.' },
+        { topic: 'DevSecOps Basics', cmd: 'trivy image nginx:latest', focus: 'Shift-left security scanning in pipelines.' },
+        { topic: 'SAST & SCA', cmd: 'semgrep --config=auto .', focus: 'Static analysis and dependency scanning.' },
+        { topic: 'Container Image Scanning', cmd: 'docker scout cves nginx', focus: 'Vulnerability scanning of container images.' },
+        { topic: 'Policy as Code', cmd: 'opa eval -d policy.rego "data.allow"', focus: 'Enforcing policies with OPA and Azure Policy.' },
+        { topic: 'Compliance Automation', cmd: 'az policy state list', focus: 'Continuous compliance with Azure Policy and Defender for Cloud.' },
+        { topic: 'Backup & DR', cmd: 'velero backup get', focus: 'Disaster recovery with Velero and Azure Backup.' },
+        { topic: 'Multi-Region Architecture', cmd: 'az traffic-manager profile list', focus: 'Active/active and active/passive across regions.' },
+        { topic: 'CDN & Edge', cmd: 'az afd profile list', focus: 'Global delivery with Azure Front Door and CDN.' },
+        { topic: 'DNS Management', cmd: 'az network dns zone list', focus: 'Reliable DNS with Azure DNS and traffic routing.' },
+        { topic: 'TLS Certificates', cmd: 'openssl s_client -connect example.com:443', focus: 'Automated cert management with cert-manager and Key Vault.' },
+        { topic: 'Network Policies', cmd: 'kubectl get networkpolicy', focus: 'Pod-level network segmentation in AKS.' },
+        { topic: 'Private Endpoints', cmd: 'az network private-endpoint list', focus: 'Securing PaaS access with Azure Private Link.' },
+        { topic: 'Identity & RBAC', cmd: 'az role assignment list', focus: 'Least-privilege access with Entra ID and Azure RBAC.' },
+        { topic: 'Managed Identities', cmd: 'az identity list', focus: 'Passwordless auth for workloads on Azure.' },
+        { topic: 'Workload Identity', cmd: 'kubectl get sa', focus: 'Federated identity for pods on AKS.' },
+        { topic: 'Service Principals', cmd: 'az ad sp list --show-mine', focus: 'Application-level credentials and rotation.' },
+        { topic: 'Pipeline Templates', cmd: 'cat .github/workflows/reusable.yml', focus: 'DRY pipelines with reusable workflows.' },
+        { topic: 'Self-Hosted Runners', cmd: 'gh runner list', focus: 'Private CI runners for compliance and performance.' },
+        { topic: 'Artifact Registries', cmd: 'az acr repository list --name demo', focus: 'Private container and package registries.' },
+        { topic: 'SBOM & Provenance', cmd: 'syft packages dir:.', focus: 'Software bill of materials and supply-chain security.' },
+        { topic: 'Sigstore Cosign', cmd: 'cosign verify ghcr.io/demo/app', focus: 'Signing and verifying container images.' },
+        { topic: 'Secrets Rotation', cmd: 'az keyvault secret rotate --name demo', focus: 'Automated credential rotation strategies.' },
+        { topic: 'Database Migrations', cmd: 'flyway migrate', focus: 'Versioned schema migrations in CI/CD.' },
+        { topic: 'Zero-Downtime Migrations', cmd: 'pg_dump --schema-only db', focus: 'Backwards-compatible migrations and dual writes.' },
+        { topic: 'Caching Strategies', cmd: 'redis-cli ping', focus: 'Application caching with Redis and Azure Cache.' },
+        { topic: 'Message Queues', cmd: 'az servicebus queue list', focus: 'Async processing with Service Bus and Event Hubs.' },
+        { topic: 'Event-Driven Architecture', cmd: 'az eventgrid topic list', focus: 'Event Grid, EventBridge, and pub/sub patterns.' },
+        { topic: 'Serverless Functions', cmd: 'func start', focus: 'Azure Functions and event-driven compute.' },
+        { topic: 'Container Apps', cmd: 'az containerapp list', focus: 'Managed serverless containers on Azure.' },
+        { topic: 'Static Web Apps', cmd: 'swa start', focus: 'Modern web hosting with built-in CI/CD.' },
+        { topic: 'CDN Cache Headers', cmd: 'curl -I https://cdn.example.com/asset.js', focus: 'Optimizing edge caching with Cache-Control.' },
+        { topic: 'Performance Testing', cmd: 'k6 run loadtest.js', focus: 'Load testing with k6 and Azure Load Testing.' },
+        { topic: 'Synthetic Monitoring', cmd: 'curl https://app/healthz', focus: 'Active probes and uptime checks.' },
+        { topic: 'Real User Monitoring', cmd: 'echo "Application Insights active"', focus: 'RUM and Core Web Vitals tracking.' },
+        { topic: 'Postmortems', cmd: 'echo "Blameless postmortem template"', focus: 'Blameless culture and learning from incidents.' },
+        { topic: 'Runbooks & Playbooks', cmd: 'cat runbook.md', focus: 'Operational documentation and automation.' },
+        { topic: 'Capacity Planning', cmd: 'kubectl describe node aks-node-1', focus: 'Forecasting resources and quota management.' },
+        { topic: 'Multi-Cluster Management', cmd: 'kubectl config get-contexts', focus: 'Federated AKS with Azure Arc and Fleet Manager.' },
+        { topic: 'Edge & IoT DevOps', cmd: 'az iot hub list', focus: 'Deploying to Azure IoT Edge and constrained devices.' },
+        { topic: 'ML/AI Pipelines (MLOps)', cmd: 'mlflow experiments list', focus: 'CI/CD for ML models with MLflow and Azure ML.' },
+        { topic: 'Data Pipelines (DataOps)', cmd: 'az synapse pipeline list --workspace-name demo', focus: 'ETL/ELT orchestration with Data Factory and Synapse.' },
+        { topic: 'Platform Engineering', cmd: 'backstage --version', focus: 'Internal developer platforms with Backstage and Radius.' },
+        { topic: 'Developer Productivity', cmd: 'gh codespace list', focus: 'Cloud dev environments with Codespaces and Dev Containers.' },
+        { topic: 'Trunk-Based Development', cmd: 'git log --oneline -5', focus: 'Short-lived branches and continuous integration.' },
+        { topic: 'Code Review Automation', cmd: 'gh pr list', focus: 'Automated reviewers, CODEOWNERS, and policy gates.' },
+        { topic: 'Pre-commit Hooks', cmd: 'pre-commit run --all-files', focus: 'Local quality gates before code reaches CI.' },
+        { topic: 'Linting & Formatting', cmd: 'eslint . && prettier --check .', focus: 'Consistent code style enforced in CI.' },
+        { topic: 'Test Automation', cmd: 'npm test -- --coverage', focus: 'Unit, integration, and contract tests.' },
+        { topic: 'E2E Testing', cmd: 'playwright test', focus: 'Browser-level testing with Playwright and Cypress.' },
+        { topic: 'Mutation Testing', cmd: 'stryker run', focus: 'Validating test suite quality.' },
+        { topic: 'Test Data Management', cmd: 'cat fixtures/users.json', focus: 'Synthetic data and golden datasets.' },
+        { topic: 'Environment Promotion', cmd: 'azd env list', focus: 'Promoting builds dev → staging → prod safely.' },
+        { topic: 'Feature Branch Environments', cmd: 'kubectl get ns -l type=preview', focus: 'On-demand preview environments per PR.' },
+        { topic: 'Rollback Strategies', cmd: 'kubectl rollout undo deploy/web', focus: 'Fast, safe rollbacks and deployment markers.' },
+        { topic: 'Observability Pillars', cmd: 'echo "metrics, logs, traces"', focus: 'Unified telemetry strategy.' },
+        { topic: 'eBPF Observability', cmd: 'sudo bpftool prog list', focus: 'Kernel-level visibility with eBPF and Cilium.' },
+        { topic: 'Tracing with W3C', cmd: 'curl -H "traceparent: 00-..." https://api', focus: 'Standardized trace context propagation.' },
+        { topic: 'Resilience Patterns', cmd: 'echo "circuit breaker, retry, bulkhead"', focus: 'Polly, retry-with-backoff, and bulkheads.' },
+        { topic: 'Idempotency', cmd: 'curl -H "Idempotency-Key: 123" -X POST https://api', focus: 'Safe retries with idempotency keys.' },
+        { topic: 'Distributed Locks', cmd: 'redis-cli SET lock:resource 1 NX EX 30', focus: 'Coordinating work across replicas.' },
+        { topic: 'Saga Pattern', cmd: 'echo "Compensating transactions"', focus: 'Long-running distributed transactions.' },
+        { topic: 'CQRS & Event Sourcing', cmd: 'echo "Read/Write separation"', focus: 'Architectural patterns for high scale.' },
+        { topic: 'Database Sharding', cmd: 'echo "Hash and range partitioning"', focus: 'Horizontal scaling of relational databases.' },
+        { topic: 'Read Replicas', cmd: 'az postgres flexible-server replica list-by-server', focus: 'Read-scaling with replicas and routing.' },
+        { topic: 'Connection Pooling', cmd: 'pgbouncer --version', focus: 'Reducing connection overhead with PgBouncer.' },
+        { topic: 'GraphQL Federation', cmd: 'rover supergraph compose', focus: 'Composing schemas across teams.' },
+        { topic: 'gRPC Services', cmd: 'grpcurl -plaintext localhost:50051 list', focus: 'High-performance RPC with Protocol Buffers.' },
+        { topic: 'WebSockets at Scale', cmd: 'az signalr list', focus: 'Real-time pub/sub with Azure SignalR.' },
+        { topic: 'Edge Functions', cmd: 'az functionapp list --query "[?kind==\'edge\']"', focus: 'Compute close to users for low latency.' },
+        { topic: 'WebAssembly Workloads', cmd: 'wasmtime run module.wasm', focus: 'Portable workloads with WASM and Spin.' },
+        { topic: 'Confidential Computing', cmd: 'az confcom list', focus: 'Trusted execution environments and attestation.' },
+        { topic: 'Quantum-Safe Crypto', cmd: 'openssl list -kdf-algorithms', focus: 'Preparing systems for post-quantum cryptography.' },
+        { topic: 'Green Software', cmd: 'echo "Carbon-aware scheduling"', focus: 'Sustainability and carbon-aware deployments.' },
+        { topic: 'AIOps', cmd: 'az monitor metrics alert list', focus: 'AI-assisted incident detection and triage.' },
+        { topic: 'LLMOps', cmd: 'az ml model list', focus: 'Operating LLMs with evaluation and guardrails.' },
+        { topic: 'Vector Databases', cmd: 'curl http://localhost:6333/collections', focus: 'Embeddings storage with Azure AI Search and Qdrant.' },
+        { topic: 'RAG in Production', cmd: 'curl http://api/rag/query', focus: 'Retrieval-augmented generation pipelines.' },
+        { topic: 'Agent Workflows', cmd: 'echo "Tool calls + planner"', focus: 'Production-grade agentic systems with Foundry.' },
+        { topic: 'Capstone: Full DevOps Stack', cmd: 'azd up', focus: 'Bringing it all together: pipeline, infra, observability.' }
+      ].map((m, i) => ({
         id: `devops-ext-${i + 1}`,
-        title: `DevOps Engineering: Module ${i + 2}`,
+        title: `DevOps Engineering: ${m.topic}`,
         content: `
-# Advanced DevOps Practice ${i + 2}
-This module dives deep into modern DevOps engineering practices, focusing on automation, scalability, and reliability.
+# ${m.topic}
+${m.focus}
 
-## Key Focus Areas
-- Infrastructure as Code (Terraform, Bicep)
-- Configuration Management (Ansible, PowerShell)
-- Monitoring & Observability (Azure Monitor, Log Analytics)
-- Security Integration (DevSecOps)
-- Site Reliability Engineering (SRE) principles
+## Why It Matters
+Mastering ${m.topic.toLowerCase()} is essential for shipping reliable, secure, and scalable software at modern engineering velocity.
 
-Building resilient and scalable systems for the modern cloud.
+## What You'll Practice
+- Run real commands in the interactive sandbox
+- Inspect outputs and reason about failure modes
+- Apply the pattern to a representative scenario
         `,
-        demoType: 'cloud-console' as const,
+        task: `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}.`,
+        demoType: 'terminal' as const,
         demoConfig: {
-          provider: 'Azure' as const,
-          service: 'Azure Monitor',
-          mockData: {
-            metrics: ['CPU Utilization', 'Memory Usage', 'Request Count', 'Error Rate'],
-            status: 'Healthy'
-          }
+          initialMessage: `${m.topic} sandbox ready. Try \`${m.cmd}\`.`,
+          availableCommands: [m.cmd.split(' ')[0], 'ls', 'pwd', 'help', 'clear']
         }
       }))
     ]
