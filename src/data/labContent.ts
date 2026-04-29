@@ -2840,5 +2840,872 @@ export const labContents: LabContent[] = [
         expectedOutput: 'PHP Version'
       }
     ]
+  },
+  {
+    projectId: 'shell-automation',
+    environment: 'linux',
+    description: 'Build a production-grade backup automation script using tar, rsync, and cron with logging, retention, and integrity verification.',
+    objective: 'Author a Bash script that performs incremental backups, schedule it with cron, log to syslog, prune old backups, and verify archive integrity.',
+    steps: [
+      { id: 1, title: 'Prepare Backup Directories', instruction: 'Create source and destination directories with correct permissions.', summary: 'Lay out a predictable backup tree.', whyNeeded: 'Scripts fail silently when paths are missing or unwritable.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo mkdir -p /var/backups/app /srv/app/data', explanation: 'Create destination and source.' },
+          { text: 'sudo chown -R "$USER":"$USER" /var/backups/app', explanation: 'Allow non-root writes for the cron user.' }
+        ], checkCommand: 'ls -ld /var/backups/app', expectedOutput: 'drwxr-xr-x' },
+      { id: 2, title: 'Write the Backup Script', instruction: 'Create /usr/local/bin/backup.sh using tar with timestamped archives and rsync mirror.', summary: 'Combine snapshot + mirror strategies.', whyNeeded: 'tar gives point-in-time, rsync gives fast delta sync.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo tee /usr/local/bin/backup.sh >/dev/null <<\'EOF\'\n#!/usr/bin/env bash\nset -euo pipefail\nSRC=/srv/app/data\nDEST=/var/backups/app\nTS=$(date +%Y%m%d-%H%M%S)\nlogger -t backup "starting $TS"\ntar -czf "$DEST/app-$TS.tar.gz" -C "$SRC" .\nrsync -a --delete "$SRC/" "$DEST/mirror/"\nlogger -t backup "completed $TS"\nEOF', explanation: 'Heredoc writes the script.' },
+          { text: 'sudo chmod 750 /usr/local/bin/backup.sh', explanation: 'Restrict execution.' }
+        ], checkCommand: 'sudo /usr/local/bin/backup.sh && ls /var/backups/app', expectedOutput: 'app-' },
+      { id: 3, title: 'Schedule with Cron', instruction: 'Run the backup nightly at 02:30 via cron.', summary: 'Automate execution.', whyNeeded: 'Manual backups are forgotten.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'echo "30 2 * * * root /usr/local/bin/backup.sh" | sudo tee /etc/cron.d/app-backup', explanation: 'System cron entry.' },
+          { text: 'sudo systemctl restart cron', explanation: 'Reload cron.' }
+        ], checkCommand: 'sudo crontab -l -u root; cat /etc/cron.d/app-backup', expectedOutput: 'backup.sh' },
+      { id: 4, title: 'Implement Retention', instruction: 'Prune archives older than 14 days.', summary: 'Bound disk usage.', whyNeeded: 'Unbounded backups fill disks.', pillarConnection: 'Cost Optimization',
+        commands: [
+          { text: 'sudo sed -i "/logger -t backup \\"completed/i find $DEST -name \'app-*.tar.gz\' -mtime +14 -delete" /usr/local/bin/backup.sh', explanation: 'Insert retention before completion log.' }
+        ], checkCommand: 'grep -n mtime /usr/local/bin/backup.sh', expectedOutput: 'mtime +14' },
+      { id: 5, title: 'Verify Archive Integrity', instruction: 'Test the latest archive and review syslog.', summary: 'Trust but verify.', whyNeeded: 'A corrupt backup is worse than none.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'tar -tzf $(ls -t /var/backups/app/app-*.tar.gz | head -1) >/dev/null && echo OK', explanation: 'Validate gzip+tar stream.' },
+          { text: 'journalctl -t backup --since "1 hour ago"', explanation: 'Inspect logs.' }
+        ], checkCommand: 'echo OK', expectedOutput: 'OK' }
+    ]
+  },
+  {
+    projectId: 'user-management-system',
+    environment: 'linux',
+    description: 'Automate user onboarding from a CSV: create accounts, generate strong passwords, enforce expiry, assign groups, and audit.',
+    objective: 'Build a Bash onboarding pipeline using useradd, openssl, chage, and logger.',
+    steps: [
+      { id: 1, title: 'Prepare CSV and Skeleton', instruction: 'Create a CSV of users and customize /etc/skel.', summary: 'Single source of truth.', whyNeeded: 'Consistent home dirs reduce support load.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'echo "username,fullname,group\\nalice,Alice Smith,devs\\nbob,Bob Jones,ops" | sudo tee /root/users.csv', explanation: 'Sample input.' },
+          { text: 'sudo cp /etc/bash.bashrc /etc/skel/.bashrc', explanation: 'Standard shell init.' }
+        ], checkCommand: 'cat /root/users.csv', expectedOutput: 'alice' },
+      { id: 2, title: 'Create Onboarding Script', instruction: 'Author /usr/local/sbin/onboard.sh that loops the CSV.', summary: 'Idempotent provisioning.', whyNeeded: 'Repeatable onboarding.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo tee /usr/local/sbin/onboard.sh >/dev/null <<\'EOF\'\n#!/usr/bin/env bash\nset -euo pipefail\nCSV=${1:-/root/users.csv}\ntail -n +2 "$CSV" | while IFS=, read -r u name g; do\n  getent group "$g" >/dev/null || groupadd "$g"\n  id "$u" &>/dev/null || useradd -m -c "$name" -g "$g" -s /bin/bash "$u"\n  pw=$(openssl rand -base64 12)\n  echo "$u:$pw" | chpasswd\n  chage -d 0 -M 90 -W 7 "$u"\n  logger -t onboard "created $u in $g"\n  echo "$u,$pw" >> /root/onboard-creds.csv\ndone\nchmod 600 /root/onboard-creds.csv\nEOF', explanation: 'Loop and provision.' },
+          { text: 'sudo chmod 700 /usr/local/sbin/onboard.sh', explanation: 'Root-only.' }
+        ], checkCommand: 'sudo bash -n /usr/local/sbin/onboard.sh && echo OK', expectedOutput: 'OK' },
+      { id: 3, title: 'Run Onboarding', instruction: 'Execute the script and inspect results.', summary: 'Provision users.', whyNeeded: 'Validate end-to-end.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo /usr/local/sbin/onboard.sh', explanation: 'Run it.' },
+          { text: 'getent passwd alice bob', explanation: 'Confirm accounts.' }
+        ], checkCommand: 'getent passwd alice', expectedOutput: 'alice' },
+      { id: 4, title: 'Force Password Reset on First Login', instruction: 'Verify chage applied expiry.', summary: 'Force credential rotation.', whyNeeded: 'Generated passwords must not persist.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo chage -l alice', explanation: 'Show aging info.' }
+        ], checkCommand: 'sudo chage -l alice | head -1', expectedOutput: 'password must be changed' },
+      { id: 5, title: 'Audit and Lock Departures', instruction: 'Lock an account safely without deleting data.', summary: 'Reversible offboarding.', whyNeeded: 'Compliance retention.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo usermod -L bob && sudo chage -E 0 bob', explanation: 'Lock + expire.' },
+          { text: 'sudo journalctl -t onboard --since today', explanation: 'Audit log.' }
+        ], checkCommand: 'sudo passwd -S bob', expectedOutput: 'L' }
+    ]
+  },
+  {
+    projectId: 'log-rotation-config',
+    environment: 'linux',
+    description: 'Design a custom logrotate policy with compression, dateext naming, size+time triggers, and a postrotate signal.',
+    objective: 'Author /etc/logrotate.d/app and validate with logrotate -d / -f.',
+    steps: [
+      { id: 1, title: 'Inventory Application Logs', instruction: 'Identify what to rotate and current sizes.', summary: 'Scope rotation.', whyNeeded: 'Avoid rotating files that should not move.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo ls -lh /var/log/app/', explanation: 'Current logs.' }
+        ], checkCommand: 'sudo du -sh /var/log/app 2>/dev/null || echo none', expectedOutput: '' },
+      { id: 2, title: 'Write logrotate Policy', instruction: 'Create /etc/logrotate.d/app with daily, size, compress, dateext.', summary: 'Custom rotation rules.', whyNeeded: 'Defaults rarely fit app logs.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo tee /etc/logrotate.d/app >/dev/null <<\'EOF\'\n/var/log/app/*.log {\n    daily\n    rotate 14\n    size 100M\n    missingok\n    notifempty\n    compress\n    delaycompress\n    dateext\n    dateformat -%Y%m%d\n    create 0640 root adm\n    sharedscripts\n    postrotate\n        systemctl reload app >/dev/null 2>&1 || true\n    endscript\n}\nEOF', explanation: 'Combined size+time policy.' }
+        ], checkCommand: 'sudo cat /etc/logrotate.d/app | head -3', expectedOutput: '/var/log/app' },
+      { id: 3, title: 'Debug Rotation', instruction: 'Dry-run with verbose debug.', summary: 'See what would happen.', whyNeeded: 'Catch syntax issues before production.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo logrotate -d /etc/logrotate.d/app', explanation: 'Dry-run output.' }
+        ], checkCommand: 'sudo logrotate -d /etc/logrotate.d/app 2>&1 | grep -c "considering log"', expectedOutput: '' },
+      { id: 4, title: 'Force First Rotation', instruction: 'Rotate immediately to validate the postrotate hook.', summary: 'Trigger reload.', whyNeeded: 'Confirm signal works.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo logrotate -f /etc/logrotate.d/app', explanation: 'Force run.' },
+          { text: 'sudo ls /var/log/app/', explanation: 'See dated archive.' }
+        ], checkCommand: 'sudo ls /var/log/app/ | grep -E "\\-[0-9]{8}" || echo no-rotation-yet', expectedOutput: '' },
+      { id: 5, title: 'Confirm Cron/Timer Schedule', instruction: 'Ensure logrotate runs daily via systemd timer or cron.', summary: 'Automation hookup.', whyNeeded: 'Manual rotation defeats the purpose.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'systemctl list-timers logrotate.timer 2>/dev/null || ls /etc/cron.daily/logrotate', explanation: 'Confirm schedule.' }
+        ], checkCommand: 'systemctl is-enabled logrotate.timer 2>/dev/null || echo cron', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'firewall-iptables',
+    environment: 'linux',
+    description: 'Harden a server with iptables: default-DROP policy, stateful allowances, logging, and persistence across reboots.',
+    objective: 'Build a complete iptables ruleset and persist it via iptables-persistent.',
+    steps: [
+      { id: 1, title: 'Flush and Set Default Policies', instruction: 'Start clean and default to DROP after allowing loopback.', summary: 'Deny by default.', whyNeeded: 'Whitelisting is the only safe model.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo iptables -F && sudo iptables -X', explanation: 'Clear chains.' },
+          { text: 'sudo iptables -A INPUT -i lo -j ACCEPT', explanation: 'Allow loopback FIRST.' },
+          { text: 'sudo iptables -P INPUT DROP && sudo iptables -P FORWARD DROP && sudo iptables -P OUTPUT ACCEPT', explanation: 'Default deny inbound.' }
+        ], checkCommand: 'sudo iptables -S | head -3', expectedOutput: '-P INPUT DROP' },
+      { id: 2, title: 'Allow Established and Related', instruction: 'Permit return traffic for outbound connections.', summary: 'Stateful inspection.', whyNeeded: 'Otherwise nothing works.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT', explanation: 'Stateful rule.' }
+        ], checkCommand: 'sudo iptables -S INPUT | grep ESTABLISHED', expectedOutput: 'ESTABLISHED' },
+      { id: 3, title: 'Allow SSH/HTTP/HTTPS', instruction: 'Open required service ports with rate limiting on SSH.', summary: 'Service whitelist.', whyNeeded: 'Limit attack surface.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set', explanation: 'Track SSH attempts.' },
+          { text: 'sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 5 -j DROP', explanation: 'Rate-limit brute force.' },
+          { text: 'sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT', explanation: 'Allow SSH.' },
+          { text: 'sudo iptables -A INPUT -p tcp -m multiport --dports 80,443 -j ACCEPT', explanation: 'Web traffic.' }
+        ], checkCommand: 'sudo iptables -S INPUT | grep -E "22|80|443"', expectedOutput: '22' },
+      { id: 4, title: 'Log Dropped Packets', instruction: 'Append a LOG rule before implicit drop for visibility.', summary: 'Audit denials.', whyNeeded: 'Detect scans and misconfig.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo iptables -A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables-drop: " --log-level 4', explanation: 'Rate-limited logging.' }
+        ], checkCommand: 'sudo iptables -S | grep LOG', expectedOutput: 'iptables-drop' },
+      { id: 5, title: 'Persist Across Reboots', instruction: 'Install iptables-persistent and save rules.', summary: 'Survive restarts.', whyNeeded: 'Rules vanish at reboot otherwise.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent', explanation: 'Persistence package.' },
+          { text: 'sudo netfilter-persistent save', explanation: 'Save current rules.' }
+        ], checkCommand: 'sudo cat /etc/iptables/rules.v4 | head -5', expectedOutput: 'INPUT' }
+    ]
+  },
+  {
+    projectId: 'nfs-share-setup',
+    environment: 'linux',
+    description: 'Export an NFS share from a server and mount it on a client with proper permissions and firewall rules.',
+    objective: 'Configure /etc/exports, exportfs, firewall, and client-side mounting.',
+    steps: [
+      { id: 1, title: 'Install NFS Server', instruction: 'Install kernel server packages.', summary: 'Server prereqs.', whyNeeded: 'Provides nfsd userspace.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get update && sudo apt-get install -y nfs-kernel-server', explanation: 'Install NFS server.' } ], checkCommand: 'systemctl is-active nfs-server', expectedOutput: 'active' },
+      { id: 2, title: 'Create Export Directory', instruction: 'Create and own the export root.', summary: 'Filesystem layout.', whyNeeded: 'NFS needs a real directory.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo mkdir -p /srv/nfs/data && sudo chown nobody:nogroup /srv/nfs/data', explanation: 'Anonymous-mapped owner.' } ], checkCommand: 'ls -ld /srv/nfs/data', expectedOutput: 'nobody' },
+      { id: 3, title: 'Configure /etc/exports', instruction: 'Export to a subnet with sync,no_subtree_check.', summary: 'Access policy.', whyNeeded: 'Controls who can mount.', pillarConnection: 'Security',
+        commands: [
+          { text: 'echo "/srv/nfs/data 10.0.0.0/24(rw,sync,no_subtree_check,root_squash)" | sudo tee -a /etc/exports', explanation: 'Add export.' },
+          { text: 'sudo exportfs -ra', explanation: 'Re-read exports.' }
+        ], checkCommand: 'sudo exportfs -v', expectedOutput: '/srv/nfs/data' },
+      { id: 4, title: 'Open Firewall', instruction: 'Allow NFS through ufw or iptables.', summary: 'Network access.', whyNeeded: 'Default firewalls block 2049.', pillarConnection: 'Security',
+        commands: [ { text: 'sudo ufw allow from 10.0.0.0/24 to any port nfs || sudo iptables -A INPUT -p tcp --dport 2049 -s 10.0.0.0/24 -j ACCEPT', explanation: 'Allow NFS.' } ], checkCommand: 'sudo ss -tlnp | grep 2049', expectedOutput: '2049' },
+      { id: 5, title: 'Mount From Client', instruction: 'Install nfs-common and mount the share.', summary: 'Validate end-to-end.', whyNeeded: 'Confirms exports.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo apt-get install -y nfs-common && sudo mkdir -p /mnt/data', explanation: 'Client tools.' },
+          { text: 'sudo mount -t nfs SERVER_IP:/srv/nfs/data /mnt/data', explanation: 'Mount.' },
+          { text: 'echo "SERVER_IP:/srv/nfs/data /mnt/data nfs defaults,_netdev 0 0" | sudo tee -a /etc/fstab', explanation: 'Persist mount.' }
+        ], checkCommand: 'mount | grep nfs', expectedOutput: 'nfs' }
+    ]
+  },
+  {
+    projectId: 'dns-bind-setup',
+    environment: 'linux',
+    description: 'Stand up an authoritative BIND9 DNS server with forward and reverse zones, then validate with dig.',
+    objective: 'Install bind9, configure named.conf.options + zones, and verify resolution.',
+    steps: [
+      { id: 1, title: 'Install BIND9', instruction: 'Install server and utilities.', summary: 'DNS daemon.', whyNeeded: 'Provides named.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y bind9 bind9utils dnsutils', explanation: 'Install.' } ], checkCommand: 'systemctl is-active named || systemctl is-active bind9', expectedOutput: 'active' },
+      { id: 2, title: 'Configure named.conf.options', instruction: 'Set listen-on, allow-query, and recursion.', summary: 'Server-wide policy.', whyNeeded: 'Open resolvers are abused.', pillarConnection: 'Security',
+        commands: [ { text: 'sudo tee /etc/bind/named.conf.options >/dev/null <<\'EOF\'\noptions {\n    directory "/var/cache/bind";\n    listen-on { any; };\n    allow-query { 10.0.0.0/24; localhost; };\n    recursion no;\n    dnssec-validation auto;\n};\nEOF', explanation: 'Authoritative-only.' } ], checkCommand: 'sudo named-checkconf', expectedOutput: '' },
+      { id: 3, title: 'Define Zones', instruction: 'Add forward and reverse zone references.', summary: 'Zone hookup.', whyNeeded: 'BIND must know where data lives.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /etc/bind/named.conf.local >/dev/null <<\'EOF\'\nzone "example.lab" { type master; file "/etc/bind/db.example.lab"; };\nzone "0.0.10.in-addr.arpa" { type master; file "/etc/bind/db.10"; };\nEOF', explanation: 'Forward + reverse.' } ], checkCommand: 'sudo named-checkconf', expectedOutput: '' },
+      { id: 4, title: 'Author Zone Files', instruction: 'Create SOA, NS, A, and PTR records.', summary: 'Resource records.', whyNeeded: 'Actual DNS data.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'sudo tee /etc/bind/db.example.lab >/dev/null <<\'EOF\'\n$TTL 3600\n@   IN  SOA ns1.example.lab. admin.example.lab. (2026010101 3600 1800 604800 3600)\n    IN  NS  ns1.example.lab.\nns1 IN  A   10.0.0.10\nweb IN  A   10.0.0.20\nEOF', explanation: 'Forward zone.' },
+          { text: 'sudo named-checkzone example.lab /etc/bind/db.example.lab', explanation: 'Validate.' },
+          { text: 'sudo systemctl reload bind9 || sudo systemctl reload named', explanation: 'Apply.' }
+        ], checkCommand: 'sudo named-checkzone example.lab /etc/bind/db.example.lab', expectedOutput: 'OK' },
+      { id: 5, title: 'Query with dig', instruction: 'Resolve records to confirm.', summary: 'Functional test.', whyNeeded: 'Truth comes from the wire.', pillarConnection: 'Reliability',
+        commands: [ { text: 'dig @127.0.0.1 web.example.lab +short', explanation: 'A record query.' } ], checkCommand: 'dig @127.0.0.1 web.example.lab +short', expectedOutput: '10.0.0.20' }
+    ]
+  },
+  {
+    projectId: 'mail-postfix-setup',
+    environment: 'linux',
+    description: 'Configure Postfix as an outbound SMTP relay with TLS and SPF/DKIM/DMARC alignment.',
+    objective: 'Install Postfix, harden main.cf, enable TLS, and publish SPF/DKIM/DMARC.',
+    steps: [
+      { id: 1, title: 'Install Postfix', instruction: 'Install with the "Internet Site" preset.', summary: 'MTA install.', whyNeeded: 'Provides smtpd.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postfix opendkim opendkim-tools', explanation: 'MTA + DKIM signer.' } ], checkCommand: 'postconf -d | grep mail_version', expectedOutput: 'mail_version' },
+      { id: 2, title: 'Configure main.cf', instruction: 'Set hostname, mydestination, restrictions.', summary: 'Core MTA policy.', whyNeeded: 'Avoid open relay.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo postconf -e "myhostname = mail.example.com" "mydestination = localhost" "inet_interfaces = all" "smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination"', explanation: 'Closed relay.' }
+        ], checkCommand: 'postconf myhostname', expectedOutput: 'mail.example.com' },
+      { id: 3, title: 'Enable TLS', instruction: 'Point Postfix at Let\'s Encrypt certs.', summary: 'Encrypt in transit.', whyNeeded: 'Modern receivers require TLS.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo postconf -e "smtpd_tls_cert_file=/etc/letsencrypt/live/mail.example.com/fullchain.pem" "smtpd_tls_key_file=/etc/letsencrypt/live/mail.example.com/privkey.pem" "smtpd_tls_security_level=may" "smtp_tls_security_level=may"', explanation: 'Opportunistic TLS.' },
+          { text: 'sudo systemctl restart postfix', explanation: 'Apply.' }
+        ], checkCommand: 'postconf smtpd_tls_security_level', expectedOutput: 'may' },
+      { id: 4, title: 'Configure DKIM Signing', instruction: 'Set up opendkim and publish the public key.', summary: 'Cryptographic signing.', whyNeeded: 'Required by Gmail/Yahoo bulk-sender rules.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo opendkim-genkey -s mail -d example.com -D /etc/opendkim/keys/example.com', explanation: 'Generate key.' },
+          { text: 'sudo postconf -e "milter_default_action=accept" "smtpd_milters=inet:localhost:8891" "non_smtpd_milters=inet:localhost:8891"', explanation: 'Hook signer.' }
+        ], checkCommand: 'sudo cat /etc/opendkim/keys/example.com/mail.txt | head -2', expectedOutput: 'mail._domainkey' },
+      { id: 5, title: 'Send Test and Verify', instruction: 'Send a test message and check headers for spf/dkim/dmarc.', summary: 'Validate end-to-end.', whyNeeded: 'Confirm deliverability.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'echo "test" | mail -s "hello" -r postmaster@example.com you@gmail.com', explanation: 'Send.' },
+          { text: 'sudo tail -50 /var/log/mail.log | grep -E "status=sent|dkim"', explanation: 'Inspect log.' }
+        ], checkCommand: 'sudo grep -c "status=sent" /var/log/mail.log', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'ssh-hardening',
+    environment: 'linux',
+    description: 'Harden OpenSSH against brute force and key compromise: disable root, enforce keys, restrict users, deploy fail2ban.',
+    objective: 'Modify sshd_config safely, validate, and pair with fail2ban.',
+    steps: [
+      { id: 1, title: 'Backup sshd_config', instruction: 'Always preserve a working copy before edits.', summary: 'Safe baseline.', whyNeeded: 'Locked-out sysadmins are a meme.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak', explanation: 'Backup.' } ], checkCommand: 'ls /etc/ssh/sshd_config.bak', expectedOutput: 'sshd_config.bak' },
+      { id: 2, title: 'Disable Root and Passwords', instruction: 'Set PermitRootLogin no and PasswordAuthentication no.', summary: 'Keys only.', whyNeeded: 'Eliminates password brute force.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo sed -i -E "s/^#?PermitRootLogin.*/PermitRootLogin no/; s/^#?PasswordAuthentication.*/PasswordAuthentication no/; s/^#?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/" /etc/ssh/sshd_config', explanation: 'Apply hardening.' }
+        ], checkCommand: 'grep -E "^PermitRootLogin|^PasswordAuthentication" /etc/ssh/sshd_config', expectedOutput: 'no' },
+      { id: 3, title: 'Restrict Users and Limit Tries', instruction: 'AllowUsers and MaxAuthTries with LoginGraceTime.', summary: 'Tighter envelope.', whyNeeded: 'Reduce attack window.', pillarConnection: 'Security',
+        commands: [
+          { text: 'echo -e "AllowUsers admin\\nMaxAuthTries 3\\nLoginGraceTime 30" | sudo tee -a /etc/ssh/sshd_config', explanation: 'Append.' }
+        ], checkCommand: 'grep AllowUsers /etc/ssh/sshd_config', expectedOutput: 'admin' },
+      { id: 4, title: 'Validate and Reload', instruction: 'sshd -t before reload to avoid lockout.', summary: 'Pre-flight.', whyNeeded: 'Catches typos.', pillarConnection: 'Reliability',
+        commands: [
+          { text: 'sudo sshd -t && sudo systemctl reload ssh', explanation: 'Test then reload.' }
+        ], checkCommand: 'sudo sshd -t && echo OK', expectedOutput: 'OK' },
+      { id: 5, title: 'Install fail2ban', instruction: 'Add automated banning for bad attempts.', summary: 'Defense in depth.', whyNeeded: 'Bots will still try.', pillarConnection: 'Security',
+        commands: [
+          { text: 'sudo apt-get install -y fail2ban', explanation: 'Install.' },
+          { text: 'sudo tee /etc/fail2ban/jail.d/sshd.local >/dev/null <<\'EOF\'\n[sshd]\nenabled = true\nmaxretry = 3\nbantime = 1h\nfindtime = 10m\nEOF', explanation: 'SSH jail.' },
+          { text: 'sudo systemctl restart fail2ban', explanation: 'Apply.' }
+        ], checkCommand: 'sudo fail2ban-client status sshd', expectedOutput: 'sshd' }
+    ]
+  },
+  {
+    projectId: 'process-monitor',
+    environment: 'linux',
+    description: 'Build a lightweight process monitor using ps, sysstat, and a systemd timer to log resource hogs.',
+    objective: 'Combine sysstat + a Bash script + systemd timer for low-overhead observability.',
+    steps: [
+      { id: 1, title: 'Install sysstat and atop', instruction: 'Provides sar/iostat/atop telemetry.', summary: 'Telemetry agents.', whyNeeded: 'Gives historical data.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y sysstat atop', explanation: 'Install.' }, { text: 'sudo sed -i "s/ENABLED=.*/ENABLED=\\"true\\"/" /etc/default/sysstat && sudo systemctl restart sysstat', explanation: 'Enable collection.' } ], checkCommand: 'systemctl is-active sysstat', expectedOutput: 'active' },
+      { id: 2, title: 'Write Top-Process Logger', instruction: 'Bash script logging top 5 CPU+mem consumers.', summary: 'Custom hot-list.', whyNeeded: 'Spot regressions.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /usr/local/bin/proc-top.sh >/dev/null <<\'EOF\'\n#!/usr/bin/env bash\nLOG=/var/log/proc-top.log\necho "=== $(date -Is) ===" >>"$LOG"\nps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -6 >>"$LOG"\nEOF', explanation: 'Snapshot script.' }, { text: 'sudo chmod 755 /usr/local/bin/proc-top.sh', explanation: 'Executable.' } ], checkCommand: 'sudo /usr/local/bin/proc-top.sh && tail -1 /var/log/proc-top.log', expectedOutput: '' },
+      { id: 3, title: 'Create systemd Service', instruction: 'Oneshot unit invokes the script.', summary: 'Managed execution.', whyNeeded: 'Replaces cron with logging.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /etc/systemd/system/proc-top.service >/dev/null <<\'EOF\'\n[Unit]\nDescription=Snapshot top processes\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/proc-top.sh\nEOF', explanation: 'Service.' } ], checkCommand: 'systemctl cat proc-top.service | head -2', expectedOutput: 'proc-top' },
+      { id: 4, title: 'Create systemd Timer', instruction: 'Run every 5 minutes.', summary: 'Scheduled trigger.', whyNeeded: 'Continuous sampling.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /etc/systemd/system/proc-top.timer >/dev/null <<\'EOF\'\n[Unit]\nDescription=Run proc-top every 5m\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=5min\n[Install]\nWantedBy=timers.target\nEOF', explanation: 'Timer.' }, { text: 'sudo systemctl daemon-reload && sudo systemctl enable --now proc-top.timer', explanation: 'Activate.' } ], checkCommand: 'systemctl list-timers proc-top.timer --no-pager', expectedOutput: 'proc-top' },
+      { id: 5, title: 'Review with sar/atop', instruction: 'Inspect historical CPU and memory.', summary: 'Forensics.', whyNeeded: 'Justify rightsizing.', pillarConnection: 'Cost Optimization',
+        commands: [ { text: 'sar -u 1 3', explanation: 'CPU sample.' }, { text: 'sudo atop -r /var/log/atop/atop_$(date +%Y%m%d) -b 00:00 -e 23:59 2>/dev/null | head -20 || true', explanation: 'Replay day.' } ], checkCommand: 'sar -u 1 1 | tail -1', expectedOutput: 'all' }
+    ]
+  },
+  {
+    projectId: 'linux-auditd',
+    environment: 'linux',
+    description: 'Deploy auditd with rules for sensitive files and syscalls; query with ausearch and aureport.',
+    objective: 'Author persistent audit rules and validate event capture.',
+    steps: [
+      { id: 1, title: 'Install auditd', instruction: 'Install audit framework.', summary: 'Kernel auditing.', whyNeeded: 'Required for compliance.', pillarConnection: 'Security',
+        commands: [ { text: 'sudo apt-get install -y auditd audispd-plugins', explanation: 'Install.' }, { text: 'sudo systemctl enable --now auditd', explanation: 'Enable.' } ], checkCommand: 'systemctl is-active auditd', expectedOutput: 'active' },
+      { id: 2, title: 'Watch Sensitive Files', instruction: 'Add file watches for /etc/passwd, /etc/shadow, /etc/sudoers.', summary: 'File integrity.', whyNeeded: 'Detect tampering.', pillarConnection: 'Security',
+        commands: [ { text: 'sudo tee /etc/audit/rules.d/identity.rules >/dev/null <<\'EOF\'\n-w /etc/passwd -p wa -k identity\n-w /etc/shadow -p wa -k identity\n-w /etc/sudoers -p wa -k identity\nEOF', explanation: 'Rules.' } ], checkCommand: 'sudo cat /etc/audit/rules.d/identity.rules | wc -l', expectedOutput: '3' },
+      { id: 3, title: 'Watch Privileged Syscalls', instruction: 'Track execve and chmod by root.', summary: 'Behavioral audit.', whyNeeded: 'Spot privilege abuse.', pillarConnection: 'Security',
+        commands: [ { text: 'sudo tee /etc/audit/rules.d/exec.rules >/dev/null <<\'EOF\'\n-a always,exit -F arch=b64 -S execve -F euid=0 -k root-exec\n-a always,exit -F arch=b64 -S chmod -S fchmod -k perm-mod\nEOF', explanation: 'Syscall rules.' } ], checkCommand: 'sudo cat /etc/audit/rules.d/exec.rules', expectedOutput: 'execve' },
+      { id: 4, title: 'Reload Rules', instruction: 'Apply via augenrules.', summary: 'Activate.', whyNeeded: 'Rules are inert otherwise.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo augenrules --load', explanation: 'Compile + load.' }, { text: 'sudo auditctl -l | head', explanation: 'List active.' } ], checkCommand: 'sudo auditctl -l | grep identity', expectedOutput: 'identity' },
+      { id: 5, title: 'Query Events', instruction: 'Trigger an event and search audit log.', summary: 'Validate capture.', whyNeeded: 'Confirm rules fire.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo touch /etc/passwd', explanation: 'Touch sensitive file.' }, { text: 'sudo ausearch -k identity -ts recent | head -20', explanation: 'Find events.' }, { text: 'sudo aureport --summary', explanation: 'Summary.' } ], checkCommand: 'sudo ausearch -k identity -ts recent | grep -c type=PATH', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'raid-config',
+    environment: 'linux',
+    description: 'Create a software RAID 1 mirror with mdadm, persist via mdadm.conf, and simulate disk failure.',
+    objective: 'Build, mount, and recover a Linux software RAID array.',
+    steps: [
+      { id: 1, title: 'Identify Disks', instruction: 'List block devices for the two unused disks.', summary: 'Confirm targets.', whyNeeded: 'Wrong disk = data loss.', pillarConnection: 'Reliability',
+        commands: [ { text: 'lsblk -o NAME,SIZE,TYPE,MOUNTPOINT', explanation: 'Show layout.' } ], checkCommand: 'lsblk | head -5', expectedOutput: 'NAME' },
+      { id: 2, title: 'Create RAID 1', instruction: 'Use mdadm to mirror two devices.', summary: 'Build array.', whyNeeded: 'Provides redundancy.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc', explanation: 'Build mirror.' } ], checkCommand: 'cat /proc/mdstat', expectedOutput: 'md0' },
+      { id: 3, title: 'Format and Mount', instruction: 'Add ext4 and mount.', summary: 'Make usable.', whyNeeded: 'Block device alone is not a filesystem.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo mkfs.ext4 /dev/md0', explanation: 'Filesystem.' }, { text: 'sudo mkdir -p /mnt/raid && sudo mount /dev/md0 /mnt/raid', explanation: 'Mount.' } ], checkCommand: 'mount | grep md0', expectedOutput: 'md0' },
+      { id: 4, title: 'Persist Configuration', instruction: 'Save to mdadm.conf and fstab.', summary: 'Survive reboot.', whyNeeded: 'Arrays must reassemble.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf', explanation: 'Save UUID.' }, { text: 'sudo update-initramfs -u', explanation: 'Update initramfs.' }, { text: 'echo "/dev/md0 /mnt/raid ext4 defaults 0 0" | sudo tee -a /etc/fstab', explanation: 'Mount on boot.' } ], checkCommand: 'grep md0 /etc/fstab', expectedOutput: 'md0' },
+      { id: 5, title: 'Simulate Failure and Rebuild', instruction: 'Mark a disk failed, remove, re-add.', summary: 'Disaster drill.', whyNeeded: 'Practice recovery.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo mdadm /dev/md0 --fail /dev/sdc --remove /dev/sdc', explanation: 'Fail disk.' }, { text: 'sudo mdadm /dev/md0 --add /dev/sdc', explanation: 'Re-add.' }, { text: 'cat /proc/mdstat', explanation: 'Watch resync.' } ], checkCommand: 'cat /proc/mdstat | grep -E "recovery|resync|UU"', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'lvm-management',
+    environment: 'linux',
+    description: 'Create and grow a logical volume online with pvcreate, vgcreate, lvcreate, and resize2fs.',
+    objective: 'Provision LVM and demonstrate online expansion.',
+    steps: [
+      { id: 1, title: 'Initialize Physical Volumes', instruction: 'pvcreate on raw disks.', summary: 'Foundation layer.', whyNeeded: 'LVM needs PVs.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo pvcreate /dev/sdb /dev/sdc', explanation: 'Make PVs.' } ], checkCommand: 'sudo pvs', expectedOutput: '/dev/sdb' },
+      { id: 2, title: 'Create Volume Group', instruction: 'Pool PVs into a VG.', summary: 'Storage pool.', whyNeeded: 'Allows flexible LVs.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo vgcreate datavg /dev/sdb /dev/sdc', explanation: 'VG creation.' } ], checkCommand: 'sudo vgs datavg', expectedOutput: 'datavg' },
+      { id: 3, title: 'Create Logical Volume', instruction: '10G LV with ext4.', summary: 'Carve out volume.', whyNeeded: 'Usable filesystem.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo lvcreate -L 10G -n applv datavg', explanation: 'LV.' }, { text: 'sudo mkfs.ext4 /dev/datavg/applv', explanation: 'Format.' }, { text: 'sudo mkdir -p /mnt/app && sudo mount /dev/datavg/applv /mnt/app', explanation: 'Mount.' } ], checkCommand: 'mount | grep applv', expectedOutput: 'applv' },
+      { id: 4, title: 'Persist in fstab', instruction: 'Add by /dev/mapper path.', summary: 'Mount on boot.', whyNeeded: 'Otherwise disappears.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "/dev/datavg/applv /mnt/app ext4 defaults 0 2" | sudo tee -a /etc/fstab', explanation: 'fstab line.' } ], checkCommand: 'grep applv /etc/fstab', expectedOutput: 'applv' },
+      { id: 5, title: 'Grow Online', instruction: 'Extend LV +5G then resize2fs.', summary: 'Online expansion.', whyNeeded: 'Avoid downtime.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo lvextend -L +5G /dev/datavg/applv', explanation: 'Grow LV.' }, { text: 'sudo resize2fs /dev/datavg/applv', explanation: 'Grow ext4.' }, { text: 'df -h /mnt/app', explanation: 'Verify.' } ], checkCommand: 'sudo lvs datavg/applv --noheadings -o lv_size', expectedOutput: '15' }
+    ]
+  },
+  {
+    projectId: 'systemd-service',
+    environment: 'linux',
+    description: 'Author a robust systemd service unit with restart policy, security sandboxing, and journal logging.',
+    objective: 'Create, enable, monitor, and harden a systemd service for an app binary.',
+    steps: [
+      { id: 1, title: 'Install Application Stub', instruction: 'Create a minimal long-running binary script.', summary: 'Target for the unit.', whyNeeded: 'Need something to manage.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /usr/local/bin/myapp >/dev/null <<\'EOF\'\n#!/usr/bin/env bash\nwhile true; do echo "[$(date -Is)] alive"; sleep 5; done\nEOF', explanation: 'Loop process.' }, { text: 'sudo chmod 755 /usr/local/bin/myapp', explanation: 'Executable.' } ], checkCommand: 'test -x /usr/local/bin/myapp && echo OK', expectedOutput: 'OK' },
+      { id: 2, title: 'Create Service Unit', instruction: 'Write /etc/systemd/system/myapp.service.', summary: 'Process supervision.', whyNeeded: 'Replaces nohup/screen.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo tee /etc/systemd/system/myapp.service >/dev/null <<\'EOF\'\n[Unit]\nDescription=My App\nAfter=network-online.target\nWants=network-online.target\n[Service]\nType=simple\nExecStart=/usr/local/bin/myapp\nRestart=on-failure\nRestartSec=5s\nUser=nobody\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\n[Install]\nWantedBy=multi-user.target\nEOF', explanation: 'Hardened unit.' } ], checkCommand: 'systemctl cat myapp.service | head -3', expectedOutput: 'myapp' },
+      { id: 3, title: 'Enable and Start', instruction: 'daemon-reload + enable + start.', summary: 'Activate service.', whyNeeded: 'Make it persist.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo systemctl daemon-reload && sudo systemctl enable --now myapp', explanation: 'Activate.' } ], checkCommand: 'systemctl is-active myapp', expectedOutput: 'active' },
+      { id: 4, title: 'Inspect Logs', instruction: 'Use journalctl follow mode.', summary: 'Live log stream.', whyNeeded: 'Verify behavior.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'journalctl -u myapp -n 10 --no-pager', explanation: 'Last 10 lines.' } ], checkCommand: 'journalctl -u myapp -n 1 --no-pager', expectedOutput: 'alive' },
+      { id: 5, title: 'Test Restart Policy', instruction: 'Kill the process and confirm respawn.', summary: 'Validate self-healing.', whyNeeded: 'Restart=on-failure must work.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo systemctl kill -s KILL myapp', explanation: 'Send SIGKILL.' }, { text: 'sleep 6 && systemctl is-active myapp', explanation: 'Confirm restart.' } ], checkCommand: 'systemctl is-active myapp', expectedOutput: 'active' }
+    ]
+  },
+  {
+    projectId: 'kernel-module',
+    environment: 'linux',
+    description: 'Build a "Hello World" Linux kernel module from source, load it, observe in dmesg, and unload.',
+    objective: 'Understand module_init/module_exit, kbuild, insmod, and rmmod.',
+    steps: [
+      { id: 1, title: 'Install Build Headers', instruction: 'Kernel headers and build-essential.', summary: 'Compile prereqs.', whyNeeded: 'Modules build against running kernel.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y build-essential linux-headers-$(uname -r)', explanation: 'Install.' } ], checkCommand: 'ls /lib/modules/$(uname -r)/build/Makefile', expectedOutput: 'Makefile' },
+      { id: 2, title: 'Write Module Source', instruction: 'Create hello.c with init/exit.', summary: 'Module skeleton.', whyNeeded: 'Required entry points.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'mkdir -p ~/hello && cd ~/hello && cat >hello.c <<\'EOF\'\n#include <linux/module.h>\n#include <linux/kernel.h>\nstatic int __init hello_init(void){ printk(KERN_INFO "hello: loaded\\n"); return 0; }\nstatic void __exit hello_exit(void){ printk(KERN_INFO "hello: unloaded\\n"); }\nmodule_init(hello_init);\nmodule_exit(hello_exit);\nMODULE_LICENSE("GPL");\nEOF', explanation: 'Source.' } ], checkCommand: 'test -f ~/hello/hello.c && echo OK', expectedOutput: 'OK' },
+      { id: 3, title: 'Write Makefile', instruction: 'kbuild-style Makefile.', summary: 'Out-of-tree build.', whyNeeded: 'Kernel build system.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > ~/hello/Makefile <<\'EOF\'\nobj-m += hello.o\nall:\n\tmake -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules\nclean:\n\tmake -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean\nEOF', explanation: 'Makefile.' } ], checkCommand: 'grep obj-m ~/hello/Makefile', expectedOutput: 'hello.o' },
+      { id: 4, title: 'Build the Module', instruction: 'Run make to produce hello.ko.', summary: 'Compile.', whyNeeded: 'Need binary module.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cd ~/hello && make', explanation: 'Build.' } ], checkCommand: 'ls ~/hello/hello.ko', expectedOutput: 'hello.ko' },
+      { id: 5, title: 'Load and Unload', instruction: 'insmod, lsmod, dmesg, rmmod.', summary: 'Lifecycle.', whyNeeded: 'Validate functionality.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo insmod ~/hello/hello.ko && lsmod | grep hello', explanation: 'Load.' }, { text: 'sudo dmesg | tail -3', explanation: 'See message.' }, { text: 'sudo rmmod hello && sudo dmesg | tail -2', explanation: 'Unload.' } ], checkCommand: 'sudo dmesg | grep -c "hello: "', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'jenkins-pipeline',
+    environment: 'linux',
+    description: 'Build a declarative Jenkins pipeline with multi-stage CI for a Node.js app, running in a Docker agent with credentials.',
+    objective: 'Author Jenkinsfile, configure shared library, and integrate with GitHub webhooks.',
+    steps: [
+      { id: 1, title: 'Install Jenkins', instruction: 'Install LTS via the official repo.', summary: 'CI engine.', whyNeeded: 'Provides controllers and agents.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null', explanation: 'GPG key.' },
+          { text: 'echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list', explanation: 'Repo.' },
+          { text: 'sudo apt-get update && sudo apt-get install -y openjdk-17-jre jenkins', explanation: 'Install.' }
+        ], checkCommand: 'systemctl is-active jenkins', expectedOutput: 'active' },
+      { id: 2, title: 'Author Jenkinsfile', instruction: 'Declarative pipeline with build/test/scan/deploy stages.', summary: 'Pipeline-as-code.', whyNeeded: 'Versioned, reviewable CI.', pillarConnection: 'Operational Excellence',
+        commands: [
+          { text: 'cat > Jenkinsfile <<\'EOF\'\npipeline {\n  agent { docker { image \'node:20-alpine\' } }\n  options { timestamps(); ansiColor(\'xterm\') }\n  stages {\n    stage(\'Install\') { steps { sh \'npm ci\' } }\n    stage(\'Test\')    { steps { sh \'npm test -- --reporter=junit\' } post { always { junit \'**/junit.xml\' } } }\n    stage(\'Build\')   { steps { sh \'npm run build\' archiveArtifacts \'dist/**\' } }\n    stage(\'Deploy\')  { when { branch \'main\' } steps { withCredentials([string(credentialsId: \'deploy-token\', variable: \'TOK\')]) { sh \'curl -H "Authorization: Bearer $TOK" https://deploy.example.com/hook\' } } }\n  }\n}\nEOF', explanation: 'Pipeline definition.' }
+        ], checkCommand: 'grep -c stage Jenkinsfile', expectedOutput: '4' },
+      { id: 3, title: 'Add Credentials', instruction: 'Store deploy token in Jenkins credentials store.', summary: 'Secret handling.', whyNeeded: 'Never hardcode tokens.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Use Manage Jenkins -> Credentials -> Global -> Add Secret Text with id=deploy-token"', explanation: 'UI step (or via JCasC).' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 4, title: 'Configure GitHub Webhook', instruction: 'Trigger builds via webhook.', summary: 'Push-based CI.', whyNeeded: 'Avoid polling.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'echo "GitHub repo -> Settings -> Webhooks -> https://JENKINS/github-webhook/ ; content-type application/json"', explanation: 'Webhook URL.' } ], checkCommand: 'echo done', expectedOutput: 'done' },
+      { id: 5, title: 'Run and Inspect', instruction: 'Trigger pipeline and review Blue Ocean view.', summary: 'Validate.', whyNeeded: 'Confirm green build.', pillarConnection: 'Reliability',
+        commands: [ { text: 'curl -X POST http://JENKINS/job/myapp/build --user admin:TOKEN', explanation: 'Trigger.' } ], checkCommand: 'echo build-triggered', expectedOutput: 'triggered' }
+    ]
+  },
+  {
+    projectId: 'ansible-webserver',
+    environment: 'linux',
+    description: 'Use Ansible to provision a web server fleet with Nginx, TLS, and templated config.',
+    objective: 'Author inventory, playbook, roles, and Jinja2 templates idempotently.',
+    steps: [
+      { id: 1, title: 'Install Ansible and Bootstrap Inventory', instruction: 'Install ansible-core and define hosts.', summary: 'Control node setup.', whyNeeded: 'Ansible runs from a control node.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y ansible', explanation: 'Install.' }, { text: 'cat > inventory.ini <<\'EOF\'\n[web]\nweb1 ansible_host=10.0.0.21\nweb2 ansible_host=10.0.0.22\n[web:vars]\nansible_user=ubuntu\nansible_ssh_private_key_file=~/.ssh/id_ed25519\nEOF', explanation: 'Inventory.' } ], checkCommand: 'ansible -i inventory.ini web -m ping', expectedOutput: 'pong' },
+      { id: 2, title: 'Create Role Layout', instruction: 'Use ansible-galaxy to scaffold a role.', summary: 'Reusable structure.', whyNeeded: 'Roles enable composition.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'ansible-galaxy init roles/nginx', explanation: 'Scaffold.' } ], checkCommand: 'ls roles/nginx/tasks/main.yml', expectedOutput: 'main.yml' },
+      { id: 3, title: 'Author Tasks', instruction: 'Install nginx, deploy site, manage service.', summary: 'Idempotent steps.', whyNeeded: 'Re-run safe.', pillarConnection: 'Reliability',
+        commands: [ { text: 'cat > roles/nginx/tasks/main.yml <<\'EOF\'\n- name: Install nginx\n  apt: { name: nginx, state: present, update_cache: yes }\n- name: Deploy site config\n  template: { src: site.conf.j2, dest: /etc/nginx/sites-available/site.conf, mode: "0644" }\n  notify: reload nginx\n- name: Enable site\n  file: { src: /etc/nginx/sites-available/site.conf, dest: /etc/nginx/sites-enabled/site.conf, state: link }\n- name: Ensure nginx running\n  service: { name: nginx, state: started, enabled: yes }\nEOF', explanation: 'Tasks.' }, { text: 'mkdir -p roles/nginx/handlers && cat > roles/nginx/handlers/main.yml <<\'EOF\'\n- name: reload nginx\n  service: { name: nginx, state: reloaded }\nEOF', explanation: 'Handler.' } ], checkCommand: 'ansible-lint roles/nginx 2>&1 | tail -1', expectedOutput: '' },
+      { id: 4, title: 'Add Jinja2 Template', instruction: 'Server block with vars.', summary: 'Templated config.', whyNeeded: 'DRY across hosts.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > roles/nginx/templates/site.conf.j2 <<\'EOF\'\nserver {\n  listen 80;\n  server_name {{ inventory_hostname }};\n  root /var/www/html;\n  index index.html;\n}\nEOF', explanation: 'Template.' } ], checkCommand: 'test -f roles/nginx/templates/site.conf.j2 && echo OK', expectedOutput: 'OK' },
+      { id: 5, title: 'Run Playbook', instruction: 'Apply with check then for real.', summary: 'Converge fleet.', whyNeeded: 'Bring hosts to desired state.', pillarConnection: 'Reliability',
+        commands: [ { text: 'cat > site.yml <<\'EOF\'\n- hosts: web\n  become: yes\n  roles: [nginx]\nEOF', explanation: 'Playbook.' }, { text: 'ansible-playbook -i inventory.ini site.yml --check', explanation: 'Dry run.' }, { text: 'ansible-playbook -i inventory.ini site.yml', explanation: 'Apply.' } ], checkCommand: 'ansible -i inventory.ini web -m shell -a "systemctl is-active nginx"', expectedOutput: 'active' }
+    ]
+  },
+  {
+    projectId: 'docker-swarm-cluster',
+    environment: 'linux',
+    description: 'Bootstrap a 3-node Docker Swarm, deploy a stack, and roll out an update with health checks.',
+    objective: 'Init swarm, join workers, deploy compose stack, perform rolling update.',
+    steps: [
+      { id: 1, title: 'Init Swarm Manager', instruction: 'docker swarm init on manager.', summary: 'Cluster bootstrap.', whyNeeded: 'Establish raft.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker swarm init --advertise-addr $(hostname -I | awk \'{print $1}\')', explanation: 'Init.' } ], checkCommand: 'docker info | grep Swarm', expectedOutput: 'active' },
+      { id: 2, title: 'Join Workers', instruction: 'Run join token on worker nodes.', summary: 'Expand cluster.', whyNeeded: 'Need workers.', pillarConnection: 'Reliability',
+        commands: [ { text: 'docker swarm join-token -q worker', explanation: 'Print token.' }, { text: '# on workers: docker swarm join --token <TOKEN> <MGR_IP>:2377', explanation: 'Join.' } ], checkCommand: 'docker node ls --format "{{.Hostname}} {{.Status}}"', expectedOutput: 'Ready' },
+      { id: 3, title: 'Author Stack File', instruction: 'compose v3.9 with replicas and healthcheck.', summary: 'Declarative deploy.', whyNeeded: 'Stack-as-code.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > stack.yml <<\'EOF\'\nversion: "3.9"\nservices:\n  web:\n    image: nginx:1.27\n    ports: ["80:80"]\n    deploy:\n      replicas: 3\n      update_config: { parallelism: 1, delay: 10s, order: start-first }\n      restart_policy: { condition: on-failure }\n    healthcheck:\n      test: ["CMD", "curl", "-fs", "http://localhost/"]\n      interval: 10s\n      retries: 3\nEOF', explanation: 'Stack.' } ], checkCommand: 'test -f stack.yml && echo OK', expectedOutput: 'OK' },
+      { id: 4, title: 'Deploy Stack', instruction: 'docker stack deploy.', summary: 'Apply.', whyNeeded: 'Push to swarm.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker stack deploy -c stack.yml app', explanation: 'Deploy.' } ], checkCommand: 'docker service ls --filter name=app_web --format "{{.Replicas}}"', expectedOutput: '3/3' },
+      { id: 5, title: 'Rolling Update', instruction: 'Bump image and watch rollout.', summary: 'Zero-downtime upgrade.', whyNeeded: 'Production hygiene.', pillarConnection: 'Reliability',
+        commands: [ { text: 'docker service update --image nginx:1.27-alpine app_web', explanation: 'Update image.' }, { text: 'docker service ps app_web --no-trunc | head', explanation: 'Watch tasks.' } ], checkCommand: 'docker service inspect app_web --format \'{{.UpdateStatus.State}}\'', expectedOutput: 'completed' }
+    ]
+  },
+  {
+    projectId: 'gitlab-ci-node',
+    environment: 'linux',
+    description: 'Build a multi-stage GitLab CI pipeline for a Node.js app with caching, artifacts, and review apps.',
+    objective: 'Author .gitlab-ci.yml using stages, cache, artifacts, and rules.',
+    steps: [
+      { id: 1, title: 'Initialize Repo and Runner', instruction: 'Register a runner and confirm tag.', summary: 'CI executor.', whyNeeded: 'Pipelines need runners.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo gitlab-runner register --url https://gitlab.com/ --token GLRT-XXXX --executor docker --docker-image alpine:3 --tag-list "linux,docker" --non-interactive', explanation: 'Register.' } ], checkCommand: 'sudo gitlab-runner verify', expectedOutput: 'alive' },
+      { id: 2, title: 'Author .gitlab-ci.yml', instruction: 'Stages: install, test, build, deploy.', summary: 'Pipeline-as-code.', whyNeeded: 'Versioned CI.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > .gitlab-ci.yml <<\'EOF\'\nimage: node:20\nstages: [install, test, build, deploy]\ncache:\n  key: ${CI_COMMIT_REF_SLUG}\n  paths: [node_modules/, .npm/]\ninstall:\n  stage: install\n  script: [ "npm ci --cache .npm --prefer-offline" ]\n  artifacts: { paths: [node_modules/], expire_in: 1h }\ntest:\n  stage: test\n  script: [ "npm test -- --reporter junit > junit.xml" ]\n  artifacts: { reports: { junit: junit.xml } }\nbuild:\n  stage: build\n  script: [ "npm run build" ]\n  artifacts: { paths: [dist/] }\ndeploy:\n  stage: deploy\n  rules: [{ if: \'$CI_COMMIT_BRANCH == "main"\' }]\n  script: [ "curl -fsSL --header \\"Authorization: Bearer $DEPLOY_TOKEN\\" https://deploy.example.com/hook" ]\nEOF', explanation: 'Full pipeline.' } ], checkCommand: 'grep -c "^[a-z].*:" .gitlab-ci.yml', expectedOutput: '' },
+      { id: 3, title: 'Configure CI Variables', instruction: 'Add DEPLOY_TOKEN as masked + protected.', summary: 'Secret management.', whyNeeded: 'Avoid leaks.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Project -> Settings -> CI/CD -> Variables -> Add DEPLOY_TOKEN (masked, protected)"', explanation: 'UI step.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 4, title: 'Push and Watch Pipeline', instruction: 'Trigger via push.', summary: 'Validate.', whyNeeded: 'See it run.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci: pipeline" && git push', explanation: 'Push.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' },
+      { id: 5, title: 'Add Merge Request Pipeline', instruction: 'Use rules to run on MRs only.', summary: 'Pre-merge validation.', whyNeeded: 'Catch regressions early.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "Add: rules: [{ if: \'$CI_PIPELINE_SOURCE == \\"merge_request_event\\"\' }]"', explanation: 'Snippet.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'sonarqube-quality',
+    environment: 'linux',
+    description: 'Run SonarQube Community in Docker and scan a project with sonar-scanner; gate the pipeline on Quality Gate.',
+    objective: 'Stand up SonarQube, run sonar-scanner, fail builds on gate violation.',
+    steps: [
+      { id: 1, title: 'Run SonarQube', instruction: 'Start the official container with persistent volumes.', summary: 'Server up.', whyNeeded: 'Hosts analysis.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker volume create sonar_data && docker volume create sonar_logs', explanation: 'Volumes.' }, { text: 'docker run -d --name sonar -p 9000:9000 -v sonar_data:/opt/sonarqube/data -v sonar_logs:/opt/sonarqube/logs sonarqube:community', explanation: 'Run.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9000', expectedOutput: '200' },
+      { id: 2, title: 'Generate Token', instruction: 'Create a project + user token via API.', summary: 'Auth.', whyNeeded: 'Required by scanner.', pillarConnection: 'Security',
+        commands: [ { text: 'curl -u admin:admin -X POST "http://localhost:9000/api/projects/create?name=demo&project=demo"', explanation: 'Create project.' }, { text: 'curl -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=ci"', explanation: 'Token.' } ], checkCommand: 'echo token-set', expectedOutput: 'token-set' },
+      { id: 3, title: 'Configure sonar-project.properties', instruction: 'Define keys and sources.', summary: 'Scanner config.', whyNeeded: 'Tells scanner what to analyze.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > sonar-project.properties <<\'EOF\'\nsonar.projectKey=demo\nsonar.host.url=http://localhost:9000\nsonar.sources=src\nsonar.javascript.lcov.reportPaths=coverage/lcov.info\nsonar.qualitygate.wait=true\nEOF', explanation: 'Config.' } ], checkCommand: 'cat sonar-project.properties | head -1', expectedOutput: 'projectKey' },
+      { id: 4, title: 'Run sonar-scanner', instruction: 'Use docker image to scan.', summary: 'Analysis.', whyNeeded: 'Push results.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker run --rm --network host -e SONAR_TOKEN=$TOKEN -v $PWD:/usr/src sonarsource/sonar-scanner-cli', explanation: 'Scan.' } ], checkCommand: 'curl -s "http://localhost:9000/api/qualitygates/project_status?projectKey=demo" | grep -o "\\"status\\":\\"[A-Z]*\\""', expectedOutput: 'status' },
+      { id: 5, title: 'Fail on Gate', instruction: 'qualitygate.wait=true returns non-zero on failure.', summary: 'Pipeline gate.', whyNeeded: 'Block bad code.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "scanner exits non-zero when status=ERROR"', explanation: 'Behavior note.' } ], checkCommand: 'echo gate-enforced', expectedOutput: 'gate-enforced' }
+    ]
+  },
+  {
+    projectId: 'packer-images',
+    environment: 'linux',
+    description: 'Build a hardened AWS AMI with HashiCorp Packer using shell provisioners and Ansible.',
+    objective: 'Author HCL2 template, provision, and validate the resulting AMI.',
+    steps: [
+      { id: 1, title: 'Install Packer', instruction: 'Install via the HashiCorp repo.', summary: 'Build tool.', whyNeeded: 'Required binary.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg', explanation: 'Key.' }, { text: 'echo "deb [signed-by=/usr/share/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list', explanation: 'Repo.' }, { text: 'sudo apt-get update && sudo apt-get install -y packer', explanation: 'Install.' } ], checkCommand: 'packer version', expectedOutput: 'Packer' },
+      { id: 2, title: 'Write HCL Template', instruction: 'amazon-ebs source + shell provisioner.', summary: 'Image-as-code.', whyNeeded: 'Reproducible AMIs.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > image.pkr.hcl <<\'EOF\'\npacker { required_plugins { amazon = { source = "github.com/hashicorp/amazon", version = "~> 1" } } }\nsource "amazon-ebs" "ubuntu" {\n  region = "us-east-1"\n  instance_type = "t3.micro"\n  ssh_username = "ubuntu"\n  ami_name = "hardened-ubuntu-{{timestamp}}"\n  source_ami_filter {\n    filters = { name = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*", virtualization-type = "hvm", root-device-type = "ebs" }\n    most_recent = true\n    owners = ["099720109477"]\n  }\n}\nbuild {\n  sources = ["source.amazon-ebs.ubuntu"]\n  provisioner "shell" { inline = ["sudo apt-get update", "sudo apt-get install -y unattended-upgrades fail2ban", "sudo systemctl enable fail2ban"] }\n}\nEOF', explanation: 'Template.' } ], checkCommand: 'packer init image.pkr.hcl && packer validate image.pkr.hcl', expectedOutput: 'successfully' },
+      { id: 3, title: 'Authenticate to AWS', instruction: 'Configure credentials.', summary: 'Cloud auth.', whyNeeded: 'Required to call EC2.', pillarConnection: 'Security',
+        commands: [ { text: 'aws configure', explanation: 'Set keys.' } ], checkCommand: 'aws sts get-caller-identity --query Arn --output text', expectedOutput: 'arn:aws' },
+      { id: 4, title: 'Build AMI', instruction: 'Run packer build.', summary: 'Bake image.', whyNeeded: 'Produce artifact.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'packer build image.pkr.hcl', explanation: 'Build.' } ], checkCommand: 'aws ec2 describe-images --owners self --query "Images[?starts_with(Name, \\"hardened-ubuntu\\")].ImageId" --output text', expectedOutput: 'ami-' },
+      { id: 5, title: 'Smoke-Test the AMI', instruction: 'Launch instance from AMI and verify fail2ban.', summary: 'Validate baking.', whyNeeded: 'Confirm provisioner ran.', pillarConnection: 'Reliability',
+        commands: [ { text: 'aws ec2 run-instances --image-id $AMI_ID --instance-type t3.micro --count 1', explanation: 'Launch.' }, { text: 'ssh ubuntu@$IP systemctl is-enabled fail2ban', explanation: 'Check.' } ], checkCommand: 'echo enabled', expectedOutput: 'enabled' }
+    ]
+  },
+  {
+    projectId: 'github-actions-react',
+    environment: 'linux',
+    description: 'Author a GitHub Actions workflow for a React app with caching, artifact upload, and Pages deployment.',
+    objective: 'Build a CI pipeline using setup-node cache, upload-pages-artifact, and deploy-pages.',
+    steps: [
+      { id: 1, title: 'Create Workflow Skeleton', instruction: 'Add .github/workflows/ci.yml.', summary: 'Workflow file.', whyNeeded: 'Required path.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'mkdir -p .github/workflows', explanation: 'Dir.' } ], checkCommand: 'ls .github/workflows', expectedOutput: '' },
+      { id: 2, title: 'Author Build Job', instruction: 'Use actions/setup-node with cache.', summary: 'Fast installs.', whyNeeded: 'Reduces minutes.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'cat > .github/workflows/ci.yml <<\'EOF\'\nname: ci\non: { push: { branches: [main] }, pull_request: {} }\npermissions: { contents: read, pages: write, id-token: write }\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with: { node-version: 20, cache: npm }\n      - run: npm ci\n      - run: npm test --if-present\n      - run: npm run build\n      - uses: actions/upload-pages-artifact@v3\n        with: { path: dist }\nEOF', explanation: 'Build job.' } ], checkCommand: 'grep -c "uses:" .github/workflows/ci.yml', expectedOutput: '' },
+      { id: 3, title: 'Add Deploy Job', instruction: 'Deploy to GitHub Pages on main only.', summary: 'CD.', whyNeeded: 'Publish artifact.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat >> .github/workflows/ci.yml <<\'EOF\'\n  deploy:\n    needs: build\n    if: github.ref == \'refs/heads/main\'\n    environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }\n    runs-on: ubuntu-latest\n    steps:\n      - id: deployment\n        uses: actions/deploy-pages@v4\nEOF', explanation: 'Deploy job.' } ], checkCommand: 'grep deploy-pages .github/workflows/ci.yml', expectedOutput: 'deploy-pages' },
+      { id: 4, title: 'Enable Pages', instruction: 'Repo settings -> Pages -> Source = GitHub Actions.', summary: 'Hosting.', whyNeeded: 'Required to deploy.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "Repo Settings -> Pages -> Build and deployment -> Source: GitHub Actions"', explanation: 'UI step.' } ], checkCommand: 'echo enabled', expectedOutput: 'enabled' },
+      { id: 5, title: 'Push and Verify', instruction: 'Push to main and watch Actions tab.', summary: 'Run pipeline.', whyNeeded: 'See green run.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci(actions): pages workflow" && git push', explanation: 'Trigger.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' }
+    ]
+  },
+  {
+    projectId: 'vault-secrets',
+    environment: 'linux',
+    description: 'Run HashiCorp Vault, initialize, unseal, write KV secrets, and read with an AppRole.',
+    objective: 'Stand up Vault, configure KV v2, set up AppRole auth, and rotate.',
+    steps: [
+      { id: 1, title: 'Run Vault Server', instruction: 'Use file storage backend for the lab.', summary: 'Start daemon.', whyNeeded: 'Required service.', pillarConnection: 'Security',
+        commands: [ { text: 'cat > vault.hcl <<\'EOF\'\nstorage "file" { path = "/var/lib/vault" }\nlistener "tcp" { address = "0.0.0.0:8200" tls_disable = true }\nui = true\napi_addr = "http://127.0.0.1:8200"\nEOF', explanation: 'Config.' }, { text: 'sudo mkdir -p /var/lib/vault && sudo chown vault:vault /var/lib/vault', explanation: 'Storage dir.' }, { text: 'vault server -config=vault.hcl &', explanation: 'Start.' } ], checkCommand: 'curl -s http://127.0.0.1:8200/v1/sys/health | grep -o initialized', expectedOutput: 'initialized' },
+      { id: 2, title: 'Initialize and Unseal', instruction: 'Generate keys and unseal with 3 of 5.', summary: 'Cryptographic bootstrap.', whyNeeded: 'Vault is sealed by default.', pillarConnection: 'Security',
+        commands: [ { text: 'export VAULT_ADDR=http://127.0.0.1:8200', explanation: 'Address.' }, { text: 'vault operator init -key-shares=5 -key-threshold=3 > init.txt', explanation: 'Init.' }, { text: 'for i in 1 2 3; do vault operator unseal $(awk -v n=$i \'/Unseal Key/ {c++; if (c==n) print $4}\' init.txt); done', explanation: 'Unseal.' } ], checkCommand: 'vault status -format=json | grep -c \'"sealed":false\'', expectedOutput: '1' },
+      { id: 3, title: 'Enable KV v2 and Write', instruction: 'Mount kv-v2 and write a secret.', summary: 'Secret store.', whyNeeded: 'Versioning + soft delete.', pillarConnection: 'Security',
+        commands: [ { text: 'vault login $(awk \'/Initial Root Token/ {print $4}\' init.txt)', explanation: 'Login.' }, { text: 'vault secrets enable -path=secret kv-v2', explanation: 'Mount.' }, { text: 'vault kv put secret/app/db password=s3cret user=app', explanation: 'Write.' } ], checkCommand: 'vault kv get -field=user secret/app/db', expectedOutput: 'app' },
+      { id: 4, title: 'AppRole for Apps', instruction: 'Enable AppRole and create role.', summary: 'Machine identity.', whyNeeded: 'Apps shouldn\'t use root token.', pillarConnection: 'Security',
+        commands: [ { text: 'vault auth enable approle', explanation: 'Auth method.' }, { text: 'vault policy write app - <<\'EOF\'\npath "secret/data/app/*" { capabilities = ["read"] }\nEOF', explanation: 'Policy.' }, { text: 'vault write auth/approle/role/app token_policies=app', explanation: 'Role.' } ], checkCommand: 'vault read -field=role_id auth/approle/role/app/role-id', expectedOutput: '' },
+      { id: 5, title: 'Read with AppRole', instruction: 'Issue secret-id, login, read secret.', summary: 'End-to-end auth.', whyNeeded: 'Validate flow.', pillarConnection: 'Reliability',
+        commands: [ { text: 'RID=$(vault read -field=role_id auth/approle/role/app/role-id) && SID=$(vault write -field=secret_id -f auth/approle/role/app/secret-id)', explanation: 'Credentials.' }, { text: 'TOK=$(vault write -field=token auth/approle/login role_id=$RID secret_id=$SID)', explanation: 'Login.' }, { text: 'VAULT_TOKEN=$TOK vault kv get secret/app/db', explanation: 'Read.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' }
+    ]
+  },
+  {
+    projectId: 'graylog-logs',
+    environment: 'linux',
+    description: 'Stand up Graylog with MongoDB and Elasticsearch/OpenSearch, ingest syslog, and define streams + alerts.',
+    objective: 'Run the stack via Docker Compose, configure inputs, streams, and alert conditions.',
+    steps: [
+      { id: 1, title: 'Compose the Stack', instruction: 'Mongo + OpenSearch + Graylog containers.', summary: 'Three services.', whyNeeded: 'Graylog requires both backends.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > docker-compose.yml <<\'EOF\'\nversion: "3.8"\nservices:\n  mongo: { image: mongo:6, volumes: [mongo:/data/db] }\n  opensearch:\n    image: opensearchproject/opensearch:2\n    environment: { discovery.type: single-node, plugins.security.disabled: "true", OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g", OPENSEARCH_INITIAL_ADMIN_PASSWORD: "Strong-Pass-1!" }\n    volumes: [os:/usr/share/opensearch/data]\n  graylog:\n    image: graylog/graylog:5.2\n    environment:\n      GRAYLOG_PASSWORD_SECRET: somepasswordpepper\n      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918\n      GRAYLOG_HTTP_EXTERNAL_URI: http://127.0.0.1:9000/\n      GRAYLOG_ELASTICSEARCH_HOSTS: http://opensearch:9200\n      GRAYLOG_MONGODB_URI: mongodb://mongo:27017/graylog\n    depends_on: [mongo, opensearch]\n    ports: ["9000:9000", "1514:1514/udp", "12201:12201/udp"]\nvolumes: { mongo: {}, os: {} }\nEOF', explanation: 'Compose.' }, { text: 'docker compose up -d', explanation: 'Run.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:9000', expectedOutput: '200' },
+      { id: 2, title: 'Login and Create Input', instruction: 'Default admin/admin then create Syslog UDP input on 1514.', summary: 'Ingestion.', whyNeeded: 'Receive logs.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "UI: System -> Inputs -> Syslog UDP -> bind 0.0.0.0:1514"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' },
+      { id: 3, title: 'Forward Logs', instruction: 'Configure rsyslog on a host to send to Graylog.', summary: 'Wire source.', whyNeeded: 'Need data to stream.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "*.* @127.0.0.1:1514" | sudo tee /etc/rsyslog.d/90-graylog.conf', explanation: 'Forward.' }, { text: 'sudo systemctl restart rsyslog', explanation: 'Apply.' }, { text: 'logger "graylog test"', explanation: 'Send a message.' } ], checkCommand: 'echo sent', expectedOutput: 'sent' },
+      { id: 4, title: 'Create Stream', instruction: 'Stream rule: source matches host pattern.', summary: 'Routing.', whyNeeded: 'Segment data.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "UI: Streams -> Create Stream -> Rule: field source matches regex .* -> Save & Start"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' },
+      { id: 5, title: 'Define Alert', instruction: 'Event Definition on stream when count > N in 5m.', summary: 'Alerting.', whyNeeded: 'Detect anomalies.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "UI: Alerts -> Event Definitions -> Create -> Aggregation count() > 100 in 5m -> Notification: Email"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' }
+    ]
+  },
+  {
+    projectId: 'spinnaker-cd',
+    environment: 'linux',
+    description: 'Deploy Spinnaker via Halyard against a local Kubernetes cluster and run a basic pipeline.',
+    objective: 'Use halyard to configure providers, deploy Spinnaker, and create a pipeline.',
+    steps: [
+      { id: 1, title: 'Install Halyard', instruction: 'Run halyard in Docker.', summary: 'Spinnaker config CLI.', whyNeeded: 'Authoritative config tool.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker run -d --name halyard --rm -v $HOME/.hal:/home/spinnaker/.hal -v $HOME/.kube:/home/spinnaker/.kube us-docker.pkg.dev/spinnaker-community/docker/halyard:stable', explanation: 'Halyard.' } ], checkCommand: 'docker exec halyard hal --version', expectedOutput: '' },
+      { id: 2, title: 'Add Kubernetes Provider', instruction: 'Register the kube context.', summary: 'Target platform.', whyNeeded: 'Where deploys land.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker exec halyard hal config provider kubernetes enable', explanation: 'Enable.' }, { text: 'docker exec halyard hal config provider kubernetes account add my-k8s --context $(kubectl config current-context)', explanation: 'Account.' } ], checkCommand: 'docker exec halyard hal config provider kubernetes', expectedOutput: 'enabled: true' },
+      { id: 3, title: 'Choose Deployment and Storage', instruction: 'Distributed install + S3/MinIO storage.', summary: 'Operational backend.', whyNeeded: 'Spinnaker needs persistence.', pillarConnection: 'Reliability',
+        commands: [ { text: 'docker exec halyard hal config deploy edit --type distributed --account-name my-k8s', explanation: 'Distributed.' }, { text: 'docker exec halyard hal config storage s3 edit --endpoint http://minio:9000 --access-key-id KEY --secret-access-key SECRET --bucket spinnaker', explanation: 'Storage.' }, { text: 'docker exec halyard hal config storage edit --type s3', explanation: 'Select.' } ], checkCommand: 'docker exec halyard hal config storage', expectedOutput: 's3' },
+      { id: 4, title: 'Deploy Spinnaker', instruction: 'Apply the config.', summary: 'Install services.', whyNeeded: 'Brings up Deck/Gate/etc.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker exec halyard hal deploy apply', explanation: 'Apply.' } ], checkCommand: 'kubectl -n spinnaker get pods', expectedOutput: 'spin-' },
+      { id: 5, title: 'Create Pipeline', instruction: 'Use Deck UI: Bake -> Deploy stages.', summary: 'CD pipeline.', whyNeeded: 'Automate releases.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "Open http://localhost:9000 -> Applications -> Create -> Pipelines -> Add Stage Deploy (Manifest)"', explanation: 'UI.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'consul-discovery',
+    environment: 'linux',
+    description: 'Run a Consul cluster, register services, and use DNS/HTTP discovery from clients.',
+    objective: 'Bootstrap servers, register a service with health check, query via DNS and HTTP.',
+    steps: [
+      { id: 1, title: 'Install Consul', instruction: 'Install from HashiCorp repo.', summary: 'Service mesh + discovery.', whyNeeded: 'Provides agents.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y consul', explanation: 'Install.' } ], checkCommand: 'consul version', expectedOutput: 'Consul' },
+      { id: 2, title: 'Bootstrap Server', instruction: 'Run a single-server dev cluster.', summary: 'Lab cluster.', whyNeeded: 'Need a server.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /etc/consul.d/server.hcl >/dev/null <<\'EOF\'\nserver = true\nbootstrap_expect = 1\ndata_dir = "/var/lib/consul"\nclient_addr = "0.0.0.0"\nui_config { enabled = true }\nEOF', explanation: 'Config.' }, { text: 'sudo systemctl enable --now consul', explanation: 'Run.' } ], checkCommand: 'consul members', expectedOutput: 'alive' },
+      { id: 3, title: 'Register Service', instruction: 'Service definition with HTTP health check.', summary: 'Catalog entry.', whyNeeded: 'Discovery requires registration.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /etc/consul.d/web.json >/dev/null <<\'EOF\'\n{ "service": { "name": "web", "port": 80, "check": { "http": "http://localhost/", "interval": "10s" } } }\nEOF', explanation: 'Service.' }, { text: 'sudo systemctl reload consul', explanation: 'Reload.' } ], checkCommand: 'consul catalog services', expectedOutput: 'web' },
+      { id: 4, title: 'Query via DNS', instruction: 'Use dig against the Consul DNS port 8600.', summary: 'DNS discovery.', whyNeeded: 'Apps resolve via DNS.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'dig @127.0.0.1 -p 8600 web.service.consul SRV', explanation: 'SRV lookup.' } ], checkCommand: 'dig @127.0.0.1 -p 8600 web.service.consul +short', expectedOutput: '' },
+      { id: 5, title: 'Query via HTTP API', instruction: 'curl /v1/health/service/web?passing=true.', summary: 'Programmatic discovery.', whyNeeded: 'Apps without DNS.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -s http://127.0.0.1:8500/v1/health/service/web?passing=true | jq .[0].Service.Address', explanation: 'API.' } ], checkCommand: 'curl -s http://127.0.0.1:8500/v1/status/leader', expectedOutput: ':' }
+    ]
+  },
+  {
+    projectId: 'newrelic-apm',
+    environment: 'linux',
+    description: 'Instrument a Node.js app with New Relic APM and the infrastructure agent on the host.',
+    objective: 'Install both agents, set NEW_RELIC_LICENSE_KEY, and verify telemetry.',
+    steps: [
+      { id: 1, title: 'Install Infrastructure Agent', instruction: 'Use the official install script.', summary: 'Host telemetry.', whyNeeded: 'CPU/mem/process metrics.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash', explanation: 'Install CLI.' }, { text: 'sudo NEW_RELIC_API_KEY=$NR_KEY NEW_RELIC_ACCOUNT_ID=$NR_ACC newrelic install -n infrastructure-agent-installer', explanation: 'Install agent.' } ], checkCommand: 'systemctl is-active newrelic-infra', expectedOutput: 'active' },
+      { id: 2, title: 'Add APM Package', instruction: 'npm install newrelic.', summary: 'App-level tracing.', whyNeeded: 'Code-level visibility.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'npm install --save newrelic', explanation: 'Install.' } ], checkCommand: 'node -e "require(\'newrelic\')" 2>&1 | head -1', expectedOutput: '' },
+      { id: 3, title: 'Configure newrelic.js', instruction: 'Set app_name and license_key via env vars.', summary: 'Agent config.', whyNeeded: 'Identifies app in UI.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > newrelic.js <<\'EOF\'\nexports.config = { app_name: [process.env.NR_APP || \'demo\'], license_key: process.env.NEW_RELIC_LICENSE_KEY, logging: { level: \'info\' }, distributed_tracing: { enabled: true } };\nEOF', explanation: 'Config.' } ], checkCommand: 'test -f newrelic.js && echo OK', expectedOutput: 'OK' },
+      { id: 4, title: 'Start App with Agent', instruction: 'node -r newrelic preloads the agent.', summary: 'Activate APM.', whyNeeded: 'Agent must initialize first.', pillarConnection: 'Reliability',
+        commands: [ { text: 'NEW_RELIC_LICENSE_KEY=$LIC NR_APP=demo node -r newrelic server.js &', explanation: 'Start.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:3000', expectedOutput: '200' },
+      { id: 5, title: 'Verify in NR One', instruction: 'Confirm host + APM service appear.', summary: 'Validate telemetry.', whyNeeded: 'No data = misconfig.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "one.newrelic.com -> APM & Services -> demo and Hosts"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' }
+    ]
+  },
+  {
+    projectId: 'travis-ci-ruby',
+    environment: 'linux',
+    description: 'Configure Travis CI for a Ruby project with bundler caching, multiple Ruby versions, and deploy.',
+    objective: 'Author .travis.yml using rvm matrix, bundler caching, and conditional deploy.',
+    steps: [
+      { id: 1, title: 'Initialize Project', instruction: 'Ensure Gemfile and tests exist.', summary: 'Build inputs.', whyNeeded: 'CI needs a project.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'bundle init && echo "gem \\"rspec\\"" >> Gemfile && bundle install', explanation: 'Bootstrap.' } ], checkCommand: 'test -f Gemfile.lock && echo OK', expectedOutput: 'OK' },
+      { id: 2, title: 'Author .travis.yml', instruction: 'rvm matrix + bundler cache.', summary: 'Pipeline.', whyNeeded: 'Test on multiple Rubies.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > .travis.yml <<\'EOF\'\nlanguage: ruby\nrvm: [3.0, 3.1, 3.2]\ncache: bundler\nscript:\n  - bundle exec rspec\nbranches: { only: [main] }\ndeploy:\n  provider: script\n  script: bash scripts/deploy.sh\n  on: { branch: main }\nEOF', explanation: 'Config.' } ], checkCommand: 'grep rvm .travis.yml', expectedOutput: 'rvm' },
+      { id: 3, title: 'Enable Repo on Travis', instruction: 'Sign in at travis-ci.com and toggle repo.', summary: 'Repo activation.', whyNeeded: 'Travis needs permission.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "travis-ci.com -> Settings -> enable repo"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' },
+      { id: 4, title: 'Add Encrypted Variables', instruction: 'Use travis CLI to encrypt deploy token.', summary: 'Secret handling.', whyNeeded: 'Avoid leaking tokens.', pillarConnection: 'Security',
+        commands: [ { text: 'gem install travis && travis encrypt DEPLOY_TOKEN=xyz --add env.global', explanation: 'Encrypt.' } ], checkCommand: 'grep secure .travis.yml', expectedOutput: 'secure' },
+      { id: 5, title: 'Push and Watch Build', instruction: 'Commit, push, and watch build status.', summary: 'Validate.', whyNeeded: 'Confirm matrix runs.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci: travis" && git push', explanation: 'Push.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' }
+    ]
+  },
+  {
+    projectId: 'chef-infra',
+    environment: 'linux',
+    description: 'Use Chef Infra Client (chef-zero/local mode) to converge a cookbook installing nginx.',
+    objective: 'Author a cookbook with recipe + template, then converge with chef-client --local-mode.',
+    steps: [
+      { id: 1, title: 'Install Chef Workstation', instruction: 'Install chef-workstation deb.', summary: 'Authoring toolset.', whyNeeded: 'Provides chef and knife.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -Ls https://omnitruck.chef.io/install.sh | sudo bash -s -- -P chef-workstation', explanation: 'Install.' } ], checkCommand: 'chef --version', expectedOutput: 'Chef' },
+      { id: 2, title: 'Generate Cookbook', instruction: 'chef generate cookbook web.', summary: 'Scaffold.', whyNeeded: 'Standard layout.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'chef generate cookbook cookbooks/web', explanation: 'Generate.' } ], checkCommand: 'ls cookbooks/web/recipes/default.rb', expectedOutput: 'default.rb' },
+      { id: 3, title: 'Author Recipe', instruction: 'Install + start nginx and template index.html.', summary: 'Resources.', whyNeeded: 'Declarative state.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > cookbooks/web/recipes/default.rb <<\'EOF\'\npackage \'nginx\'\nservice \'nginx\' do\n  action [:enable, :start]\nend\ntemplate \'/var/www/html/index.html\' do\n  source \'index.html.erb\'\n  variables(host: node[\'hostname\'])\nend\nEOF', explanation: 'Recipe.' }, { text: 'mkdir -p cookbooks/web/templates && cat > cookbooks/web/templates/index.html.erb <<\'EOF\'\n<h1>Hello from <%= @host %></h1>\nEOF', explanation: 'Template.' } ], checkCommand: 'cookstyle cookbooks/web 2>&1 | tail -1', expectedOutput: '' },
+      { id: 4, title: 'Converge in Local Mode', instruction: 'chef-client --local-mode applies the run_list.', summary: 'Apply state.', whyNeeded: 'No Chef server needed for the lab.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo chef-client --local-mode --runlist "recipe[web]" --chef-license accept-silent', explanation: 'Converge.' } ], checkCommand: 'systemctl is-active nginx', expectedOutput: 'active' },
+      { id: 5, title: 'Test with InSpec', instruction: 'Author a control and run.', summary: 'Compliance test.', whyNeeded: 'Verify desired state.', pillarConnection: 'Reliability',
+        commands: [ { text: 'mkdir -p test/controls && cat > test/controls/web.rb <<\'EOF\'\ncontrol \'nginx-running\' do\n  describe service(\'nginx\') do it { should be_running } end\n  describe port(80) do it { should be_listening } end\nend\nEOF', explanation: 'Control.' }, { text: 'inspec exec test', explanation: 'Run.' } ], checkCommand: 'inspec exec test 2>&1 | grep -c "0 failures"', expectedOutput: '1' }
+    ]
+  },
+  {
+    projectId: 'puppet-config',
+    environment: 'linux',
+    description: 'Use Puppet apply with a module to manage NTP across a host.',
+    objective: 'Install puppet-agent, write a manifest using a module, and converge.',
+    steps: [
+      { id: 1, title: 'Install Puppet Agent', instruction: 'Use the puppet release deb.', summary: 'Install.', whyNeeded: 'Provides puppet binary.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'wget https://apt.puppet.com/puppet8-release-$(lsb_release -cs).deb && sudo dpkg -i puppet8-release-$(lsb_release -cs).deb', explanation: 'Repo deb.' }, { text: 'sudo apt-get update && sudo apt-get install -y puppet-agent', explanation: 'Install.' }, { text: 'echo "export PATH=/opt/puppetlabs/bin:$PATH" | sudo tee /etc/profile.d/puppet.sh', explanation: 'PATH.' } ], checkCommand: '/opt/puppetlabs/bin/puppet --version', expectedOutput: '' },
+      { id: 2, title: 'Install Module', instruction: 'puppet module install puppetlabs-ntp.', summary: 'Reusable code.', whyNeeded: 'Battle-tested module.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo /opt/puppetlabs/bin/puppet module install puppetlabs-ntp', explanation: 'Install module.' } ], checkCommand: '/opt/puppetlabs/bin/puppet module list | grep ntp', expectedOutput: 'ntp' },
+      { id: 3, title: 'Write Manifest', instruction: 'site.pp invoking the ntp class.', summary: 'Declarative config.', whyNeeded: 'Defines desired state.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > site.pp <<\'EOF\'\nclass { \'ntp\':\n  servers => [\'time.cloudflare.com\', \'pool.ntp.org\'],\n  restrict => [\'default ignore\', \'127.0.0.1\'],\n}\nEOF', explanation: 'Manifest.' } ], checkCommand: '/opt/puppetlabs/bin/puppet parser validate site.pp && echo OK', expectedOutput: 'OK' },
+      { id: 4, title: 'Apply Manifest', instruction: 'puppet apply with --noop first.', summary: 'Converge.', whyNeeded: 'See changes before applying.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo /opt/puppetlabs/bin/puppet apply --noop site.pp', explanation: 'Dry run.' }, { text: 'sudo /opt/puppetlabs/bin/puppet apply site.pp', explanation: 'Apply.' } ], checkCommand: 'systemctl is-active ntp || systemctl is-active chrony || systemctl is-active ntpsec', expectedOutput: 'active' },
+      { id: 5, title: 'Idempotency Check', instruction: 'Re-apply and confirm zero changes.', summary: 'Convergence proof.', whyNeeded: 'Validates declarative model.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo /opt/puppetlabs/bin/puppet apply --detailed-exitcodes site.pp; echo exit=$?', explanation: 'Exit 0 means no changes.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'azure-devops-net',
+    environment: 'linux',
+    description: 'Build and deploy a .NET app via Azure DevOps Pipelines using azure-pipelines.yml.',
+    objective: 'Author a multi-stage YAML pipeline with build, test, and deploy to Azure Web App.',
+    steps: [
+      { id: 1, title: 'Create Service Connection', instruction: 'Add Azure Resource Manager connection in DevOps project.', summary: 'Cloud auth.', whyNeeded: 'Pipeline needs to deploy.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "DevOps -> Project Settings -> Service connections -> New -> Azure Resource Manager (Workload identity federation)"', explanation: 'UI step.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 2, title: 'Author azure-pipelines.yml', instruction: 'Stages: Build, Test, Deploy.', summary: 'Pipeline-as-code.', whyNeeded: 'Versioned with code.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > azure-pipelines.yml <<\'EOF\'\ntrigger: [main]\npool: { vmImage: ubuntu-latest }\nvariables: { buildConfiguration: Release }\nstages:\n  - stage: Build\n    jobs:\n      - job: BuildJob\n        steps:\n          - task: UseDotNet@2\n            inputs: { packageType: sdk, version: 8.x }\n          - script: dotnet restore\n          - script: dotnet build --configuration $(buildConfiguration) --no-restore\n          - script: dotnet test --configuration $(buildConfiguration) --logger trx\n          - task: PublishTestResults@2\n            inputs: { testResultsFormat: VSTest, testResultsFiles: \'**/*.trx\' }\n          - script: dotnet publish -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\n          - publish: $(Build.ArtifactStagingDirectory)\n            artifact: drop\n  - stage: Deploy\n    dependsOn: Build\n    jobs:\n      - deployment: Web\n        environment: prod\n        strategy:\n          runOnce:\n            deploy:\n              steps:\n                - download: current\n                  artifact: drop\n                - task: AzureWebApp@1\n                  inputs: { azureSubscription: \'azure-rm-sc\', appName: my-app, package: $(Pipeline.Workspace)/drop }\nEOF', explanation: 'Pipeline.' } ], checkCommand: 'grep -c stage: azure-pipelines.yml', expectedOutput: '' },
+      { id: 3, title: 'Create Environment', instruction: 'Add prod environment with approval.', summary: 'Approvals.', whyNeeded: 'Gate production.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Pipelines -> Environments -> New -> prod -> Approvals & Checks -> Approvals"', explanation: 'UI step.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 4, title: 'Run Pipeline', instruction: 'Push and observe runs.', summary: 'Trigger.', whyNeeded: 'Validate.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci: azure devops pipeline" && git push', explanation: 'Trigger.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' },
+      { id: 5, title: 'Verify Deployment', instruction: 'Hit the web app and check Application Insights.', summary: 'Validate.', whyNeeded: 'Confirm live.', pillarConnection: 'Reliability',
+        commands: [ { text: 'curl -s -o /dev/null -w "%{http_code}" https://my-app.azurewebsites.net', explanation: 'HTTP check.' } ], checkCommand: 'echo 200', expectedOutput: '200' }
+    ]
+  },
+  {
+    projectId: 'splunk-analysis',
+    environment: 'linux',
+    description: 'Run Splunk Free in Docker, ingest via universal forwarder, and run searches.',
+    objective: 'Stand up Splunk, configure HEC + UF, and craft SPL searches.',
+    steps: [
+      { id: 1, title: 'Run Splunk', instruction: 'docker run with admin password.', summary: 'Start indexer.', whyNeeded: 'Needed to ingest.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker run -d --name splunk -p 8000:8000 -p 8089:8089 -p 8088:8088 -p 9997:9997 -e SPLUNK_START_ARGS=--accept-license -e SPLUNK_PASSWORD=Strong-Pass-1! splunk/splunk:latest', explanation: 'Run.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:8000', expectedOutput: '200' },
+      { id: 2, title: 'Enable HTTP Event Collector', instruction: 'Create an HEC token.', summary: 'HTTP ingest.', whyNeeded: 'Easiest API ingest.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker exec splunk /opt/splunk/bin/splunk http-event-collector enable -uri https://localhost:8089 -auth admin:Strong-Pass-1!', explanation: 'Enable HEC.' }, { text: 'docker exec splunk /opt/splunk/bin/splunk http-event-collector create demo -uri https://localhost:8089 -auth admin:Strong-Pass-1!', explanation: 'Token.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 3, title: 'Send Sample Events', instruction: 'curl HEC endpoint.', summary: 'Push data.', whyNeeded: 'Validate ingest.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -k https://localhost:8088/services/collector -H "Authorization: Splunk $TOKEN" -d \'{"event":"hello","sourcetype":"demo"}\'', explanation: 'Send event.' } ], checkCommand: 'echo sent', expectedOutput: 'sent' },
+      { id: 4, title: 'Install Universal Forwarder', instruction: 'On a host, run UF and forward syslog.', summary: 'Agent ingest.', whyNeeded: 'Ship logs from servers.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'wget -O splunkforwarder.deb \'https://download.splunk.com/...\' && sudo dpkg -i splunkforwarder.deb', explanation: 'Install (URL placeholder).' }, { text: 'sudo /opt/splunkforwarder/bin/splunk add forward-server SPLUNK_HOST:9997 -auth admin:Strong-Pass-1!', explanation: 'Forward.' }, { text: 'sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/syslog -auth admin:Strong-Pass-1!', explanation: 'Monitor.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 5, title: 'Run SPL Search', instruction: 'Search and stats by sourcetype.', summary: 'Analytics.', whyNeeded: 'Extract value.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "search: index=* | stats count by sourcetype | sort - count"', explanation: 'SPL example.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'datadog-monitoring',
+    environment: 'linux',
+    description: 'Install the Datadog agent, enable APM/log collection, and create a monitor + dashboard.',
+    objective: 'Configure agent, send logs, and build a CPU monitor.',
+    steps: [
+      { id: 1, title: 'Install Agent', instruction: 'Use the one-liner installer.', summary: 'Telemetry agent.', whyNeeded: 'Source of truth.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'DD_API_KEY=$DD_API_KEY DD_SITE=datadoghq.com bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"', explanation: 'Install.' } ], checkCommand: 'sudo systemctl is-active datadog-agent', expectedOutput: 'active' },
+      { id: 2, title: 'Enable Log Collection', instruction: 'Set logs_enabled and add a log integration.', summary: 'Logs to DD.', whyNeeded: 'Unified backend.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo sed -i "s/^# logs_enabled.*/logs_enabled: true/" /etc/datadog-agent/datadog.yaml', explanation: 'Enable.' }, { text: 'sudo tee /etc/datadog-agent/conf.d/syslog.d/conf.yaml >/dev/null <<\'EOF\'\nlogs:\n  - type: file\n    path: /var/log/syslog\n    service: host\n    source: syslog\nEOF', explanation: 'Source.' }, { text: 'sudo systemctl restart datadog-agent', explanation: 'Apply.' } ], checkCommand: 'sudo datadog-agent status | grep -A1 "Logs Agent" | head -2', expectedOutput: 'Logs' },
+      { id: 3, title: 'Enable APM', instruction: 'Set apm_config.enabled and instrument app.', summary: 'Trace ingest.', whyNeeded: 'Code-level tracing.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo sed -i "/^# apm_config:/,/^# *enabled:/ s/.*/apm_config:\\n  enabled: true/" /etc/datadog-agent/datadog.yaml', explanation: 'Enable apm.' }, { text: 'npm install dd-trace --save && DD_SERVICE=demo DD_ENV=prod node -r dd-trace/init server.js', explanation: 'Node example.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:8126', expectedOutput: '404' },
+      { id: 4, title: 'Create Monitor', instruction: 'CPU > 80% for 5m via API.', summary: 'Alerting.', whyNeeded: 'Detect issues.', pillarConnection: 'Reliability',
+        commands: [ { text: 'curl -X POST "https://api.datadoghq.com/api/v1/monitor" -H "DD-API-KEY: $DD_API_KEY" -H "DD-APPLICATION-KEY: $DD_APP_KEY" -H "Content-Type: application/json" -d \'{ "name": "High CPU", "type": "metric alert", "query": "avg(last_5m):avg:system.cpu.user{*} > 80", "message": "CPU high @pagerduty" }\'', explanation: 'Create.' } ], checkCommand: 'echo monitor-created', expectedOutput: 'monitor-created' },
+      { id: 5, title: 'Build Dashboard', instruction: 'Import a JSON dashboard via API.', summary: 'Visualization.', whyNeeded: 'See trends.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "Use /api/v1/dashboard with a JSON body containing widgets[].definition (timeseries on system.cpu.user)"', explanation: 'API.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'bitbucket-pipelines',
+    environment: 'linux',
+    description: 'Configure Bitbucket Pipelines for a Python/Django project with caching, parallel steps, and deploy.',
+    objective: 'Author bitbucket-pipelines.yml using definitions, caches, and deployment steps.',
+    steps: [
+      { id: 1, title: 'Enable Pipelines', instruction: 'Repo settings -> Pipelines -> Enable.', summary: 'Activate CI.', whyNeeded: 'Required toggle.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "Repository settings -> Pipelines -> Settings -> Enable"', explanation: 'UI.' } ], checkCommand: 'echo enabled', expectedOutput: 'enabled' },
+      { id: 2, title: 'Author Pipelines YAML', instruction: 'Use python image with pip cache.', summary: 'Pipeline-as-code.', whyNeeded: 'Versioned CI.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > bitbucket-pipelines.yml <<\'EOF\'\nimage: python:3.12\ndefinitions:\n  caches: { pipenv: ~/.cache/pip }\npipelines:\n  default:\n    - parallel:\n        - step:\n            name: Lint\n            caches: [pipenv]\n            script: [ "pip install ruff", "ruff check ." ]\n        - step:\n            name: Test\n            caches: [pipenv]\n            script: [ "pip install -r requirements.txt", "pytest --junitxml=test-results.xml" ]\n  branches:\n    main:\n      - step:\n          name: Deploy\n          deployment: production\n          script: [ "pip install awscli", "aws s3 sync ./build s3://$BUCKET --delete" ]\nEOF', explanation: 'YAML.' } ], checkCommand: 'grep -c step: bitbucket-pipelines.yml', expectedOutput: '' },
+      { id: 3, title: 'Configure Variables', instruction: 'Add BUCKET/AWS keys as repo variables.', summary: 'Secrets.', whyNeeded: 'Avoid hardcoding.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Repo settings -> Pipelines -> Repository variables -> add BUCKET, AWS_ACCESS_KEY_ID (secured), AWS_SECRET_ACCESS_KEY (secured)"', explanation: 'UI.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 4, title: 'Add Deployment Environment', instruction: 'Define production environment with approval.', summary: 'Gated deploy.', whyNeeded: 'Manual gate.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Deployments -> production -> require manual approval"', explanation: 'UI.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 5, title: 'Run Pipeline', instruction: 'Push commit and watch.', summary: 'Validate.', whyNeeded: 'See it run.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci: bitbucket pipelines" && git push', explanation: 'Push.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' }
+    ]
+  },
+  {
+    projectId: 'vagrant-local',
+    environment: 'linux',
+    description: 'Use Vagrant with VirtualBox to manage a local multi-VM dev environment with provisioning.',
+    objective: 'Author a Vagrantfile with multiple machines and a shell provisioner.',
+    steps: [
+      { id: 1, title: 'Install Vagrant + VirtualBox', instruction: 'Install both packages.', summary: 'VM toolchain.', whyNeeded: 'Required.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y virtualbox vagrant', explanation: 'Install.' } ], checkCommand: 'vagrant --version', expectedOutput: 'Vagrant' },
+      { id: 2, title: 'Author Vagrantfile', instruction: 'Two VMs (web/db) on a private network.', summary: 'Multi-machine.', whyNeeded: 'Realistic topology.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > Vagrantfile <<\'EOF\'\nVagrant.configure("2") do |config|\n  config.vm.box = "ubuntu/jammy64"\n  config.vm.define "web" do |w|\n    w.vm.hostname = "web"\n    w.vm.network "private_network", ip: "192.168.56.10"\n    w.vm.provision "shell", inline: "apt-get update && apt-get install -y nginx"\n  end\n  config.vm.define "db" do |d|\n    d.vm.hostname = "db"\n    d.vm.network "private_network", ip: "192.168.56.11"\n    d.vm.provision "shell", inline: "apt-get update && apt-get install -y postgresql"\n  end\nend\nEOF', explanation: 'Vagrantfile.' } ], checkCommand: 'vagrant validate', expectedOutput: 'valid' },
+      { id: 3, title: 'Bring Up VMs', instruction: 'vagrant up.', summary: 'Provision.', whyNeeded: 'Create the lab.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'vagrant up', explanation: 'Up.' } ], checkCommand: 'vagrant status | grep running | wc -l', expectedOutput: '2' },
+      { id: 4, title: 'SSH and Verify', instruction: 'Confirm services.', summary: 'Validate provisioner.', whyNeeded: 'Spot failures.', pillarConnection: 'Reliability',
+        commands: [ { text: 'vagrant ssh web -c "systemctl is-active nginx"', explanation: 'Check web.' }, { text: 'vagrant ssh db -c "systemctl is-active postgresql"', explanation: 'Check db.' } ], checkCommand: 'echo active', expectedOutput: 'active' },
+      { id: 5, title: 'Snapshot and Destroy', instruction: 'Snapshot for fast rollback then destroy.', summary: 'Lifecycle.', whyNeeded: 'Manage state.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'vagrant snapshot save web baseline', explanation: 'Snapshot.' }, { text: 'vagrant destroy -f', explanation: 'Tear down.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'rancher-k8s',
+    environment: 'linux',
+    description: 'Deploy Rancher in Docker, import an existing Kubernetes cluster, and manage workloads.',
+    objective: 'Run Rancher, configure SSL, import cluster, and deploy a workload via UI/API.',
+    steps: [
+      { id: 1, title: 'Run Rancher', instruction: 'Use the official rancher/rancher image.', summary: 'Multi-cluster manager.', whyNeeded: 'Provides UI.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker run -d --restart=unless-stopped -p 80:80 -p 443:443 --privileged --name rancher rancher/rancher:latest', explanation: 'Run.' } ], checkCommand: 'curl -sk -o /dev/null -w "%{http_code}" https://localhost', expectedOutput: '200' },
+      { id: 2, title: 'Initial Bootstrap', instruction: 'Read bootstrap password and set admin.', summary: 'First login.', whyNeeded: 'Required setup.', pillarConnection: 'Security',
+        commands: [ { text: 'docker logs rancher 2>&1 | grep "Bootstrap Password" | tail -1', explanation: 'Initial password.' } ], checkCommand: 'echo done', expectedOutput: 'done' },
+      { id: 3, title: 'Import Cluster', instruction: 'Run the import yaml on a kube context.', summary: 'Onboarding.', whyNeeded: 'Manage existing cluster.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "UI: Cluster Management -> Import Existing -> Generic -> kubectl apply -f https://rancher/.../import.yaml"', explanation: 'UI.' }, { text: 'kubectl apply -f https://rancher/.../import.yaml', explanation: 'Apply.' } ], checkCommand: 'kubectl -n cattle-system get pods', expectedOutput: 'cattle-cluster-agent' },
+      { id: 4, title: 'Deploy Workload', instruction: 'Use Rancher UI or kubectl.', summary: 'Smoke test.', whyNeeded: 'Confirm management.', pillarConnection: 'Reliability',
+        commands: [ { text: 'kubectl create deploy hello --image=nginx && kubectl expose deploy hello --port 80 --type ClusterIP', explanation: 'Workload.' } ], checkCommand: 'kubectl get deploy hello -o jsonpath={.status.readyReplicas}', expectedOutput: '1' },
+      { id: 5, title: 'Configure RBAC and Projects', instruction: 'Create a Project and assign users.', summary: 'Multi-tenancy.', whyNeeded: 'Org alignment.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "UI: Cluster -> Projects/Namespaces -> Create Project -> Members -> Add"', explanation: 'UI.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'tekton-ci',
+    environment: 'linux',
+    description: 'Install Tekton Pipelines on Kubernetes and run a Task + Pipeline that builds and pushes an image.',
+    objective: 'Apply Tekton CRDs, write Task/Pipeline/PipelineRun, and observe.',
+    steps: [
+      { id: 1, title: 'Install Tekton', instruction: 'Apply the latest release manifest.', summary: 'CRDs + controller.', whyNeeded: 'Required to run pipelines.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml', explanation: 'Install.' } ], checkCommand: 'kubectl -n tekton-pipelines get deploy tekton-pipelines-controller -o jsonpath={.status.readyReplicas}', expectedOutput: '1' },
+      { id: 2, title: 'Write Task', instruction: 'Task that runs git-clone + kaniko.', summary: 'Reusable step.', whyNeeded: 'Atomic build steps.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > task-build.yaml <<\'EOF\'\napiVersion: tekton.dev/v1\nkind: Task\nmetadata: { name: build-image }\nspec:\n  params: [{ name: image, type: string }, { name: url, type: string }]\n  workspaces: [{ name: source }]\n  steps:\n    - name: clone\n      image: alpine/git\n      script: git clone $(params.url) $(workspaces.source.path)\n    - name: build\n      image: gcr.io/kaniko-project/executor:latest\n      args: ["--dockerfile=Dockerfile","--context=$(workspaces.source.path)","--destination=$(params.image)"]\nEOF', explanation: 'Task.' }, { text: 'kubectl apply -f task-build.yaml', explanation: 'Apply.' } ], checkCommand: 'kubectl get task build-image -o name', expectedOutput: 'task.tekton.dev/build-image' },
+      { id: 3, title: 'Write Pipeline', instruction: 'Pipeline composing the task.', summary: 'Workflow.', whyNeeded: 'Multi-task orchestration.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > pipeline.yaml <<\'EOF\'\napiVersion: tekton.dev/v1\nkind: Pipeline\nmetadata: { name: ci }\nspec:\n  params: [{ name: image }, { name: url }]\n  workspaces: [{ name: shared }]\n  tasks:\n    - name: build\n      taskRef: { name: build-image }\n      params:\n        - { name: image, value: $(params.image) }\n        - { name: url,   value: $(params.url) }\n      workspaces: [{ name: source, workspace: shared }]\nEOF', explanation: 'Pipeline.' }, { text: 'kubectl apply -f pipeline.yaml', explanation: 'Apply.' } ], checkCommand: 'kubectl get pipeline ci -o name', expectedOutput: 'pipeline.tekton.dev/ci' },
+      { id: 4, title: 'PipelineRun', instruction: 'Run with a PVC workspace.', summary: 'Execute.', whyNeeded: 'Trigger pipeline.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > run.yaml <<\'EOF\'\napiVersion: tekton.dev/v1\nkind: PipelineRun\nmetadata: { generateName: ci- }\nspec:\n  pipelineRef: { name: ci }\n  params:\n    - { name: image, value: registry.example.com/app:1 }\n    - { name: url,   value: https://github.com/me/app.git }\n  workspaces:\n    - name: shared\n      volumeClaimTemplate:\n        spec: { accessModes: [ReadWriteOnce], resources: { requests: { storage: 1Gi } } }\nEOF', explanation: 'Run spec.' }, { text: 'kubectl create -f run.yaml', explanation: 'Submit.' } ], checkCommand: 'kubectl get pipelinerun --sort-by=.metadata.creationTimestamp -o name | tail -1', expectedOutput: 'pipelinerun' },
+      { id: 5, title: 'Observe with tkn CLI', instruction: 'Install tkn and follow logs.', summary: 'Inspection.', whyNeeded: 'Debug runs.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'tkn pipelinerun logs --last -f', explanation: 'Stream.' } ], checkCommand: 'tkn pipelinerun describe --last | grep Succeeded || true', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'pulumi-iac',
+    environment: 'linux',
+    description: 'Provision an Azure Resource Group + Storage Account using Pulumi (TypeScript).',
+    objective: 'Author program, preview, deploy, and destroy with state in Pulumi Cloud or local backend.',
+    steps: [
+      { id: 1, title: 'Install Pulumi', instruction: 'Use the install script.', summary: 'CLI.', whyNeeded: 'Required.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -fsSL https://get.pulumi.com | sh', explanation: 'Install.' }, { text: 'export PATH=$HOME/.pulumi/bin:$PATH', explanation: 'PATH.' } ], checkCommand: 'pulumi version', expectedOutput: 'v' },
+      { id: 2, title: 'New Project', instruction: 'pulumi new azure-typescript.', summary: 'Scaffold.', whyNeeded: 'Boilerplate.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'pulumi login --local', explanation: 'Local backend.' }, { text: 'mkdir infra && cd infra && pulumi new azure-typescript -y --force', explanation: 'New project.' } ], checkCommand: 'test -f Pulumi.yaml && echo OK', expectedOutput: 'OK' },
+      { id: 3, title: 'Author Program', instruction: 'Define RG + Storage Account.', summary: 'IaC code.', whyNeeded: 'Declarative resources.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > index.ts <<\'EOF\'\nimport * as resources from "@pulumi/azure-native/resources";\nimport * as storage from "@pulumi/azure-native/storage";\nconst rg = new resources.ResourceGroup("rg");\nconst sa = new storage.StorageAccount("sa", { resourceGroupName: rg.name, sku: { name: "Standard_LRS" }, kind: "StorageV2" });\nexport const accountName = sa.name;\nEOF', explanation: 'Program.' } ], checkCommand: 'grep StorageAccount index.ts', expectedOutput: 'StorageAccount' },
+      { id: 4, title: 'Preview and Deploy', instruction: 'pulumi up.', summary: 'Deploy.', whyNeeded: 'Apply state.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'pulumi preview', explanation: 'Plan.' }, { text: 'pulumi up -y', explanation: 'Apply.' } ], checkCommand: 'pulumi stack output accountName', expectedOutput: '' },
+      { id: 5, title: 'Destroy', instruction: 'Tear down resources cleanly.', summary: 'Lifecycle.', whyNeeded: 'Avoid cost.', pillarConnection: 'Cost Optimization',
+        commands: [ { text: 'pulumi destroy -y && pulumi stack rm dev -y', explanation: 'Destroy.' } ], checkCommand: 'echo destroyed', expectedOutput: 'destroyed' }
+    ]
+  },
+  {
+    projectId: 'grafana-dashboards',
+    environment: 'linux',
+    description: 'Run Grafana with Prometheus, scrape node_exporter, and import a hardware dashboard.',
+    objective: 'Stand up the stack via Docker Compose, configure datasource, import dashboard 1860.',
+    steps: [
+      { id: 1, title: 'Compose Prom + Grafana + node_exporter', instruction: 'docker-compose.yml with three services.', summary: 'Observability stack.', whyNeeded: 'Self-hosted lab.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'cat > docker-compose.yml <<\'EOF\'\nversion: "3.8"\nservices:\n  prom:\n    image: prom/prometheus\n    volumes: ["./prom.yml:/etc/prometheus/prometheus.yml"]\n    ports: ["9090:9090"]\n  node:\n    image: prom/node-exporter\n    pid: host\n    network_mode: host\n  grafana:\n    image: grafana/grafana\n    ports: ["3000:3000"]\n    environment: { GF_SECURITY_ADMIN_PASSWORD: admin }\nEOF', explanation: 'Compose.' }, { text: 'cat > prom.yml <<\'EOF\'\nscrape_configs:\n  - job_name: node\n    static_configs: [{ targets: ["host.docker.internal:9100"] }]\nEOF', explanation: 'Prom config.' }, { text: 'docker compose up -d', explanation: 'Up.' } ], checkCommand: 'curl -s http://localhost:9090/-/ready', expectedOutput: 'Ready' },
+      { id: 2, title: 'Login and Add Datasource', instruction: 'Provision Prometheus datasource via API.', summary: 'Datasource.', whyNeeded: 'Connect Grafana to Prom.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -u admin:admin -H "Content-Type: application/json" -X POST http://localhost:3000/api/datasources -d \'{"name":"Prom","type":"prometheus","access":"proxy","url":"http://prom:9090"}\'', explanation: 'Create datasource.' } ], checkCommand: 'curl -u admin:admin -s http://localhost:3000/api/datasources/name/Prom | grep -o \'"name":"Prom"\'', expectedOutput: 'Prom' },
+      { id: 3, title: 'Import Dashboard 1860', instruction: 'Use the dashboard import API.', summary: 'Pre-built panels.', whyNeeded: 'Saves time.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'curl -s https://grafana.com/api/dashboards/1860/revisions/latest/download -o nodefull.json', explanation: 'Download.' }, { text: 'jq \'{dashboard:., overwrite:true, inputs:[{name:"DS_PROMETHEUS",type:"datasource",pluginId:"prometheus",value:"Prom"}]}\' nodefull.json > import.json', explanation: 'Wrap.' }, { text: 'curl -u admin:admin -H "Content-Type: application/json" -X POST http://localhost:3000/api/dashboards/import -d @import.json', explanation: 'Import.' } ], checkCommand: 'curl -u admin:admin -s "http://localhost:3000/api/search?query=node" | grep -c title', expectedOutput: '' },
+      { id: 4, title: 'Add Alert Rule', instruction: 'Create alert on high CPU.', summary: 'Alerting.', whyNeeded: 'Notify on issues.', pillarConnection: 'Reliability',
+        commands: [ { text: 'echo "UI: Alerting -> Alert rules -> New -> expr: 100 - avg by (instance)(rate(node_cpu_seconds_total{mode=\\"idle\\"}[5m])) * 100 > 80"', explanation: 'Rule.' } ], checkCommand: 'echo created', expectedOutput: 'created' },
+      { id: 5, title: 'Add Notification Channel', instruction: 'Configure contact point (Slack webhook).', summary: 'Delivery.', whyNeeded: 'Reach humans.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "UI: Alerting -> Contact points -> New -> Slack -> Webhook URL"', explanation: 'UI.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' }
+    ]
+  },
+  {
+    projectId: 'chaos-gremlin',
+    environment: 'linux',
+    description: 'Install the Gremlin agent and run controlled CPU, latency, and shutdown attacks against a target host.',
+    objective: 'Register a host, define and run resource + state attacks, and observe blast radius.',
+    steps: [
+      { id: 1, title: 'Install Gremlin Agent', instruction: 'Add repo and install gremlind.', summary: 'Chaos agent.', whyNeeded: 'Required executor.', pillarConnection: 'Reliability',
+        commands: [ { text: 'curl https://rpm.gremlin.com/gremlin.pub | sudo apt-key add -', explanation: 'Key.' }, { text: 'echo "deb https://deb.gremlin.com/ release non-free" | sudo tee /etc/apt/sources.list.d/gremlin.list', explanation: 'Repo.' }, { text: 'sudo apt-get update && sudo apt-get install -y gremlin gremlind', explanation: 'Install.' } ], checkCommand: 'systemctl is-active gremlind', expectedOutput: 'active' },
+      { id: 2, title: 'Register Host', instruction: 'gremlin init with team and secret.', summary: 'Cloud registration.', whyNeeded: 'Linked to team.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo gremlin init', explanation: 'Interactive.' } ], checkCommand: 'sudo gremlin --help | head -1', expectedOutput: 'Usage' },
+      { id: 3, title: 'Run CPU Attack', instruction: 'Saturate cores for 30s.', summary: 'Resource attack.', whyNeeded: 'Test autoscaling.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo gremlin attack cpu -l 30 -c 4 -p 100', explanation: 'CPU attack.' } ], checkCommand: 'sudo gremlin attack list | head', expectedOutput: '' },
+      { id: 4, title: 'Run Latency Attack', instruction: 'Inject 200ms RTT toward an IP.', summary: 'Network attack.', whyNeeded: 'Test timeouts.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo gremlin attack latency -l 60 -h 1.1.1.1 -m 200', explanation: 'Latency.' } ], checkCommand: 'echo running', expectedOutput: 'running' },
+      { id: 5, title: 'Halt and Review', instruction: 'Halt running attacks and review in UI.', summary: 'Cleanup.', whyNeeded: 'Always halt.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo gremlin halt', explanation: 'Stop all.' } ], checkCommand: 'sudo gremlin attack list', expectedOutput: '' }
+    ]
+  },
+  {
+    projectId: 'sentry-errors',
+    environment: 'linux',
+    description: 'Initialize Sentry in a Node.js app and a React frontend; verify a captured error and configure releases.',
+    objective: 'Install the SDK, set DSN, capture exceptions, and tie events to a release.',
+    steps: [
+      { id: 1, title: 'Create Sentry Project', instruction: 'On sentry.io create node + react projects.', summary: 'Get DSN.', whyNeeded: 'Required to ingest events.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "sentry.io -> Projects -> Create Project (node and react)"', explanation: 'UI.' } ], checkCommand: 'echo done', expectedOutput: 'done' },
+      { id: 2, title: 'Install Node SDK', instruction: 'Add @sentry/node to server.', summary: 'Backend SDK.', whyNeeded: 'Captures unhandled errors.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'npm install --save @sentry/node @sentry/profiling-node', explanation: 'Install.' }, { text: 'cat > sentry.js <<\'EOF\'\nimport * as Sentry from "@sentry/node";\nSentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.2, environment: process.env.NODE_ENV });\nEOF', explanation: 'Init.' } ], checkCommand: 'grep dsn sentry.js', expectedOutput: 'dsn' },
+      { id: 3, title: 'Wire Express Middleware', instruction: 'Add request + error handlers.', summary: 'Integration.', whyNeeded: 'Capture HTTP context.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "app.use(Sentry.Handlers.requestHandler()); ... app.use(Sentry.Handlers.errorHandler());"', explanation: 'Snippet.' } ], checkCommand: 'echo wired', expectedOutput: 'wired' },
+      { id: 4, title: 'Install React SDK', instruction: '@sentry/react with browser tracing.', summary: 'Frontend SDK.', whyNeeded: 'JS errors.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'npm install --save @sentry/react', explanation: 'Install.' }, { text: 'echo "Sentry.init({ dsn: REACT_DSN, integrations:[new Sentry.BrowserTracing()], tracesSampleRate: 0.1 })"', explanation: 'Init.' } ], checkCommand: 'echo installed', expectedOutput: 'installed' },
+      { id: 5, title: 'Trigger and Verify Release', instruction: 'Throw error and create release with sourcemaps.', summary: 'Validate end-to-end.', whyNeeded: 'Confirm visibility.', pillarConnection: 'Reliability',
+        commands: [ { text: 'npx @sentry/cli releases new $VERSION && npx @sentry/cli releases files $VERSION upload-sourcemaps ./dist && npx @sentry/cli releases finalize $VERSION', explanation: 'Release.' }, { text: 'curl http://localhost:3000/throw', explanation: 'Trigger.' } ], checkCommand: 'echo verified', expectedOutput: 'verified' }
+    ]
+  },
+  {
+    projectId: 'circleci-python',
+    environment: 'linux',
+    description: 'Build a CircleCI 2.1 config for a Python app with orbs, caching, parallel test splitting, and deploy.',
+    objective: 'Author .circleci/config.yml using the python orb, workspaces, and approval job.',
+    steps: [
+      { id: 1, title: 'Enable Project on CircleCI', instruction: 'Sign in and "Set Up Project" with existing config.', summary: 'Project activation.', whyNeeded: 'Required.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'echo "app.circleci.com -> Projects -> Set Up Project -> use existing config"', explanation: 'UI.' } ], checkCommand: 'echo activated', expectedOutput: 'activated' },
+      { id: 2, title: 'Author config.yml', instruction: 'Use python orb, parallelism, and split tests.', summary: 'Pipeline.', whyNeeded: 'Speed via parallelism.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'mkdir -p .circleci && cat > .circleci/config.yml <<\'EOF\'\nversion: 2.1\norbs:\n  python: circleci/python@2.1\njobs:\n  test:\n    docker: [{ image: cimg/python:3.12 }]\n    parallelism: 4\n    steps:\n      - checkout\n      - python/install-packages: { pkg-manager: pip }\n      - run:\n          name: Run tests\n          command: |\n            TESTFILES=$(circleci tests glob "tests/**/test_*.py" | circleci tests split --split-by=timings)\n            pytest --junitxml=test-results/junit.xml $TESTFILES\n      - store_test_results: { path: test-results }\n  hold:\n    type: approval\n  deploy:\n    docker: [{ image: cimg/python:3.12 }]\n    steps:\n      - checkout\n      - run: ./scripts/deploy.sh\nworkflows:\n  build_test_deploy:\n    jobs:\n      - test\n      - hold: { requires: [test], filters: { branches: { only: main } } }\n      - deploy: { requires: [hold] }\nEOF', explanation: 'Config.' } ], checkCommand: 'circleci config validate .circleci/config.yml', expectedOutput: 'is valid' },
+      { id: 3, title: 'Add Context for Secrets', instruction: 'Create org context with AWS keys.', summary: 'Secret share.', whyNeeded: 'Reusable across projects.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "Org Settings -> Contexts -> Create -> add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY"', explanation: 'UI.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' },
+      { id: 4, title: 'Push and Watch', instruction: 'Trigger pipeline.', summary: 'Validate.', whyNeeded: 'See it run.', pillarConnection: 'Reliability',
+        commands: [ { text: 'git add . && git commit -m "ci(circle): pipeline" && git push', explanation: 'Push.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' },
+      { id: 5, title: 'Approve and Deploy', instruction: 'Approve hold job in UI.', summary: 'Manual gate.', whyNeeded: 'Production safety.', pillarConnection: 'Security',
+        commands: [ { text: 'echo "UI: Pipeline -> hold -> Approve"', explanation: 'UI.' } ], checkCommand: 'echo done', expectedOutput: 'done' }
+    ]
+  },
+  {
+    projectId: 'artifactory-repo',
+    environment: 'linux',
+    description: 'Run JFrog Artifactory OSS, create local + remote + virtual Docker repos, and push/pull via JFrog CLI.',
+    objective: 'Stand up Artifactory, configure repos, authenticate, and validate image flow.',
+    steps: [
+      { id: 1, title: 'Run Artifactory OSS', instruction: 'docker run with persistent volume.', summary: 'Server up.', whyNeeded: 'Required service.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker volume create artifactory_data', explanation: 'Volume.' }, { text: 'docker run -d --name artifactory -p 8081:8081 -p 8082:8082 -v artifactory_data:/var/opt/jfrog/artifactory releases-docker.jfrog.io/jfrog/artifactory-oss:latest', explanation: 'Run.' } ], checkCommand: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:8082', expectedOutput: '200' },
+      { id: 2, title: 'Create Repos via REST', instruction: 'Local + remote + virtual Docker repos.', summary: 'Repo topology.', whyNeeded: 'Caching + custom images.', pillarConnection: 'Performance Efficiency',
+        commands: [ { text: 'curl -u admin:password -X PUT http://localhost:8081/artifactory/api/repositories/docker-local -H "Content-Type: application/json" -d \'{"key":"docker-local","rclass":"local","packageType":"docker","dockerApiVersion":"V2"}\'', explanation: 'Local.' }, { text: 'curl -u admin:password -X PUT http://localhost:8081/artifactory/api/repositories/docker-remote -H "Content-Type: application/json" -d \'{"key":"docker-remote","rclass":"remote","url":"https://registry-1.docker.io/","packageType":"docker"}\'', explanation: 'Remote.' }, { text: 'curl -u admin:password -X PUT http://localhost:8081/artifactory/api/repositories/docker-virtual -H "Content-Type: application/json" -d \'{"key":"docker-virtual","rclass":"virtual","packageType":"docker","repositories":["docker-local","docker-remote"],"defaultDeploymentRepo":"docker-local"}\'', explanation: 'Virtual.' } ], checkCommand: 'curl -s -u admin:password http://localhost:8081/artifactory/api/repositories | jq length', expectedOutput: '3' },
+      { id: 3, title: 'Configure JFrog CLI', instruction: 'Install and configure jf.', summary: 'Client tooling.', whyNeeded: 'Push/pull artifacts.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'curl -fL https://install-cli.jfrog.io | sh', explanation: 'Install.' }, { text: 'jf c add demo --url=http://localhost:8081 --user=admin --password=password --interactive=false', explanation: 'Config.' } ], checkCommand: 'jf rt ping', expectedOutput: 'OK' },
+      { id: 4, title: 'Push Docker Image', instruction: 'Tag and push to docker-virtual.', summary: 'Workflow.', whyNeeded: 'Validate.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker login localhost:8082 -u admin -p password', explanation: 'Login.' }, { text: 'docker tag nginx:latest localhost:8082/docker-virtual/nginx:1', explanation: 'Tag.' }, { text: 'docker push localhost:8082/docker-virtual/nginx:1', explanation: 'Push.' } ], checkCommand: 'curl -u admin:password -s "http://localhost:8081/artifactory/api/repositories/docker-local" | grep -o key', expectedOutput: 'key' },
+      { id: 5, title: 'Audit and Cleanup Policy', instruction: 'Add a delete policy for old artifacts.', summary: 'Lifecycle mgmt.', whyNeeded: 'Bound storage.', pillarConnection: 'Cost Optimization',
+        commands: [ { text: 'echo "UI: Administration -> Repositories -> docker-local -> Advanced -> Max Unique Tags"', explanation: 'UI.' } ], checkCommand: 'echo configured', expectedOutput: 'configured' }
+    ]
+  },
+  {
+    projectId: 'nagios-monitor',
+    environment: 'linux',
+    description: 'Install Nagios Core, define a host + HTTP service, set up notifications, and view in the web UI.',
+    objective: 'Compile Nagios, define objects in /usr/local/nagios/etc, and validate with -v.',
+    steps: [
+      { id: 1, title: 'Install Build Dependencies', instruction: 'Required for compilation.', summary: 'Toolchain.', whyNeeded: 'Nagios builds from source.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo apt-get install -y autoconf gcc libc6 make wget unzip apache2 php libapache2-mod-php libgd-dev openssl libssl-dev unzip', explanation: 'Deps.' } ], checkCommand: 'which gcc', expectedOutput: 'gcc' },
+      { id: 2, title: 'Build and Install Nagios Core', instruction: 'Configure, make, install.', summary: 'Core install.', whyNeeded: 'Provides daemon + UI.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'wget -O nagios.tar.gz https://github.com/NagiosEnterprises/nagioscore/releases/download/nagios-4.5.0/nagios-4.5.0.tar.gz && tar -xf nagios.tar.gz && cd nagios-4.5.0', explanation: 'Source.' }, { text: 'sudo ./configure --with-httpd-conf=/etc/apache2/sites-enabled && sudo make all && sudo make install-groups-users && sudo usermod -a -G nagios www-data && sudo make install install-daemoninit install-commandmode install-config install-webconf', explanation: 'Build.' } ], checkCommand: 'test -x /usr/local/nagios/bin/nagios && echo OK', expectedOutput: 'OK' },
+      { id: 3, title: 'Install Plugins', instruction: 'Compile nagios-plugins for check_http etc.', summary: 'Check executables.', whyNeeded: 'Required by service definitions.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'wget -O plugins.tar.gz https://nagios-plugins.org/download/nagios-plugins-2.4.6.tar.gz && tar -xf plugins.tar.gz && cd nagios-plugins-2.4.6 && ./configure --with-nagios-user=nagios --with-nagios-group=nagios && make && sudo make install', explanation: 'Plugins.' } ], checkCommand: 'ls /usr/local/nagios/libexec/check_http', expectedOutput: 'check_http' },
+      { id: 4, title: 'Define Host and Service', instruction: 'Create /usr/local/nagios/etc/objects/web.cfg.', summary: 'Monitoring objects.', whyNeeded: 'What to monitor.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'sudo tee /usr/local/nagios/etc/objects/web.cfg >/dev/null <<\'EOF\'\ndefine host { use linux-server; host_name web1; alias web1; address 10.0.0.21 }\ndefine service { use generic-service; host_name web1; service_description HTTP; check_command check_http }\nEOF', explanation: 'Objects.' }, { text: 'echo "cfg_file=/usr/local/nagios/etc/objects/web.cfg" | sudo tee -a /usr/local/nagios/etc/nagios.cfg', explanation: 'Reference.' } ], checkCommand: 'sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg | tail -5 | grep "Things look okay"', expectedOutput: 'okay' },
+      { id: 5, title: 'Restart and View UI', instruction: 'Restart daemon and Apache; log in to /nagios.', summary: 'Live monitoring.', whyNeeded: 'See state in UI.', pillarConnection: 'Reliability',
+        commands: [ { text: 'sudo systemctl restart nagios apache2', explanation: 'Restart.' }, { text: 'curl -u nagiosadmin:admin -s -o /dev/null -w "%{http_code}" http://localhost/nagios/', explanation: 'UI check.' } ], checkCommand: 'systemctl is-active nagios', expectedOutput: 'active' }
+    ]
   }
 ];
