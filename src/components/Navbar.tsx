@@ -5,11 +5,12 @@ import { auth, logout } from '../firebase';
 import { AuthModal } from './AuthModal';
 
 interface NavbarProps {
-  activeTab: 'projects' | 'learn' | 'pricing';
-  onTabChange: (tab: 'projects' | 'learn' | 'pricing') => void;
+  activeTab: 'projects' | 'learn';
+  onTabChange: (tab: 'projects' | 'learn') => void;
+  xp?: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }) => {
   const [user, loading] = useAuthState(auth);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -50,12 +51,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
             >
               Labs
             </button>
-            <button 
-              onClick={() => onTabChange('pricing')}
-              className={`text-sm font-bold transition-colors ${activeTab === 'pricing' ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-900'}`}
-            >
-              Pricing
-            </button>
           </div>
 
           <div className="hidden lg:flex items-center flex-1 max-w-sm mx-8">
@@ -72,6 +67,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           </div>
 
           <div className="flex items-center gap-3">
+            {xp > 0 && (
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-full border border-amber-200">
+                <Sparkle className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">{xp} XP</span>
+              </div>
+            )}
             {!loading && (
               <>
                 {user ? (

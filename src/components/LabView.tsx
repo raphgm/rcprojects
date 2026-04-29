@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ChevronLeft, ChevronRight, CheckCircle, Terminal as TerminalIcon, Layout, Code, Play, Info, AlertCircle, Copy, Check } from 'lucide-react';
+import { 
+  ChevronLeft, Check, Share2, 
+  Terminal as TerminalIcon, Play, 
+  BookOpen, Target, Lightbulb
+} from 'lucide-react';
 import { LabContent, LabStep } from '../types/content';
 import { Terminal } from './Terminal';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
@@ -8,42 +12,33 @@ import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
 interface LabViewProps {
   lab: LabContent;
   onClose: () => void;
-  onComplete: () => void;
+  onComplete: (xp?: number) => void;
   projectTitle: string;
-  mode: 'real' | 'cli';
 }
 
-export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, projectTitle, mode }) => {
+export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, projectTitle }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const [showHint, setShowHint] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<'python' | 'nodejs' | 'csharp' | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionProgress, setConnectionProgress] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const startLabSession = () => {
     setIsConnecting(true);
-    const statuses = mode === 'real' ? [
+    const statuses = [
       'Initializing secure tunnel...',
       'Provisioning cloud resources...',
       'Configuring network interfaces...',
       'Starting container runtime...',
       'Establishing terminal connection...'
-    ] : [
-      'Initializing CLI environment...',
-      'Loading lab configurations...',
-      'Setting up local simulation...',
-      'Preparing verification engine...',
-      'Ready for CLI testing...'
     ];
     
     let currentStatusIndex = 0;
@@ -56,7 +51,6 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
           return 100;
         }
         
-        // Update status message based on progress
         const newProgress = prev + (Math.random() * 15);
         const statusIndex = Math.floor((newProgress / 100) * statuses.length);
         if (statusIndex < statuses.length) {
@@ -72,21 +66,18 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === lab.steps.length - 1;
 
-  const displayInstruction = (selectedLanguage && currentStep.languageInstructions?.[selectedLanguage]) 
-    ? currentStep.languageInstructions[selectedLanguage] 
-    : currentStep.instruction;
-
   const nextStep = () => {
+    if (!completedSteps.includes(currentStep.id)) {
+      setCompletedSteps(prev => [...prev, currentStep.id]);
+    }
     if (!isLastStep) {
       setCurrentStepIndex(prev => prev + 1);
-      setShowHint(false);
     }
   };
 
   const prevStep = () => {
     if (!isFirstStep) {
       setCurrentStepIndex(prev => prev - 1);
-      setShowHint(false);
     }
   };
 
@@ -96,11 +87,6 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     );
   };
 
-  const resetEnvironment = () => {
-    setCompletedSteps(prev => prev.filter(id => id !== currentStep.id));
-    setShowHint(false);
-  };
-
   const progress = (completedSteps.length / lab.steps.length) * 100;
 
   return (
@@ -108,286 +94,119 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] bg-zinc-900 flex flex-col relative overflow-hidden"
+      className="fixed inset-0 z-[60] bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 font-sans"
+      onClick={onClose}
     >
-      {/* Doodles */}
-      <DoodleWrapper className="top-20 left-10 text-white/5 w-24 h-24">
-        <SquigglyArrow />
-      </DoodleWrapper>
-      <DoodleWrapper className="bottom-20 right-10 text-white/5 w-16 h-16">
-        <Sparkle />
-      </DoodleWrapper>
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white w-full max-w-6xl max-h-full rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative"
+      >
+        {/* Header */}
+        <header className="bg-white border-b border-zinc-100 px-8 py-6 shrink-0">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={onClose}
+              className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 transition-colors font-bold text-sm"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              All Labs
+            </button>
+            <div className="h-4 w-px bg-zinc-200"></div>
+            <button className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 transition-colors font-bold text-sm">
+              <Share2 className="w-4 h-4" />
+              Share Lab
+            </button>
+          </div>
 
-      <AnimatePresence>
-        {showHint && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-32 right-8 z-[70] w-80 bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-amber-500/10 rounded-lg">
-                  <Info className="w-4 h-4 text-amber-500" />
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+                Mission {lab.missionNumber || 1} of {lab.totalMissions || lab.steps.length}
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-32 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    className="h-full bg-brand-blue"
+                  />
                 </div>
-                <span className="text-xs font-bold text-white uppercase tracking-widest">Lab Hint</span>
               </div>
-              <button 
-                onClick={() => setShowHint(false)}
-                className="p-1 hover:bg-zinc-800 rounded-full transition-colors"
-              >
-                <X className="w-4 h-4 text-zinc-500" />
-              </button>
             </div>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              {currentStep.hint || "Try to follow the instructions carefully. If you're stuck, check the documentation for the specific service."}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* Header */}
-      <header className="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={onClose}
-            className="p-2 hover:bg-zinc-800 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-zinc-400" />
-          </button>
-          <div className="h-6 w-px bg-zinc-800"></div>
-          <div>
-            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest block mb-0.5">
-              Hands-on Lab
-            </span>
-            <h1 className="text-lg font-bold text-white leading-tight">
-              {projectTitle}
-            </h1>
+            {lab.xpReward && (
+              <div className="flex flex-col items-center px-4 py-2 bg-amber-50 rounded-2xl border border-amber-100">
+                <span className="text-sm font-black text-amber-600 leading-none">{lab.xpReward} XP</span>
+                <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest mt-0.5">Reward</span>
+              </div>
+            )}
           </div>
-        </div>
-
-        <div className="flex items-center gap-8">
-          <div className="hidden lg:flex items-center gap-4">
-            <div className="w-48 h-2 bg-zinc-800 rounded-full overflow-hidden">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                className="h-full bg-brand-blue"
-              />
-            </div>
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
-              {Math.round(progress)}% Complete
-            </span>
-          </div>
-          <button 
-            onClick={() => {
-              onComplete();
-              onClose();
-            }}
-            disabled={!isStarted}
-            className={`px-6 py-2 rounded-full text-sm font-bold transition-all shadow-lg ${
-              isStarted 
-                ? 'bg-brand-blue text-white hover:bg-brand-blue/90 shadow-brand-blue/20' 
-                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-            }`}
-          >
-            Submit Lab
-          </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden flex">
-        {/* Lab Instructions */}
-        <div className="w-full md:w-[400px] lg:w-[450px] bg-zinc-900 border-r border-zinc-800 flex flex-col shrink-0">
-          <div className="p-6 overflow-y-auto flex-1 space-y-8 scrollbar-thin scrollbar-thumb-zinc-800">
-            <div>
-              <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Info className="w-4 h-4" />
-                Lab Steps
-              </h2>
-              <div className="space-y-3">
-                {lab.steps.map((step, i) => (
-                  <button
-                    key={step.id}
-                    onClick={() => setCurrentStepIndex(i)}
-                    className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 flex items-start gap-4 ${
-                      i === currentStepIndex 
-                        ? 'bg-zinc-800 border-zinc-700 shadow-xl' 
-                        : 'bg-transparent border-zinc-800 hover:border-zinc-700'
-                    }`}
-                  >
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${
-                      completedSteps.includes(step.id) 
-                        ? 'bg-brand-blue text-white' 
-                        : i === currentStepIndex ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-500'
-                    }`}>
-                      {completedSteps.includes(step.id) ? <CheckCircle className="w-4 h-4" /> : i + 1}
-                    </div>
-                    <div>
-                      <h3 className={`text-sm font-bold mb-1 ${i === currentStepIndex ? 'text-white' : 'text-zinc-400'}`}>
-                        {step.title}
-                      </h3>
-                      {i === currentStepIndex && (
-                        <p className="text-xs text-zinc-500 leading-relaxed">
-                          Click to view detailed instructions for this step.
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                ))}
+      <main className="flex-1 overflow-y-auto bg-zinc-50/50">
+        <div className="max-w-6xl mx-auto py-12 px-8">
+          {/* Lab Title Section */}
+          <div className="mb-10">
+            <h1 className="text-4xl font-black text-zinc-900 mb-6 tracking-tight leading-tight">
+              {projectTitle}
+            </h1>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-zinc-200">
+              <div>
+                <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                  <BookOpen className="w-3 h-3" />
+                  Description
+                </h4>
+                <p className="text-zinc-500 text-sm leading-relaxed">
+                  {lab.steps[0].instruction}
+                </p>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                  <Target className="w-3 h-3" />
+                  Objective
+                </h4>
+                <p className="text-zinc-500 text-sm leading-relaxed">
+                  Complete all {lab.steps.length} missions to master the core concepts of {projectTitle} and validate your practical skills in a live-cloud sandbox environment.
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className="bg-brand-blue/5 border border-brand-blue/10 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-brand-blue/10 rounded-lg">
-                    <Play className="w-4 h-4 text-brand-blue" />
-                  </div>
-                  <h4 className="font-bold uppercase tracking-widest text-xs text-brand-blue">Current Task</h4>
-                </div>
-                
-                {currentStep.languageInstructions && (
-                  <div className="flex gap-1 bg-zinc-800 p-1 rounded-lg">
-                    {Object.keys(currentStep.languageInstructions).map((lang) => (
-                      <button
-                        key={lang}
-                        onClick={() => setSelectedLanguage(lang as any)}
-                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase transition-all ${
-                          selectedLanguage === lang 
-                            ? 'bg-brand-blue text-white' 
-                            : 'text-zinc-500 hover:text-zinc-300'
-                        }`}
-                      >
-                        {lang === 'csharp' ? 'C#' : lang === 'nodejs' ? 'Node' : 'Py'}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-                {displayInstruction}
-              </p>
-
-              {currentStep.command && (
-                <div className="mb-6">
-                  <h5 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Task Command</h5>
-                  <div className="relative group">
-                    <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-brand-blue break-all pr-12">
-                      {currentStep.command}
-                    </div>
-                    <button 
-                      onClick={() => copyToClipboard(currentStep.command!)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 hover:text-white"
-                      title="Copy command"
-                    >
-                      {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {completedSteps.includes(currentStep.id) && currentStep.feedback && (
+          <div className="h-[650px] flex flex-col relative">
+            <AnimatePresence>
+              {isLastStep && completedSteps.includes(currentStep.id) && (
                 <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="mb-6 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl"
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className="absolute inset-x-8 -top-6 z-20"
                 >
-                  <h5 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3" />
-                    Feedback Explanation
-                  </h5>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    {currentStep.feedback}
-                  </p>
+                  <div className="bg-emerald-500 text-white px-8 py-4 rounded-[2rem] shadow-2xl flex items-center justify-between border-4 border-white">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                        🏆
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black uppercase tracking-widest">Mission Accomplished!</h4>
+                        <p className="text-[10px] font-medium opacity-90">All objectives secured. Lab status: COMPLETED.</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-xl font-black">+{lab.xpReward || 250} XP</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest opacity-75">Cloud Progress</span>
+                    </div>
+                  </div>
                 </motion.div>
               )}
+            </AnimatePresence>
 
-              <button 
-                onClick={() => toggleStepCompletion(currentStep.id)}
-                disabled={!isStarted}
-                className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
-                  !isStarted
-                    ? 'bg-zinc-800/50 text-zinc-600 cursor-not-allowed'
-                    : completedSteps.includes(currentStep.id)
-                      ? 'bg-brand-blue text-white shadow-lg shadow-brand-blue/20'
-                      : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                }`}
-              >
-                {!isStarted ? 'Start Lab to Begin' : completedSteps.includes(currentStep.id) ? 'Step Completed' : 'Mark as Complete'}
-              </button>
-            </div>
-          </div>
-
-          <div className="p-6 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between">
-            <button 
-              onClick={prevStep}
-              disabled={isFirstStep}
-              className={`p-3 rounded-xl transition-all ${isFirstStep ? 'text-zinc-700' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Step {currentStepIndex + 1} of {lab.steps.length}</span>
-            </div>
-            <button 
-              onClick={nextStep}
-              disabled={isLastStep}
-              className={`p-3 rounded-xl transition-all ${isLastStep ? 'text-zinc-700' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-
-        {/* Lab Terminal / Sandbox */}
-        <div className="flex-1 bg-zinc-950 p-8 flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-zinc-900 rounded-lg border border-zinc-800">
-                  <TerminalIcon className="w-4 h-4 text-brand-blue" />
-                </div>
-                <span className="text-sm font-bold text-white uppercase tracking-widest">Cloud Terminal</span>
-              </div>
-              <div className="h-4 w-px bg-zinc-800"></div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${isStarted ? 'bg-brand-blue animate-pulse' : 'bg-zinc-700'}`}></div>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                  Environment: {isStarted ? lab.environment.toUpperCase() : 'OFFLINE'}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={resetEnvironment}
-                disabled={!isStarted}
-                className={`px-4 py-2 border rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                  isStarted ? 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800' : 'bg-zinc-900/50 border-zinc-800/50 text-zinc-700 cursor-not-allowed'
-                }`}
-              >
-                Reset Environment
-              </button>
-              <button 
-                onClick={() => setShowHint(!showHint)}
-                disabled={!isStarted}
-                className={`px-4 py-2 border rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                  !isStarted 
-                    ? 'bg-zinc-900/50 border-zinc-800/50 text-zinc-700 cursor-not-allowed'
-                    : showHint 
-                      ? 'bg-amber-500 border-amber-500 text-white' 
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
-                }`}
-              >
-                {showHint ? 'Hide Hint' : 'Get Hint'}
-              </button>
-            </div>
-          </div>
-
-          <div className="flex-1 relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
             {!isStarted ? (
-              <div className="absolute inset-0 z-10 bg-zinc-950/40 backdrop-blur-md flex flex-col items-center justify-center text-center p-8">
+              <div className="flex-1 bg-white rounded-[2rem] border-2 border-zinc-100 flex flex-col items-center justify-center text-center p-12">
                 <AnimatePresence mode="wait">
                   {isConnecting ? (
                     <motion.div 
@@ -401,17 +220,17 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                         <div className="absolute inset-0 rounded-full border-2 border-brand-blue/20 border-t-brand-blue animate-spin"></div>
                         <TerminalIcon className="w-8 h-8 text-brand-blue" />
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-4">
-                        {mode === 'real' ? 'Connecting to Cloud...' : 'Preparing CLI Environment...'}
-                      </h3>
-                      <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-4">
+                      <h2 className="text-xl font-bold text-zinc-900 mb-4">
+                        Connecting to Cloud...
+                      </h2>
+                      <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mb-4">
                         <motion.div 
                           className="h-full bg-brand-blue"
                           initial={{ width: 0 }}
                           animate={{ width: `${connectionProgress}%` }}
                         />
                       </div>
-                      <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">
+                      <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest animate-pulse">
                         {connectionStatus}
                       </p>
                     </motion.div>
@@ -423,83 +242,123 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                       exit={{ opacity: 0, y: -10 }}
                       className="flex flex-col items-center"
                     >
-                      <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-brand-blue/20">
-                        <Play className="w-10 h-10 text-brand-blue fill-brand-blue/20" />
+                      <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mb-6 ring-1 border border-brand-blue/20">
+                        <Play className="w-10 h-10 text-brand-blue fill-brand-blue/20 ml-1" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-3">
-                        {mode === 'real' ? 'Ready to start your lab?' : 'Ready to test with CLI?'}
-                      </h3>
-                      <p className="text-zinc-400 text-sm max-w-md mb-8 leading-relaxed">
-                        {mode === 'real' 
-                          ? 'Click the button below to provision your cloud environment and connect to the interactive terminal.'
-                          : 'Click the button below to start the CLI simulation and test your knowledge of the concepts.'}
+                      <h2 className="text-2xl font-black text-zinc-900 mb-3 tracking-tight">
+                        Initialize Cloud Sandbox
+                      </h2>
+                      <p className="text-zinc-500 text-sm max-w-md mb-8 leading-relaxed">
+                        This will provision a dedicated container with all required cloud tools and configuration pre-installed for this lab.
                       </p>
-                      <motion.button 
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                      <button 
                         onClick={startLabSession}
-                        className="bg-brand-blue text-white px-10 py-4 rounded-xl font-bold hover:bg-brand-blue/90 transition-all shadow-2xl shadow-brand-blue/40 flex items-center gap-3 cursor-pointer"
+                        className="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all shadow-2xl shadow-zinc-900/20 flex items-center gap-3 cursor-pointer"
                       >
-                        <Play className="w-5 h-5 fill-current" />
-                        {mode === 'real' ? 'Start Lab Session' : 'Start CLI Test'}
-                      </motion.button>
+                        <Play className="w-4 h-4 fill-current" />
+                        Start Lab Session
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
               <Terminal 
-                initialMessage={mode === 'real' 
-                  ? `Connected to ${lab.environment} instance... Ready for lab: ${projectTitle}`
-                  : `CLI Simulation Environment Ready... Testing concepts for: ${projectTitle}`
-                }
-                onCommand={(cmd) => {
-                  if (currentStep.checkCommand && cmd === currentStep.checkCommand) {
-                    return currentStep.expectedOutput || 'Command executed successfully.';
+                initialMessage={`Connected to ${lab.environment} instance... Ready for lab: ${projectTitle}`}
+                currentStep={currentStep}
+                allSteps={lab.steps}
+                currentStepIndex={currentStepIndex}
+                onNext={nextStep}
+                onPrev={prevStep}
+                isFirstStep={isFirstStep}
+                isLastStep={isLastStep}
+                onStepComplete={(stepId) => {
+                  if (!completedSteps.includes(stepId)) {
+                    setCompletedSteps(prev => [...prev, stepId]);
                   }
-                  // Return null or empty string to let Terminal handle it if it's a standard command
-                  // But since Terminal handles standard commands in its own switch, 
-                  // we only get here if it's NOT a standard command.
-                  return `bash: ${cmd}: command executed.`;
+                }}
+                onComplete={() => {
+                  onComplete(lab.xpReward || 250);
+                  onClose();
+                }}
+                xpReward={lab.xpReward || 250}
+                flavor="ubuntu"
+                onCommand={(cmd) => {
+                  const command = cmd.trim().toLowerCase();
+                  
+                  // Global Commands
+                  if (command === 'help') return 'Available commands: az, kubectl, terraform, ansible, helm, ls, cd, pwd, curl, date, whoami, help';
+                  if (command === 'ls') return 'configs/  scripts/  manifests/  terraform/  README.md';
+                  if (command === 'pwd') return '/home/cloud-user/workspace';
+                  if (command === 'whoami') return 'cloud-user';
+                  if (command === 'date') return new Date().toUTCString();
+                  if (command.startsWith('cd ')) return `Changed directory to ${command.split(' ')[1]}`;
+
+                  // Helm Installation specific
+                  if (command.includes('curl') && command.includes('get_helm.sh')) {
+                    return '  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n100  11.2k  100  11.2k    0     0  45161      0 --:--:-- --:--:-- --:--:-- 45362';
+                  }
+                  if (command.includes('chmod 700 get_helm.sh')) {
+                    return ''; // Silent success
+                  }
+                  if (command.includes('./get_helm.sh')) {
+                    return 'Downloading https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz\nVerifying checksum... Done.\nPreparing to install helm into /usr/local/bin\nhelm installed into /usr/local/bin/helm successfully.\nRun "helm version" to verify.';
+                  }
+
+                  // Tool Specific Realistic Outputs
+                  if (command.includes('helm version')) {
+                    return 'version.BuildInfo{Version:"v3.12.0", GitCommit:"c9f554a753830491f22316e25dc520399433b7e0", GitTreeState:"clean", GoVersion:"go1.20.3"}';
+                  }
+
+                  if (command.includes('kubectl get nodes')) {
+                    return 'NAME             STATUS   ROLES           AGE   VERSION\naks-nodepool1    Ready    agent           12d   v1.26.3\naks-nodepool2    Ready    agent           12d   v1.26.3';
+                  }
+
+                  if (command.includes('kubectl get pods')) {
+                    if (currentStepIndex > 1) {
+                      return 'NAME                                      READY   STATUS    RESTARTS   AGE\nprometheus-server-767988bfb9-w87v5        1/1     Running   0          2m\ngrafana-56c68677c7-xphk7                  1/1     Running   0          2m\nnode-exporter-8v6tx                       1/1     Running   0          2m';
+                    }
+                    return 'No resources found in default namespace.';
+                  }
+
+                  if (command.includes('curl') && command.includes('http')) {
+                    return 'HTTP/1.1 200 OK\nContent-Type: application/json\nDate: ' + new Date().toUTCString() + '\n\n{"status": "success", "data": "connected to endpoint"}';
+                  }
+
+                  if (command.includes('terraform plan')) {
+                    return 'Terraform used the selected providers to generate the following execution plan...\n\nPlan: 4 to add, 0 to change, 0 to destroy.';
+                  }
+
+                  if (command.includes('terraform apply')) {
+                    return 'azurerm_resource_group.main: Creating...\nazurerm_kubernetes_cluster.k8s: Creating...\n\nApply complete! Resources: 4 added, 0 changed, 0 destroyed.';
+                  }
+
+                  if (command.includes('az login')) {
+                    return 'Logged in successfully as user@example.com (Tenant ID: 72f988bf-86f1-41af-91ab-2d7cd011db47)';
+                  }
+
+                  // Default success message for unknown but valid-looking commands
+                  return `bash: ${cmd}: command executed successfully. [LOG: ${new Date().toISOString()}]`;
                 }}
               />
             )}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <AlertCircle className={`w-4 h-4 ${isStarted ? 'text-amber-500' : 'text-zinc-600'}`} />
-                <h5 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Resource Usage</h5>
-              </div>
-              <div className="flex items-end gap-2">
-                <span className={`text-2xl font-bold ${isStarted ? 'text-white' : 'text-zinc-700'}`}>{isStarted ? '12%' : '--'}</span>
-                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">CPU Utilization</span>
-              </div>
-            </div>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Layout className={`w-4 h-4 ${isStarted ? 'text-blue-500' : 'text-zinc-600'}`} />
-                <h5 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Active Services</h5>
-              </div>
-              <div className="flex items-end gap-2">
-                <span className={`text-2xl font-bold ${isStarted ? 'text-white' : 'text-zinc-700'}`}>{isStarted ? '4' : '--'}</span>
-                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Running Containers</span>
-              </div>
-            </div>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Code className={`w-4 h-4 ${isStarted ? 'text-purple-500' : 'text-zinc-600'}`} />
-                <h5 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Network Traffic</h5>
-              </div>
-              <div className="flex items-end gap-2">
-                <span className={`text-2xl font-bold ${isStarted ? 'text-white' : 'text-zinc-700'}`}>{isStarted ? '1.2' : '--'}</span>
-                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">MB/s Inbound</span>
-              </div>
-            </div>
-          </div>
         </div>
       </main>
+
+      {/* Footer (Simplified as navigation is mostly in terminal now) */}
+      <footer className="bg-white border-t border-zinc-100 px-8 py-4 shrink-0">
+        <div className="max-w-6xl mx-auto flex items-center justify-between text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
+          <div>{lab.environment.toUpperCase()} ENVIRONMENT READY</div>
+          <div className="flex items-center gap-4">
+            <span className={isStarted ? "text-emerald-500" : "text-zinc-300"}>
+              {isStarted ? "● LIVE SESSION ACTIVE" : "○ SESSION IDLE"}
+            </span>
+          </div>
+        </div>
+      </footer>
     </motion.div>
-  );
+  </motion.div>
+);
 };
+

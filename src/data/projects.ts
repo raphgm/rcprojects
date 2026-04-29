@@ -2,7 +2,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  category: 'AWS' | 'Azure' | 'GCP' | 'Kubernetes' | 'DevOps' | 'Security';
+  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   duration: string;
   tags: string[];
@@ -12,13 +12,13 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: '1',
-    title: 'Deploy a High-Availability Web App on AWS',
-    description: 'Learn to set up an Auto Scaling Group with an Application Load Balancer and RDS database.',
-    category: 'AWS',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['EC2', 'RDS', 'ALB', 'Auto Scaling'],
-    image: 'https://picsum.photos/seed/aws-architecture/800/600'
+    title: 'Linux Web Server Setup & Security',
+    description: 'Learn to deploy, configure and secure an Apache web server on Ubuntu Linux from the command line.',
+    category: 'DevOps',
+    difficulty: 'Beginner',
+    duration: '1.5 hours',
+    tags: ['Linux', 'Apache', 'Security', 'UFW'],
+    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2000&auto=format&fit=crop'
   },
   {
     id: '2',
@@ -26,7 +26,7 @@ export const projects: Project[] = [
     description: 'Deploy a full monitoring stack on K8s and configure custom alerts for your services.',
     category: 'Kubernetes',
     difficulty: 'Advanced',
-    duration: '3 hours',
+    duration: '3.5 hours',
     tags: ['Prometheus', 'Grafana', 'Helm', 'K8s'],
     image: 'https://picsum.photos/seed/kubernetes-monitoring/800/600'
   },
@@ -42,13 +42,13 @@ export const projects: Project[] = [
   },
   {
     id: '4',
-    title: 'Infrastructure as Code with Terraform & GCP',
-    description: 'Provision a complete Google Cloud environment using Terraform modules and state management.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Terraform', 'GCE', 'VPC', 'IAM'],
-    image: 'https://picsum.photos/seed/terraform-gcp/800/600'
+    title: 'Enterprise Shell Automation & Backup',
+    description: 'Master the art of Linux automation by building a complex backup and log rotation system using Bash.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Bash', 'Automation', 'Cron', 'Linux'],
+    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2000&auto=format&fit=crop'
   },
   {
     id: '5',
@@ -56,39 +56,9 @@ export const projects: Project[] = [
     description: 'Automate your build, test, and deployment workflow for a modern React application.',
     category: 'DevOps',
     difficulty: 'Beginner',
-    duration: '45 mins',
+    duration: '2 hours',
     tags: ['GitHub Actions', 'Docker', 'CI/CD'],
     image: 'https://picsum.photos/seed/github-actions/800/600'
-  },
-  {
-    id: '6',
-    title: 'Securing Cloud Native Apps with Vault',
-    description: 'Implement secret management and dynamic credentials using HashiCorp Vault on AWS.',
-    category: 'Security',
-    difficulty: 'Advanced',
-    duration: '4 hours',
-    tags: ['Vault', 'Secrets', 'Security', 'AWS'],
-    image: 'https://picsum.photos/seed/hashicorp-vault/800/600'
-  },
-  {
-    id: '7',
-    title: 'Serverless Image Processing with AWS Lambda',
-    description: 'Build an automated image processing workflow using S3 triggers, Lambda, and Amazon Rekognition.',
-    category: 'AWS',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Lambda', 'S3', 'Rekognition', 'Python'],
-    image: 'https://picsum.photos/seed/aws-lambda-serverless/800/600'
-  },
-  {
-    id: '8',
-    title: 'Data Warehousing with Google BigQuery',
-    description: 'Design and implement a scalable data warehouse for e-commerce analytics using BigQuery and Dataflow.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '3.5 hours',
-    tags: ['BigQuery', 'Dataflow', 'SQL', 'GCP'],
-    image: 'https://picsum.photos/seed/google-bigquery/800/600'
   },
   {
     id: '9',
@@ -96,7 +66,7 @@ export const projects: Project[] = [
     description: 'Enhance your Kubernetes microservices with traffic management, security, and observability using Istio.',
     category: 'Kubernetes',
     difficulty: 'Advanced',
-    duration: '4 hours',
+    duration: '5 hours',
     tags: ['Istio', 'K8s', 'Service Mesh', 'Envoy'],
     image: 'https://picsum.photos/seed/istio-service-mesh/800/600'
   },
@@ -106,7 +76,7 @@ export const projects: Project[] = [
     description: 'Implement a modern GitOps continuous delivery pipeline for Kubernetes applications using ArgoCD.',
     category: 'DevOps',
     difficulty: 'Intermediate',
-    duration: '2.5 hours',
+    duration: '3 hours',
     tags: ['ArgoCD', 'GitOps', 'K8s', 'Helm'],
     image: 'https://picsum.photos/seed/argocd-gitops/800/600'
   },
@@ -131,79 +101,19 @@ export const projects: Project[] = [
     image: 'https://picsum.photos/seed/azure-networking-vpn/800/600'
   },
   {
-    id: '13',
-    title: 'Containerizing Microservices with Amazon ECS & Fargate',
-    description: 'Deploy and manage scalable containerized applications without managing servers using ECS Fargate.',
-    category: 'AWS',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['ECS', 'Fargate', 'Docker', 'AWS'],
-    image: 'https://picsum.photos/seed/amazon-ecs-fargate/800/600'
-  },
-  {
-    id: '14',
-    title: 'Scalable NoSQL Design with Amazon DynamoDB',
-    description: 'Master single-table design patterns and global secondary indexes for high-performance NoSQL databases.',
-    category: 'AWS',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['DynamoDB', 'NoSQL', 'Serverless', 'AWS'],
-    image: 'https://picsum.photos/seed/amazon-dynamodb/800/600'
-  },
-  {
-    id: '15',
-    title: 'Infrastructure as Code with AWS CDK',
-    description: 'Define your cloud infrastructure using familiar programming languages like TypeScript with AWS CDK.',
-    category: 'AWS',
-    difficulty: 'Intermediate',
-    duration: '1.5 hours',
-    tags: ['CDK', 'CloudFormation', 'TypeScript', 'IaC'],
-    image: 'https://picsum.photos/seed/aws-cdk-infrastructure/800/600'
-  },
-  {
-    id: '16',
-    title: 'Real-time Log Analysis with Amazon Kinesis & OpenSearch',
-    description: 'Build a real-time streaming data pipeline to analyze application logs and visualize them in dashboards.',
-    category: 'AWS',
-    difficulty: 'Advanced',
-    duration: '3.5 hours',
-    tags: ['Kinesis', 'OpenSearch', 'CloudWatch', 'Streaming'],
-    image: 'https://picsum.photos/seed/aws-kinesis-streaming/800/600'
-  },
-  {
-    id: '17',
-    title: 'Machine Learning Model Deployment with Amazon SageMaker',
-    description: 'Train, deploy, and scale machine learning models using SageMaker endpoints and built-in algorithms.',
-    category: 'AWS',
-    difficulty: 'Advanced',
-    duration: '4 hours',
-    tags: ['SageMaker', 'MLOps', 'Python', 'AI'],
-    image: 'https://picsum.photos/seed/amazon-sagemaker-ml/800/600'
-  },
-  {
-    id: '18',
-    title: 'Multi-Region Disaster Recovery with AWS Route 53',
-    description: 'Implement a robust disaster recovery strategy using Route 53 health checks and failover routing.',
-    category: 'AWS',
-    difficulty: 'Advanced',
-    duration: '3 hours',
-    tags: ['Route 53', 'CloudFront', 'S3', 'Disaster Recovery'],
-    image: 'https://picsum.photos/seed/aws-disaster-recovery/800/600'
-  },
-  {
     id: '19',
     title: 'Kubernetes Cluster Setup with Kubeadm',
     description: 'Learn to bootstrap a production-ready Kubernetes cluster from scratch using Kubeadm on Linux nodes.',
     category: 'Kubernetes',
     difficulty: 'Intermediate',
-    duration: '2 hours',
+    duration: '2.5 hours',
     tags: ['Kubeadm', 'Linux', 'Cluster', 'K8s'],
     image: 'https://picsum.photos/seed/kubernetes-cluster/800/600'
   },
   {
     id: '20',
     title: 'Managing Secrets with Kubernetes External Secrets',
-    description: 'Integrate external secret managers like AWS Secrets Manager or HashiCorp Vault with Kubernetes.',
+    description: 'Integrate external secret managers like Azure Key Vault or HashiCorp Vault with Kubernetes.',
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '1.5 hours',
@@ -226,7 +136,7 @@ export const projects: Project[] = [
     description: 'Set up and configure NGINX Ingress Controller for advanced traffic routing and SSL termination.',
     category: 'Kubernetes',
     difficulty: 'Beginner',
-    duration: '1 hour',
+    duration: '1.5 hours',
     tags: ['Ingress', 'NGINX', 'Networking', 'K8s'],
     image: 'https://picsum.photos/seed/kubernetes-ingress/800/600'
   },
@@ -246,7 +156,7 @@ export const projects: Project[] = [
     description: 'Secure your pod-to-pod communication using fine-grained Kubernetes Network Policies.',
     category: 'Kubernetes',
     difficulty: 'Advanced',
-    duration: '3 hours',
+    duration: '3.5 hours',
     tags: ['Network Policy', 'Security', 'Calico', 'K8s'],
     image: 'https://picsum.photos/seed/kubernetes-network-policy/800/600'
   },
@@ -551,292 +461,12 @@ export const projects: Project[] = [
     image: 'https://picsum.photos/seed/azure-lighthouse-management/800/600'
   },
   {
-    id: '55',
-    title: 'GCP Cloud Run Serverless Deployment',
-    description: 'Deploy and scale containerized applications on a fully managed serverless platform using Cloud Run.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Cloud Run', 'Serverless', 'Docker', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-run/800/600'
-  },
-  {
-    id: '56',
-    title: 'GCP Cloud Spanner Relational Database',
-    description: 'Implement a globally distributed, strongly consistent relational database using Cloud Spanner.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '4 hours',
-    tags: ['Cloud Spanner', 'SQL', 'Databases', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-spanner/800/600'
-  },
-  {
-    id: '57',
-    title: 'GCP Cloud Functions Event-driven Logic',
-    description: 'Build and deploy event-driven functions that scale automatically with Cloud Functions.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Cloud Functions', 'Serverless', 'Events', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-functions/800/600'
-  },
-  {
-    id: '58',
-    title: 'GCP Anthos Multi-cloud Management',
-    description: 'Manage applications across on-premises and multiple clouds using Anthos.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '6 hours',
-    tags: ['Anthos', 'Hybrid Cloud', 'Kubernetes', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-anthos/800/600'
-  },
-  {
-    id: '59',
-    title: 'GCP Cloud Armor Web Security',
-    description: 'Protect your applications from DDoS and web attacks using Cloud Armor security policies.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Cloud Armor', 'WAF', 'Security', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-armor/800/600'
-  },
-  {
-    id: '60',
-    title: 'GCP Cloud Build CI/CD Pipelines',
-    description: 'Automate your build, test, and deployment process using Cloud Build.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['Cloud Build', 'CI/CD', 'DevOps', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-build/800/600'
-  },
-  {
-    id: '61',
-    title: 'GCP Cloud Pub/Sub Messaging',
-    description: 'Implement reliable, many-to-many asynchronous messaging using Cloud Pub/Sub.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Pub/Sub', 'Messaging', 'Events', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-pubsub/800/600'
-  },
-  {
-    id: '62',
-    title: 'GCP Cloud Storage Lifecycle Management',
-    description: 'Optimize storage costs by automating object lifecycle transitions in Cloud Storage.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Cloud Storage', 'Storage', 'Cost Optimization', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-storage/800/600'
-  },
-  {
-    id: '63',
-    title: 'GCP Cloud SQL Database Administration',
-    description: 'Set up, manage, and scale relational databases (MySQL, PostgreSQL, SQL Server) on Cloud SQL.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Cloud SQL', 'SQL', 'Databases', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-sql/800/600'
-  },
-  {
-    id: '64',
-    title: 'GCP Compute Engine Managed Instance Groups',
-    description: 'Configure autoscaling and self-healing for your VM workloads using Managed Instance Groups.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['Compute Engine', 'Autoscaling', 'VMs', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-compute/800/600'
-  },
-  {
-    id: '65',
-    title: 'GCP VPC Network Peering',
-    description: 'Connect two Virtual Private Cloud (VPC) networks together for private communication.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '1.5 hours',
-    tags: ['VPC', 'Networking', 'Peering', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-vpc/800/600'
-  },
-  {
-    id: '66',
-    title: 'GCP Cloud Interconnect Implementation',
-    description: 'Establish direct, high-speed physical connections between your on-premises network and GCP.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '5 hours',
-    tags: ['Cloud Interconnect', 'Networking', 'Hybrid', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-interconnect/800/600'
-  },
-  {
-    id: '67',
-    title: 'GCP Cloud DNS Management',
-    description: 'Manage your domain names and DNS records using a reliable, low-latency DNS service.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Cloud DNS', 'DNS', 'Networking', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-dns/800/600'
-  },
-  {
-    id: '68',
-    title: 'GCP Cloud CDN Content Delivery',
-    description: 'Speed up content delivery for your websites and applications using Cloud CDN.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '1.5 hours',
-    tags: ['Cloud CDN', 'CDN', 'Networking', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-cdn/800/600'
-  },
-  {
-    id: '69',
-    title: 'GCP Cloud IAM Roles and Permissions',
-    description: 'Implement fine-grained access control for your GCP resources using IAM roles.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['IAM', 'Security', 'Access Control', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-iam/800/600'
-  },
-  {
-    id: '70',
-    title: 'GCP Cloud Logging and Monitoring',
-    description: 'Gain visibility into the performance, uptime, and overall health of your GCP applications.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['Cloud Logging', 'Cloud Monitoring', 'Observability', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-logging/800/600'
-  },
-  {
-    id: '71',
-    title: 'GCP Cloud Trace Performance Analysis',
-    description: 'Collect latency data from your applications and visualize it to find performance bottlenecks.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Cloud Trace', 'Performance', 'Observability', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-trace/800/600'
-  },
-  {
-    id: '72',
-    title: 'GCP Cloud Debugger for Live Apps',
-    description: 'Inspect the state of your application at any code location without stopping or slowing it down.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '1.5 hours',
-    tags: ['Cloud Debugger', 'Debugging', 'Observability', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-debugger/800/600'
-  },
-  {
-    id: '73',
-    title: 'GCP Cloud Profiler Resource Optimization',
-    description: 'Analyze the CPU and memory consumption of your applications to optimize resource usage.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2 hours',
-    tags: ['Cloud Profiler', 'Optimization', 'Observability', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-profiler/800/600'
-  },
-  {
-    id: '74',
-    title: 'GCP Cloud Deployment Manager IaC',
-    description: 'Automate the creation and management of your GCP resources using infrastructure as code.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '3 hours',
-    tags: ['Deployment Manager', 'IaC', 'Automation', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-deployment/800/600'
-  },
-  {
-    id: '75',
-    title: 'GCP Cloud Composer (Managed Airflow)',
-    description: 'Orchestrate complex data workflows using a fully managed Apache Airflow service.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '4 hours',
-    tags: ['Cloud Composer', 'Airflow', 'Data Engineering', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-composer/800/600'
-  },
-  {
-    id: '76',
-    title: 'GCP Cloud Dataflow Stream Processing',
-    description: 'Build and run data processing pipelines for both batch and streaming data using Dataflow.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '4.5 hours',
-    tags: ['Dataflow', 'Apache Beam', 'Big Data', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-dataflow/800/600'
-  },
-  {
-    id: '77',
-    title: 'GCP Cloud Dataproc Managed Spark/Hadoop',
-    description: 'Run Apache Spark and Hadoop clusters in a fast, easy, and cost-effective way.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '3 hours',
-    tags: ['Dataproc', 'Spark', 'Hadoop', 'Big Data'],
-    image: 'https://picsum.photos/seed/google-cloud-dataproc/800/600'
-  },
-  {
-    id: '78',
-    title: 'GCP Vertex AI Platform Workflows',
-    description: 'Build, deploy, and scale machine learning models faster with a unified AI platform.',
-    category: 'GCP',
-    difficulty: 'Advanced',
-    duration: '5 hours',
-    tags: ['Vertex AI', 'Machine Learning', 'AI', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-vertex-ai/800/600'
-  },
-  {
-    id: '79',
-    title: 'GCP Cloud Vision API Integration',
-    description: 'Derive insights from your images with powerful pre-trained machine learning models.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1.5 hours',
-    tags: ['Cloud Vision', 'AI', 'ML', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-vision/800/600'
-  },
-  {
-    id: '80',
-    title: 'GCP Cloud Natural Language API',
-    description: 'Analyze text and derive insights like sentiment, entities, and syntax using ML.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1.5 hours',
-    tags: ['Natural Language', 'AI', 'ML', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-language/800/600'
-  },
-  {
-    id: '81',
-    title: 'GCP Cloud Translation API Implementation',
-    description: 'Dynamically translate text between thousands of language pairs using Google ML.',
-    category: 'GCP',
-    difficulty: 'Beginner',
-    duration: '1 hour',
-    tags: ['Cloud Translation', 'AI', 'ML', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-translation/800/600'
-  },
-  {
-    id: '82',
-    title: 'GCP Cloud Video Intelligence API',
-    description: 'Make your videos searchable and discoverable by extracting metadata with ML.',
-    category: 'GCP',
-    difficulty: 'Intermediate',
-    duration: '2.5 hours',
-    tags: ['Video Intelligence', 'AI', 'ML', 'GCP'],
-    image: 'https://picsum.photos/seed/google-cloud-video-intelligence/800/600'
-  },
-  {
     id: '83',
     title: 'Jenkins Pipeline as Code with Groovy',
     description: 'Define and manage your CI/CD pipelines using Jenkinsfiles and Groovy scripts for better version control.',
     category: 'DevOps',
     difficulty: 'Intermediate',
-    duration: '2 hours',
+    duration: '2.5 hours',
     tags: ['Jenkins', 'Groovy', 'CI/CD', 'Automation'],
     image: 'https://picsum.photos/seed/jenkins-pipeline/800/600'
   },
@@ -1116,7 +746,7 @@ export const projects: Project[] = [
     description: 'Learn to identify and mitigate the most critical web application security risks defined by OWASP.',
     category: 'Security',
     difficulty: 'Intermediate',
-    duration: '3 hours',
+    duration: '4 hours',
     tags: ['OWASP', 'Web Security', 'AppSec', 'Mitigation'],
     image: 'https://picsum.photos/seed/owasp-top-10/800/600'
   },
@@ -1389,5 +1019,35 @@ export const projects: Project[] = [
     duration: '3 hours',
     tags: ['OPA', 'Gatekeeper', 'Policy as Code', 'K8s'],
     image: 'https://picsum.photos/seed/opa-gatekeeper/800/600'
+  },
+  {
+    id: '139',
+    title: 'Kubernetes Cost Visibility with Kubecost',
+    description: 'Implement Kubecost to gain real-time visibility into your Kubernetes spending and resource allocation.',
+    category: 'Kubernetes',
+    difficulty: 'Intermediate',
+    duration: '2 hours',
+    tags: ['Kubecost', 'FinOps', 'Cost Management', 'K8s'],
+    image: 'https://picsum.photos/seed/kubecost-finops/800/600'
+  },
+  {
+    id: '140',
+    title: 'Optimizing Kubernetes Resource Quotas for FinOps',
+    description: 'Learn to implement and manage Resource Quotas and LimitRanges to control costs and prevent resource waste.',
+    category: 'Kubernetes',
+    difficulty: 'Intermediate',
+    duration: '1.5 hours',
+    tags: ['Resource Quotas', 'FinOps', 'Optimization', 'K8s'],
+    image: 'https://picsum.photos/seed/k8s-resource-quotas/800/600'
+  },
+  {
+    id: '150',
+    title: 'AI-Powered Chatbot with LangChain & Gemini',
+    description: 'Build a production-grade RAG (Retrieval-Augmented Generation) chatbot using modern LLM orchestration frameworks.',
+    category: 'DevOps',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['LangChain', 'OpenAI', 'Python', 'AI'],
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2000&auto=format&fit=crop'
   }
 ];

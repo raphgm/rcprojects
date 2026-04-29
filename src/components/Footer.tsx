@@ -2,7 +2,7 @@ import React from 'react';
 import { Github, Twitter, Linkedin, Youtube, Instagram, Mail, Sparkle } from 'lucide-react';
 
 interface FooterProps {
-  onTabChange: (tab: 'projects' | 'learn' | 'pricing') => void;
+  onTabChange: (tab: 'projects' | 'learn') => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
@@ -10,7 +10,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleLinkClick = (tab: 'projects' | 'learn' | 'pricing') => {
+  const handleLinkClick = (tab: 'projects' | 'learn') => {
     onTabChange(tab);
     scrollToTop();
   };
@@ -67,12 +67,6 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
                 <button onClick={() => handleLinkClick('projects')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
                   <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
                   Skill Trees
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleLinkClick('pricing')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
-                  <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
-                  Pricing
                 </button>
               </li>
               <li>

@@ -14,7 +14,7 @@ import { Project } from '../data/projects';
 
 interface ProjectCardProps {
   project: Project;
-  onStart: (mode: 'real' | 'cli') => void;
+  onStart: () => void;
   isCompleted?: boolean;
 }
 
@@ -78,7 +78,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ y: -8 }}
-      onClick={() => onStart('real')}
+      onClick={() => onStart()}
       className="group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 transition-all duration-500 flex flex-col h-full cursor-pointer relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]"
     >
       {/* Bottom Depth Layer */}
@@ -115,20 +115,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={(e) => { e.stopPropagation(); onStart('real'); }}
+            onClick={(e) => { e.stopPropagation(); onStart(); }}
             className="bg-white px-4 py-2 rounded-xl shadow-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 hover:bg-brand-blue hover:text-white transition-all cursor-pointer w-full justify-center"
           >
-            Real Lab
+            Start Lab
             <ArrowUpRight className="w-3.5 h-3.5" />
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => { e.stopPropagation(); onStart('cli'); }}
-            className="bg-zinc-900 px-4 py-2 rounded-xl shadow-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition-all cursor-pointer w-full justify-center"
-          >
-            CLI Test
-            <Terminal className="w-3.5 h-3.5" />
           </motion.button>
         </div>
       </div>

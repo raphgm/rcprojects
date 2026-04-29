@@ -72,7 +72,7 @@ const PathDetail: React.FC<{
   path: LearningPath; 
   onClose: () => void;
   onStartCourse: (id: string, title: string) => void;
-  onStartLab: (id: string, title: string, mode: 'real' | 'cli') => void;
+  onStartLab: (id: string, title: string) => void;
   isEnrolled: boolean;
   onEnroll: () => void;
   completedLabs: string[];
@@ -210,21 +210,12 @@ const PathDetail: React.FC<{
                       <div className="flex gap-2">
                         <button 
                           onClick={() => {
-                            onStartLab(project.id, project.title, 'real');
+                            onStartLab(project.id, project.title);
                             onClose();
                           }}
-                          className="flex-1 py-2 bg-zinc-900 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer"
+                          className="w-full py-2 bg-zinc-900 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer"
                         >
-                          Real Lab
-                        </button>
-                        <button 
-                          onClick={() => {
-                            onStartLab(project.id, project.title, 'cli');
-                            onClose();
-                          }}
-                          className="flex-1 py-2 bg-zinc-100 text-zinc-600 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all cursor-pointer"
-                        >
-                          CLI Test
+                          Start Lab
                         </button>
                       </div>
                     </div>
@@ -259,7 +250,7 @@ const PathDetail: React.FC<{
 
 interface LearnViewProps {
   onStartCourse: (id: string, title: string) => void;
-  onStartLab: (id: string, title: string, mode: 'real' | 'cli') => void;
+  onStartLab: (id: string, title: string) => void;
   completedLabs: string[];
 }
 
@@ -279,6 +270,8 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
       }
     }
   };
+
+  const paths = learningPaths;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
@@ -324,7 +317,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {learningPaths.map((path) => (
+        {paths.map((path) => (
           <div key={path.id} className="relative">
             <PathCard 
               path={path} 

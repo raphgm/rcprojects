@@ -7,7 +7,7 @@ import { Rocket, Search } from 'lucide-react';
 import { SquigglyArrow, ZigZag, DoodleWrapper } from './Doodles';
 
 interface ProjectGridProps {
-  onStartLab: (id: string, title: string, mode: 'real' | 'cli') => void;
+  onStartLab: (id: string, title: string) => void;
   completedLabs: string[];
 }
 
@@ -87,7 +87,7 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
               key={project.id} 
               project={project} 
               isCompleted={completedLabs.includes(project.id)}
-              onStart={(mode) => onStartLab(project.id, project.title, mode)} 
+              onStart={() => onStartLab(project.id, project.title)} 
             />
           ))}
         </AnimatePresence>
@@ -107,8 +107,8 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
             <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Guided Projects</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2">15+</div>
-            <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Cloud Providers</div>
+            <div className="text-4xl font-bold mb-2">100+</div>
+            <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Azure Labs</div>
           </div>
           <div>
             <div className="text-4xl font-bold mb-2">24/7</div>

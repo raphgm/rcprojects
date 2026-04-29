@@ -33,9 +33,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
   
   const currentLesson = lessons[currentLessonIndex];
   
-  const isCloudCourse = courseTitle.toLowerCase().includes('aws') || 
-                        courseTitle.toLowerCase().includes('gcp') || 
-                        courseTitle.toLowerCase().includes('azure') ||
+  const isCloudCourse = courseTitle.toLowerCase().includes('azure') ||
                         courseTitle.toLowerCase().includes('cloud');
 
   // Get flavor-specific content if available
@@ -69,9 +67,17 @@ export const LessonView: React.FC<LessonViewProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] bg-zinc-50 flex flex-col relative overflow-hidden"
+      className="fixed inset-0 z-[60] bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
+      onClick={onClose}
     >
-      {/* Doodles */}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-zinc-50 w-full max-w-6xl max-h-full rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative"
+      >
+        {/* Doodles */}
       <DoodleWrapper className="top-20 left-10 text-zinc-200 w-24 h-24">
         <SquigglyArrow />
       </DoodleWrapper>
@@ -141,42 +147,9 @@ export const LessonView: React.FC<LessonViewProps> = ({
           )}
 
           {isCloudCourse && (
-            <div className="relative">
-              <button 
-                onClick={() => setShowCloudSelector(!showCloudSelector)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors text-xs font-bold text-zinc-600"
-              >
-                <Settings2 className="w-3.5 h-3.5" />
-                Cloud: <span className="text-brand-blue uppercase">{cloudProvider}</span>
-              </button>
-
-              <AnimatePresence>
-                {showCloudSelector && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 z-50"
-                  >
-                    <div className="px-3 py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-100 mb-1">
-                      Choose Cloud Provider
-                    </div>
-                    {(['aws', 'gcp', 'azure'] as CloudProvider[]).map((provider) => (
-                      <button
-                        key={provider}
-                        onClick={() => {
-                          onCloudProviderChange?.(provider);
-                          setShowCloudSelector(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${cloudProvider === provider ? 'bg-brand-blue/10 text-brand-blue' : 'hover:bg-zinc-50 text-zinc-600'}`}
-                      >
-                        {provider.toUpperCase()}
-                        {cloudProvider === provider && <CheckCircle className="w-3.5 h-3.5 inline ml-2" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 rounded-lg text-xs font-bold text-zinc-600">
+              <Settings2 className="w-3.5 h-3.5" />
+              Cloud: <span className="text-brand-blue uppercase">Azure</span>
             </div>
           )}
           <div className="hidden md:flex items-center gap-2">
@@ -302,6 +275,13 @@ export const LessonView: React.FC<LessonViewProps> = ({
                       initialMessage={currentLesson.demoConfig?.initialMessage}
                       availableCommands={currentLesson.demoConfig?.availableCommands}
                       flavor={linuxFlavor}
+                      currentStep={currentLesson as any}
+                      allSteps={lessons.map(l => ({
+                        id: l.id,
+                        title: l.title,
+                        instruction: l.task || '',
+                      })) as any}
+                      currentStepIndex={currentLessonIndex}
                     />
                   ) : (
                     <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex-1 flex flex-col">
@@ -374,6 +354,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
           </div>
         )}
       </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 };

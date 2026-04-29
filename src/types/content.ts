@@ -10,12 +10,14 @@ export interface Lesson {
     rhel?: { content?: string; task?: string };
   };
   cloudContent?: {
-    aws?: { content?: string; task?: string };
-    gcp?: { content?: string; task?: string };
     azure?: { content?: string; task?: string };
   };
   demoType: 'terminal' | 'cloud-console' | 'code-editor';
   demoConfig?: any;
+  commands?: {
+    text: string;
+    explanation: string;
+  }[];
 }
 
 export interface CourseContent {
@@ -27,6 +29,22 @@ export interface LabStep {
   id: string;
   title: string;
   instruction: string;
+  summary?: string;
+  whyNeeded?: string;
+  pillarConnection?: string;
+  repository?: {
+    name: string;
+    url: string;
+    explanation: string;
+  };
+  detailedSteps?: {
+    title: string;
+    description: string;
+  }[];
+  commands?: {
+    text: string;
+    explanation: string;
+  }[];
   hint?: string;
   command?: string;
   feedback?: string;
@@ -41,6 +59,9 @@ export interface LabStep {
 
 export interface LabContent {
   projectId: string;
+  environment: 'linux' | 'azure' | 'kubernetes';
+  missionNumber?: number;
+  totalMissions?: number;
+  xpReward?: number;
   steps: LabStep[];
-  environment: 'linux' | 'aws' | 'azure' | 'gcp' | 'kubernetes';
 }

@@ -94,7 +94,6 @@ export const learningPaths: LearningPath[] = [
     ],
     projects: [
       { id: 'jenkins-pipeline', title: 'Automated Deployment Pipeline', difficulty: 'Hard', estimatedTime: '5h' },
-      { id: 'terraform-aws', title: 'AWS Infrastructure with Terraform', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'ansible-webserver', title: 'Configuring Nginx with Ansible', difficulty: 'Easy', estimatedTime: '2h' },
       { id: 'docker-swarm-cluster', title: 'Deploying a Docker Swarm Cluster', difficulty: 'Medium', estimatedTime: '6h' },
       { id: 'gitlab-ci-node', title: 'GitLab CI for Node.js Apps', difficulty: 'Medium', estimatedTime: '4h' },
@@ -311,10 +310,12 @@ export const learningPaths: LearningPath[] = [
       { id: 'k8s-crds', title: 'Configure Custom Resource Definitions', difficulty: 'Hard', estimatedTime: '6h' },
       { id: 'multi-cluster-k8s', title: 'Multi-cluster K8s Environment', difficulty: 'Hard', estimatedTime: '12h' },
       { id: 'security-contexts', title: 'Implement Security Contexts', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'externaldns-route53', title: 'Configure ExternalDNS for Route53', difficulty: 'Medium', estimatedTime: '5h' },
+      { id: 'externaldns-azure-dns', title: 'Configure ExternalDNS for Azure DNS', difficulty: 'Medium', estimatedTime: '5h' },
       { id: 'kubeflow-ml', title: 'ML Model with Kubeflow', difficulty: 'Hard', estimatedTime: '15h' },
       { id: 'admission-controllers', title: 'Implement Admission Controllers', difficulty: 'Hard', estimatedTime: '8h' },
       { id: 'local-k8s-kind', title: 'Local K8s Cluster with Kind', difficulty: 'Easy', estimatedTime: '1h' },
+      { id: '139', title: 'Kubernetes Cost Visibility with Kubecost', difficulty: 'Medium', estimatedTime: '2h' },
+      { id: '140', title: 'Optimizing Kubernetes Resource Quotas for FinOps', difficulty: 'Medium', estimatedTime: '1.5h' },
       // Programmatically generate remaining projects up to 100
       ...Array.from({ length: 70 }, (_, i) => ({
         id: `k8s-proj-ext-${i + 1}`,
@@ -489,27 +490,6 @@ export const learningPaths: LearningPath[] = [
     ]
   },
   {
-    id: 'aws',
-    title: 'AWS',
-    skills: 420,
-    coursesCount: 15,
-    projectsCount: 50,
-    icon: 'Cloud',
-    description: 'Master the world\'s leading cloud platform and its services.',
-    color: 'bg-orange-400',
-    courses: [
-      { id: 'aws-practitioner', title: 'AWS Cloud Practitioner', duration: '10h', level: 'Beginner', lessons: 100 },
-      { id: 'aws-architect', title: 'AWS Solutions Architect', duration: '30h', level: 'Advanced', lessons: 100 },
-      { id: 'aws-developer', title: 'AWS Certified Developer', duration: '25h', level: 'Intermediate', lessons: 100 },
-      { id: 'aws-sysops', title: 'AWS SysOps Administrator', duration: '28h', level: 'Intermediate', lessons: 100 }
-    ],
-    projects: [
-      { id: 'serverless-app', title: 'Serverless Photo Gallery', difficulty: 'Medium', estimatedTime: '8h' },
-      { id: 'aws-ha-web', title: 'Highly Available Web App on AWS', difficulty: 'Hard', estimatedTime: '12h' },
-      { id: 'aws-data-lake', title: 'Building a Data Lake on AWS', difficulty: 'Hard', estimatedTime: '15h' }
-    ]
-  },
-  {
     id: 'rust',
     title: 'Rust',
     skills: 76,
@@ -643,53 +623,6 @@ export const learningPaths: LearningPath[] = [
       { id: 'log-analyzer', title: 'Automated Log Analyzer', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'system-health-check', title: 'System Health Dashboard Script', difficulty: 'Medium', estimatedTime: '5h' },
       { id: 'backup-rotation-shell', title: 'Incremental Backup Script', difficulty: 'Hard', estimatedTime: '6h' }
-    ]
-  },
-  {
-    id: 'gcp',
-    title: 'Google Cloud',
-    skills: 280,
-    coursesCount: 10,
-    projectsCount: 30,
-    icon: 'CloudFog',
-    description: 'Leverage Google\'s infrastructure for your applications.',
-    color: 'bg-brand-blue',
-    courses: [
-      { id: 'gcp-basics', title: 'Google Cloud Fundamentals', duration: '8h', level: 'Beginner', lessons: 25 },
-      { id: 'gcp-architect', title: 'GCP Professional Architect', duration: '25h', level: 'Advanced', lessons: 70 },
-      { id: 'gcp-data-engineer', title: 'GCP Data Engineering', duration: '20h', level: 'Advanced', lessons: 55 }
-    ],
-    projects: [
-      { id: 'gcp-deployment', title: 'Deploying Apps on GKE', difficulty: 'Hard', estimatedTime: '12h' },
-      { id: 'compute-engine-vm', title: 'Deploy a Compute Engine Instance', difficulty: 'Easy', estimatedTime: '1h' },
-      { id: 'gcp-vpc-config', title: 'Configure Google Cloud VPC', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'cloud-sql-mysql', title: 'Setup Cloud SQL for MySQL', difficulty: 'Medium', estimatedTime: '2h' },
-      { id: 'app-engine-standard', title: 'App Engine Standard Environment', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'cloud-load-balancing', title: 'Configure Cloud Load Balancing', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'iam-roles-gcp', title: 'Manage IAM Roles & Permissions', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'cloud-storage-buckets', title: 'Setup Cloud Storage Buckets', difficulty: 'Easy', estimatedTime: '1h' },
-      { id: 'cloud-functions-gcp', title: 'Implement Cloud Functions', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'cloud-armor-waf', title: 'Configure Cloud Armor (WAF)', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'cloud-build-cicd', title: 'Implement Cloud Build CI/CD', difficulty: 'Medium', estimatedTime: '5h' },
-      { id: 'secret-manager-gcp', title: 'Configure Secret Manager', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'cloud-monitor-logs', title: 'Cloud Monitoring & Logging', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'cloud-run-serverless', title: 'Cloud Run Serverless Containers', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'cloud-cdn-gcp', title: 'Configure Cloud CDN', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'bigquery-analytics', title: 'BigQuery for Data Analytics', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'cloud-pubsub', title: 'Implement Cloud Pub/Sub', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'cloud-iap', title: 'Cloud Identity-Aware Proxy', difficulty: 'Hard', estimatedTime: '6h' },
-      { id: 'artifact-registry', title: 'Setup Artifact Registry', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'org-policies-gcp', title: 'Implement Organization Policies', difficulty: 'Hard', estimatedTime: '5h' },
-      { id: 'cloud-router-interconnect', title: 'Cloud Router & Interconnect', difficulty: 'Hard', estimatedTime: '10h' },
-      { id: 'cloud-spanner-db', title: 'Setup Cloud Spanner', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'cloud-tasks-gcp', title: 'Implement Cloud Tasks', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'cloud-nat-config', title: 'Configure Cloud NAT', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'vertex-ai-ml', title: 'Setup Vertex AI for ML', difficulty: 'Hard', estimatedTime: '12h' },
-      { id: 'security-command-center', title: 'Cloud Security Command Center', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'cloud-dns-gcp', title: 'Configure Cloud DNS', difficulty: 'Easy', estimatedTime: '2h' },
-      { id: 'cloud-dataflow-gcp', title: 'Setup Cloud Dataflow', difficulty: 'Hard', estimatedTime: '10h' },
-      { id: 'cloud-endpoints', title: 'Implement Cloud Endpoints', difficulty: 'Medium', estimatedTime: '5h' },
-      { id: 'deployment-manager', title: 'Cloud Deployment Manager', difficulty: 'Medium', estimatedTime: '6h' }
     ]
   },
   {
@@ -858,6 +791,27 @@ export const learningPaths: LearningPath[] = [
       { id: 'image-gen-app', title: 'AI Image Generation App', difficulty: 'Medium', estimatedTime: '6h' },
       { id: 'rag-system', title: 'RAG System for Documents', difficulty: 'Hard', estimatedTime: '10h' },
       { id: 'ai-content-gen', title: 'Automated Content Generator', difficulty: 'Medium', estimatedTime: '4h' }
+    ]
+  },
+  {
+    id: 'finops',
+    title: 'Cloud FinOps',
+    icon: 'DollarSign',
+    skills: 120,
+    coursesCount: 3,
+    projectsCount: 15,
+    description: 'Master the art of cloud financial management and cost optimization.',
+    color: 'bg-emerald-500',
+    courses: [
+      { id: 'finops-fundamentals', title: 'FinOps Fundamentals', duration: '4h', level: 'Beginner', lessons: 12 },
+      { id: 'cloud-cost-optimization', title: 'Cloud Cost Optimization', duration: '8h', level: 'Intermediate', lessons: 20 },
+      { id: 'k8s-finops-mastery', title: 'Kubernetes FinOps Mastery', duration: '10h', level: 'Advanced', lessons: 25 }
+    ],
+    projects: [
+      { id: '139', title: 'Kubernetes Cost Visibility with Kubecost', difficulty: 'Medium', estimatedTime: '2h' },
+      { id: '140', title: 'Optimizing Kubernetes Resource Quotas for FinOps', difficulty: 'Medium', estimatedTime: '1.5h' },
+      { id: 'aws-cost-explorer', title: 'AWS Cost Explorer Automation', difficulty: 'Medium', estimatedTime: '3h' },
+      { id: 'gcp-billing-export', title: 'GCP Billing Export to BigQuery', difficulty: 'Hard', estimatedTime: '5h' }
     ]
   }
 ];

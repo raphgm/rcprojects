@@ -25,7 +25,12 @@ The terminal is where the magic happens in Linux. You interact with the system u
         demoConfig: {
           initialMessage: 'Welcome to the Linux Sandbox! Try typing "ls" or "pwd".',
           availableCommands: ['ls', 'pwd', 'whoami', 'date', 'clear']
-        }
+        },
+        commands: [
+          { text: 'ls', explanation: 'List all files and folders in the current directory.' },
+          { text: 'pwd', explanation: 'Show the absolute path of your current working directory.' },
+          { text: 'whoami', explanation: 'Display the username of the current user.' }
+        ]
       },
       {
         id: 'package-management',
@@ -99,7 +104,12 @@ Red Hat Enterprise Linux (RHEL) uses **DNF (Dandified YUM)** or **YUM**.
         demoConfig: {
           initialMessage: 'Try using your flavor\'s package manager (apt, yum, or apk).',
           availableCommands: ['apt', 'yum', 'dnf', 'apk', 'clear']
-        }
+        },
+        commands: [
+          { text: 'sudo apt update', explanation: 'Refresh the local package index to see new updates.' },
+          { text: 'sudo apt list --upgradable', explanation: 'List all packages that have a newer version available.' },
+          { text: 'sudo apt install -y curl', explanation: 'Install the curl utility non-interactively.' }
+        ]
       },
       {
         id: 'file-system',
@@ -124,7 +134,12 @@ Everything in Linux is a file. The root directory is denoted by \`/\`.
         demoConfig: {
           initialMessage: 'Try navigating the file system using "cd" and "ls".',
           availableCommands: ['ls', 'pwd', 'cd', 'mkdir', 'touch', 'clear']
-        }
+        },
+        commands: [
+          { text: 'cd /etc', explanation: 'Change the current directory to the system config folder.' },
+          { text: 'ls -la', explanation: 'List all files, including hidden ones, with detailed metadata.' },
+          { text: 'cd ~', explanation: 'Return to your home directory.' }
+        ]
       },
       // Programmatically generate 98 more lessons for Linux Basics
       ...Array.from({ length: 98 }, (_, i) => ({
@@ -173,30 +188,6 @@ To shorten the systems development life cycle and provide continuous delivery wi
         `,
         task: 'Review the mock pipeline status in the cloud console demo below.',
         cloudContent: {
-          aws: {
-            content: `
-# DevOps on AWS
-AWS provides a robust set of tools for DevOps, including CodePipeline, CodeBuild, and CodeDeploy.
-
-## Key Services
-- **AWS CodePipeline**: Continuous delivery service.
-- **AWS CodeBuild**: Fully managed build service.
-- **AWS CodeDeploy**: Automated software deployment.
-            `,
-            task: 'Explore the AWS CodePipeline status in the sandbox.'
-          },
-          gcp: {
-            content: `
-# DevOps on Google Cloud
-Google Cloud Platform (GCP) offers Cloud Build and Cloud Deploy for modern CI/CD.
-
-## Key Services
-- **Cloud Build**: Serverless CI/CD platform.
-- **Cloud Deploy**: Managed CD service for GKE and Cloud Run.
-- **Artifact Registry**: Store and manage build artifacts.
-            `,
-            task: 'Check the Google Cloud Build logs in the sandbox.'
-          },
           azure: {
             content: `
 # DevOps on Microsoft Azure
@@ -229,9 +220,9 @@ Azure DevOps provides a comprehensive suite of services for the entire lifecycle
 This module dives deep into modern DevOps engineering practices, focusing on automation, scalability, and reliability.
 
 ## Key Focus Areas
-- Infrastructure as Code (Terraform, CloudFormation)
-- Configuration Management (Ansible, Chef)
-- Monitoring & Observability (Prometheus, ELK)
+- Infrastructure as Code (Terraform, Bicep)
+- Configuration Management (Ansible, PowerShell)
+- Monitoring & Observability (Azure Monitor, Log Analytics)
 - Security Integration (DevSecOps)
 - Site Reliability Engineering (SRE) principles
 
@@ -239,8 +230,8 @@ Building resilient and scalable systems for the modern cloud.
         `,
         demoType: 'cloud-console' as const,
         demoConfig: {
-          provider: 'AWS' as const,
-          service: 'CloudWatch',
+          provider: 'Azure' as const,
+          service: 'Azure Monitor',
           mockData: {
             metrics: ['CPU Utilization', 'Memory Usage', 'Request Count', 'Error Rate'],
             status: 'Healthy'
@@ -338,8 +329,8 @@ Master the skills required for senior Linux administrator roles.
 Terraform is an open-source Infrastructure as Code (IaC) tool created by HashiCorp.
 
 ## Key Concepts
-- **Providers**: Plugins that interact with cloud APIs (AWS, Azure, GCP).
-- **Resources**: The components of your infrastructure (EC2, S3, VPC).
+- **Providers**: Plugins that interact with cloud APIs (Azure, Kubernetes, etc.).
+- **Resources**: The components of your infrastructure (Virtual Machines, Storage Accounts, VNets).
 - **State**: A record of your managed infrastructure.
 - **Variables**: Make your configurations reusable.
 
@@ -353,7 +344,12 @@ Terraform is an open-source Infrastructure as Code (IaC) tool created by HashiCo
         demoConfig: {
           initialMessage: 'Terraform CLI initialized. Try "terraform init".',
           availableCommands: ['terraform init', 'terraform plan', 'terraform apply', 'ls', 'clear']
-        }
+        },
+        commands: [
+          { text: 'terraform init', explanation: 'Initialize the working directory and download providers.' },
+          { text: 'terraform plan', explanation: 'Create an execution plan to see what will be changed.' },
+          { text: 'terraform apply -auto-approve', explanation: 'Apply the changes to reach the desired state automatically.' }
+        ]
       },
       // Programmatically generate 99 more lessons for Terraform
       ...Array.from({ length: 99 }, (_, i) => ({
@@ -365,7 +361,7 @@ This lesson explores advanced IaC patterns, focusing on modularity, state manage
 
 ## Key Focus Areas
 - Terraform Modules & Registry
-- Remote State Management (S3, Terraform Cloud)
+- Remote State Management (Azure Storage, Terraform Cloud)
 - Workspaces & Environments
 - Sentinel Policy as Code
 - Provider Development Basics
@@ -376,93 +372,6 @@ Building scalable and maintainable infrastructure with code.
         demoConfig: {
           initialMessage: `Terraform Lesson ${i + 2} ready.`,
           availableCommands: ['terraform plan', 'terraform apply', 'terraform show', 'clear']
-        }
-      }))
-    ]
-  },
-  {
-    courseId: 'aws-solutions-architect',
-    lessons: [
-      {
-        id: 'aws-vpc',
-        title: 'Cloud Networking Fundamentals',
-        content: `
-# Virtual Private Cloud (VPC)
-A VPC is a logically isolated section of the cloud where you can launch resources.
-        `,
-        cloudContent: {
-          aws: {
-            content: `
-# Amazon VPC
-Amazon Virtual Private Cloud (VPC) lets you provision a logically isolated section of the AWS Cloud.
-
-## Key Components
-- **Subnets**: IP ranges within the VPC.
-- **Route Tables**: Traffic routing rules.
-- **Internet Gateway**: Connection to the public internet.
-            `,
-            task: 'Configure a public subnet in your AWS VPC.'
-          },
-          gcp: {
-            content: `
-# Google Cloud VPC
-Google Cloud VPC provides networking functionality to Compute Engine VM instances, GKE clusters, and App Engine.
-
-## Key Components
-- **Subnetworks**: Regional resources with IP ranges.
-- **Firewall Rules**: Control traffic to/from instances.
-- **Cloud Router**: Dynamic routing using BGP.
-            `,
-            task: 'Create a regional subnet in your Google Cloud VPC.'
-          },
-          azure: {
-            content: `
-# Azure Virtual Network (VNet)
-Azure Virtual Network (VNet) is the fundamental building block for your private network in Azure.
-
-## Key Components
-- **Subnets**: Segments of the VNet address space.
-- **Network Security Groups (NSG)**: Filter network traffic.
-- **Azure Bastion**: Secure RDP/SSH access.
-            `,
-            task: 'Set up a Network Security Group (NSG) for your Azure VNet.'
-          }
-        },
-        demoType: 'cloud-console',
-        demoConfig: {
-          service: 'VPC Console',
-          mockData: {
-            pipelineName: 'VPC-Production',
-            stages: ['Create VPC', 'Add Subnets', 'Config Routing', 'Attach Gateway']
-          }
-        }
-      },
-      // Programmatically generate 99 more lessons for AWS Solutions Architect
-      ...Array.from({ length: 99 }, (_, i) => ({
-        id: `aws-sa-ext-${i + 1}`,
-        title: `AWS Solutions Architecture: Part ${i + 2}`,
-        content: `
-# Advanced AWS Architecture ${i + 2}
-This lesson covers enterprise-grade architecture on AWS, focusing on high availability, disaster recovery, and cost optimization.
-
-## Topics Covered
-- Multi-region Architectures
-- AWS Direct Connect & Transit Gateway
-- Advanced Security with AWS Shield & WAF
-- Data Migration Strategies
-- Cost Optimization with Spot Instances & Savings Plans
-
-Designing robust and cost-effective solutions on the world's leading cloud platform.
-        `,
-        demoType: 'cloud-console' as const,
-        demoConfig: {
-          provider: 'AWS' as const,
-          service: 'Architecture Center',
-          mockData: {
-            diagram: 'High-Availability-Web-App',
-            status: 'Optimized',
-            costEstimate: '$120/month'
-          }
         }
       }))
     ]
@@ -492,7 +401,12 @@ Kubernetes (K8s) is an open-source system for automating deployment, scaling, an
         demoConfig: {
           initialMessage: 'Kubernetes cluster ready. Try "kubectl get nodes".',
           availableCommands: ['kubectl get nodes', 'kubectl get pods', 'kubectl cluster-info', 'clear']
-        }
+        },
+        commands: [
+          { text: 'kubectl get nodes', explanation: 'List all nodes currently active in the cluster.' },
+          { text: 'kubectl cluster-info', explanation: 'Display endpoint information about the control plane and services.' },
+          { text: 'kubectl get namespaces', explanation: 'List all isolated namespaces in the cluster.' }
+        ]
       },
       // Programmatically generate 99 more lessons for Kubernetes Fundamentals
       ...Array.from({ length: 99 }, (_, i) => ({
@@ -682,6 +596,59 @@ Prompt Engineering is the process of structuring text that can be interpreted an
         demoConfig: {
           initialMessage: 'Prompt Sandbox. Try different prompting styles.',
           availableCommands: ['help', 'clear']
+        }
+      }
+    ]
+  },
+  {
+    courseId: 'k8s-finops-mastery',
+    lessons: [
+      {
+        id: 'k8s-cost-visibility',
+        title: 'Kubernetes Cost Visibility',
+        content: `
+# Visibility: The First Step in FinOps
+In Kubernetes, costs are often hidden behind shared resources. Gaining visibility is the "Inform" phase of the FinOps lifecycle.
+
+## Why Visibility Matters
+- **Accountability**: Assign costs to specific teams or projects.
+- **Budgeting**: Predict future spending based on current trends.
+- **Optimization**: Identify where resources are being wasted.
+
+## Tools for Visibility
+- **Kubecost**: Real-time cost monitoring and allocation.
+- **Cloud Provider Billing**: Azure Cost Management, Azure Advisor.
+- **Prometheus/Grafana**: Custom dashboards for resource usage.
+        `,
+        task: 'Explore the Kubecost dashboard in the lab to see cost allocation by namespace.',
+        demoType: 'terminal',
+        demoConfig: {
+          initialMessage: 'Kubecost API Sandbox. Try querying for cost data.',
+          availableCommands: ['curl', 'kubectl', 'helm', 'clear']
+        }
+      },
+      {
+        id: 'k8s-resource-optimization',
+        title: 'Optimizing Kubernetes Resources',
+        content: `
+# Optimization: Reducing Waste
+Once you have visibility, the next step is the "Optimize" phase. This involves adjusting resources to match actual demand.
+
+## Key Optimization Techniques
+1. **Right-sizing**: Adjusting CPU/Memory requests and limits based on actual usage.
+2. **Autoscaling**: Using HPA and VPA to scale pods dynamically.
+3. **Resource Quotas**: Enforcing boundaries at the namespace level.
+4. **Spot Instances**: Using cheaper, preemptible nodes for non-critical workloads.
+
+## Resource Quotas and LimitRanges
+- **ResourceQuotas**: Limit the total resources a namespace can consume.
+- **LimitRanges**: Enforce default and max/min resource settings for individual pods.
+        `,
+        task: 'Apply a ResourceQuota to the "dev" namespace and verify it is enforced.',
+        demoType: 'terminal',
+        demoConfig: {
+          initialMessage: 'Kubernetes Optimization Sandbox. Try applying quotas.',
+          availableCommands: ['kubectl', 'apply', 'describe', 'clear']
         }
       }
     ]

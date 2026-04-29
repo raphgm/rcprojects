@@ -8,7 +8,6 @@ import { LabView } from './components/LabView';
 import { Footer } from './components/Footer';
 import { TrustedBy } from './components/TrustedBy';
 import { Features } from './components/Features';
-import { PricingView } from './components/PricingView';
 import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { AnimatePresence } from 'motion/react';
@@ -20,28 +19,41 @@ import { db } from './firebase';
 import { doc, getDocFromServer } from 'firebase/firestore';
 
 export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
-export type CloudProvider = 'aws' | 'gcp' | 'azure';
+export type CloudProvider = 'azure';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'learn' | 'pricing'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'learn'>('projects');
   const [activeLesson, setActiveLesson] = useState<{ lessons: Lesson[], title: string } | null>(null);
-  const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string, mode: 'real' | 'cli' } | null>(null);
+  const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
   const [completedLabs, setCompletedLabs] = useState<string[]>([]);
   const [linuxFlavor, setLinuxFlavor] = useState<LinuxFlavor>('ubuntu');
-  const [cloudProvider, setCloudProvider] = useState<CloudProvider>('aws');
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>('azure');
+  const [xp, setXp] = useState<number>(0);
 
   useEffect(() => {
-    async function testConnection() {
-      try {
-        await getDocFromServer(doc(db, 'test', 'connection'));
-      } catch (error) {
-        if(error instanceof Error && error.message.includes('the client is offline')) {
-          console.error("Please check your Firebase configuration. ");
-        }
-      }
-    }
-    testConnection();
+    // Load XP and completed labs from local storage if needed
+    const savedXp = localStorage.getItem('realcloud_xp');
+    const savedLabs = localStorage.getItem('realcloud_completed_labs');
+    if (savedXp) setXp(parseInt(savedXp));
+    if (savedLabs) setCompletedLabs(JSON.parse(savedLabs));
   }, []);
+
+  const completeLab = (projectId: string, xpReward?: number) => {
+    if (!completedLabs.includes(projectId)) {
+      setCompletedLabs(prev => {
+        const newCompleted = [...prev, projectId];
+        localStorage.setItem('realcloud_completed_labs', JSON.stringify(newCompleted));
+        return newCompleted;
+      });
+      
+      const addedXp = xpReward || 250;
+      setXp(currentXp => {
+        const newXp = currentXp + addedXp;
+        localStorage.setItem('realcloud_xp', newXp.toString());
+        return newXp;
+      });
+    }
+  };
 
   const startCourse = (courseId: string, courseTitle: string) => {
     setActiveLab(null); // Clear active lab
@@ -65,11 +77,11 @@ export default function App() {
     }
   };
 
-  const startLab = (projectId: string, projectTitle: string, mode: 'real' | 'cli' = 'real') => {
+  const startLab = (projectId: string, projectTitle: string) => {
     setActiveLesson(null); // Clear active lesson
     const content = labContents.find(l => l.projectId === projectId);
     if (content) {
-      setActiveLab({ lab: content, title: projectTitle, mode });
+      setActiveLab({ lab: content, title: projectTitle });
     } else {
       // Fallback for demo purposes
       setActiveLab({
@@ -82,15 +94,8 @@ export default function App() {
             { id: 'step-3', title: 'Verification', instruction: 'Verify that all components are working as expected.', hint: 'Use the check commands to validate your deployment.' }
           ]
         },
-        title: projectTitle,
-        mode
+        title: projectTitle
       });
-    }
-  };
-
-  const completeLab = (projectId: string) => {
-    if (!completedLabs.includes(projectId)) {
-      setCompletedLabs(prev => [...prev, projectId]);
     }
   };
 
@@ -98,7 +103,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white font-sans selection:bg-zinc-900 selection:text-white">
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navbar activeTab={activeTab} onTabChange={setActiveTab} xp={xp} />
       <main>
         {activeTab === 'projects' && (
           <Hero 
@@ -126,10 +131,6 @@ export default function App() {
 
         {activeTab === 'learn' && (
           <LearnView onStartCourse={startCourse} onStartLab={startLab} completedLabs={completedLabs} />
-        )}
-
-        {activeTab === 'pricing' && (
-          <PricingView />
         )}
 
         {activeTab === 'projects' && <Features />}
@@ -186,9 +187,8 @@ export default function App() {
             key="lab-view"
             lab={activeLab.lab}
             projectTitle={activeLab.title}
-            mode={activeLab.mode}
             onClose={() => setActiveLab(null)}
-            onComplete={() => completeLab(activeLab.lab.projectId)}
+            onComplete={(xpReward) => completeLab(activeLab.lab.projectId, xpReward)}
           />
         )}
       </AnimatePresence>
