@@ -30,7 +30,7 @@ const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: b
       className={`relative bg-white border border-zinc-200 rounded-2xl p-6 transition-all group ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'}`}
     >
       {isLocked && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900/15 rounded-2xl pointer-events-none">
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-6 bg-zinc-900/15 rounded-2xl pointer-events-none">
           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
             <Lock className="w-5 h-5 text-zinc-900" />
           </div>
