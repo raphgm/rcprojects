@@ -34,7 +34,7 @@ const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: b
           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
             <Lock className="w-5 h-5 text-zinc-900" />
           </div>
-          <span className="px-3 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Coming Soon</span>
+          <span className="px-3 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Under Development</span>
         </div>
       )}
       <div className={`w-12 h-12 ${path.color} rounded-xl flex items-center justify-center mb-6 text-white shadow-lg`}>
@@ -330,7 +330,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={path.id !== 'linux'}
+              isLocked={false}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">

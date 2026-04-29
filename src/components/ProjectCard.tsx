@@ -87,7 +87,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
           <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
             <Lock className="w-6 h-6 text-zinc-900" />
           </div>
-          <span className="px-4 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Coming Soon</span>
+          <span className="px-4 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Under Development</span>
         </div>
       )}
       {/* Bottom Depth Layer */}

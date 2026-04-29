@@ -87,7 +87,7 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
               key={project.id} 
               project={project} 
               isCompleted={completedLabs.includes(project.id)}
-              isLocked={project.category !== 'DevOps'}
+              isLocked={false}
               onStart={() => onStartLab(project.id, project.title)} 
             />
           ))}
