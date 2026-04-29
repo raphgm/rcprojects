@@ -35,7 +35,7 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
           >
             <div className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-brand-blue/10 text-brand-blue mb-8 uppercase tracking-[0.2em] border border-brand-blue/20">
               <span className="flex h-1.5 w-1.5 rounded-full bg-brand-blue mr-2 animate-pulse"></span>
-              The Future of Learning
+              No Videos. 100% Hands-on Learning.
             </div>
             <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-zinc-900 mb-8 leading-[0.95]">
               Build your <br />
@@ -52,7 +52,7 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
                 onClick={onStart}
                 className="w-full sm:w-auto px-12 py-5 bg-brand-blue text-white rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-brand-blue/90 transition-all shadow-2xl shadow-brand-blue/20 group text-lg cursor-pointer"
               >
-                Start Learning
+                Start Learning for Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
               <motion.button 

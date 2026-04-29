@@ -12,6 +12,8 @@ import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { AboutUs } from './components/AboutUs';
 import { Blog } from './components/Blog';
+import { StatsBar } from './components/StatsBar';
+import { Community } from './components/Community';
 import { StaticPage } from './components/StaticPage';
 import type { FooterTab } from './components/Footer';
 import { AnimatePresence } from 'motion/react';
@@ -127,6 +129,8 @@ export default function App() {
         )}
         
         {activeTab === 'projects' && <TrustedBy />}
+
+        {activeTab === 'projects' && <StatsBar />}
         
         {activeTab === 'projects' && <HowItWorks />}
         
@@ -147,6 +151,8 @@ export default function App() {
         {activeTab === 'projects' && <Features />}
 
         {activeTab === 'projects' && <Testimonials />}
+
+        {activeTab === 'projects' && <Community onStart={() => { const el = document.getElementById('projects-section'); el?.scrollIntoView({ behavior: 'smooth' }); }} />}
 
         {activeTab === 'projects' && <AboutUs />}
 

@@ -8,7 +8,7 @@ import {
   GitBranch, Terminal, Search, Settings,
   MessageSquare, Layout, Layers, Radio,
   Hexagon, Key, ShieldCheck, Code, Workflow,
-  CheckCircle2, Lock
+  CheckCircle2
 } from 'lucide-react';
 import { Project } from '../data/projects';
 
@@ -134,7 +134,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
       </div>
 
       <div className="p-10 flex flex-col flex-1">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
+          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${difficultyColor[project.difficulty]}`}>
+            {project.difficulty}
+          </span>
+          <div className="w-1 h-1 rounded-full bg-zinc-200"></div>
           <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">{project.category}</span>
           <div className="w-1 h-1 rounded-full bg-zinc-200"></div>
           <div className="flex items-center gap-2 text-zinc-400">
