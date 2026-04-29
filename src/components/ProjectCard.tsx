@@ -80,10 +80,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       whileHover={isLocked ? undefined : { y: -8 }}
       onClick={() => { if (!isLocked) onStart(); }}
-      className={`group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] ${isLocked ? 'cursor-not-allowed opacity-70 grayscale' : 'cursor-pointer hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]'}`}
+      className={`group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]'}`}
     >
       {isLocked && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900/55 backdrop-blur-[2px] rounded-[2.5rem] pointer-events-none">
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900/15 rounded-[2.5rem] pointer-events-none">
           <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
             <Lock className="w-6 h-6 text-zinc-900" />
           </div>
