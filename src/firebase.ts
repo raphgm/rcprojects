@@ -15,8 +15,20 @@ export interface UserProfile {
   displayName: string | null;
   photoURL: string | null;
   createdAt: Timestamp;
-  role: 'user' | 'admin';
+  role: 'user' | 'editor' | 'admin' | 'owner';
 }
+
+// Hard-coded owner email — bootstraps owner permissions without manual Firestore edits.
+export const OWNER_EMAIL = 'raphgm@gmail.com';
+
+export const canWriteTutorials = (
+  email: string | null | undefined,
+  role: UserProfile['role'] | null | undefined
+): boolean => {
+  if (!email) return false;
+  if (email.toLowerCase() === OWNER_EMAIL.toLowerCase()) return true;
+  return role === 'editor' || role === 'owner' || role === 'admin';
+};
 
 export const signInWithGoogle = async () => {
   try {

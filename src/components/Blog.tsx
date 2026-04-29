@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Edit3, Trash2, Save, X, BookOpen, Calendar, Tag } from 'lucide-react';
+import { Plus, Edit3, Trash2, Save, X, BookOpen, Calendar, Tag, Lock } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db, canWriteTutorials, UserProfile } from '../firebase';
 
 interface BlogPost {
   id: string;
@@ -176,6 +179,28 @@ export const Blog: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [editing, setEditing] = useState<BlogPost | null>(null);
   const [filter, setFilter] = useState<string>('all');
+  const [canWrite, setCanWrite] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // Watch auth state → resolve role → decide write permission
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setCanWrite(false);
+        setUserEmail(null);
+        return;
+      }
+      setUserEmail(user.email);
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const role = (snap.exists() ? (snap.data() as UserProfile).role : 'user') as UserProfile['role'];
+        setCanWrite(canWriteTutorials(user.email, role));
+      } catch {
+        setCanWrite(canWriteTutorials(user.email, 'user'));
+      }
+    });
+    return () => unsub();
+  }, []);
 
   // Load posts on mount
   useEffect(() => {
@@ -302,11 +327,26 @@ export const Blog: React.FC = () => {
           </div>
           <button
             onClick={startNew}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue text-white rounded-xl font-bold text-sm hover:bg-brand-blue/90 transition-all shadow-lg shadow-brand-blue/20"
+            disabled={!canWrite}
+            title={canWrite ? 'Write a new tutorial' : 'Only editors and owners can write tutorials'}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              canWrite
+                ? 'bg-brand-blue text-white hover:bg-brand-blue/90 shadow-lg shadow-brand-blue/20'
+                : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
+            }`}
           >
-            <Plus className="w-4 h-4" /> New Tutorial
+            {canWrite ? <Plus className="w-4 h-4" /> : <Lock className="w-4 h-4" />} New Tutorial
           </button>
         </div>
+
+        {!canWrite && (
+          <div className="mb-8 flex items-start gap-3 px-5 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-900">
+            <Lock className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>
+              Tutorials are read-only. {userEmail ? <>Signed in as <strong>{userEmail}</strong> — only editors and the owner can publish tutorials.</> : <>Sign in as an editor or the owner to publish tutorials.</>}
+            </span>
+          </div>
+        )}
 
         {/* Editor or list / detail */}
         <AnimatePresence mode="wait">
@@ -325,6 +365,7 @@ export const Blog: React.FC = () => {
               onBack={() => setActiveId(null)}
               onEdit={() => startEdit(activePost)}
               onDelete={() => deletePost(activePost.id)}
+              canWrite={canWrite}
             />
           ) : (
             <motion.div
@@ -338,7 +379,7 @@ export const Blog: React.FC = () => {
                 <div className="col-span-full bg-white border border-dashed border-zinc-300 rounded-3xl p-12 text-center">
                   <BookOpen className="w-10 h-10 text-zinc-300 mx-auto mb-4" />
                   <p className="text-zinc-500 text-sm">
-                    No tutorials yet. Click <strong>New Tutorial</strong> to write one.
+                    No tutorials yet.{canWrite && <> Click <strong>New Tutorial</strong> to write one.</>}
                   </p>
                 </div>
               ) : (
@@ -369,24 +410,32 @@ export const Blog: React.FC = () => {
                       <span>{p.author}</span>
                     </div>
                     <div className="flex gap-2 mt-4 pt-4 border-t border-zinc-100">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startEdit(p);
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-lg transition-colors"
-                      >
-                        <Edit3 className="w-3 h-3" /> Edit
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deletePost(p.id);
-                        }}
-                        className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                      {canWrite ? (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEdit(p);
+                            }}
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-lg transition-colors"
+                          >
+                            <Edit3 className="w-3 h-3" /> Edit
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deletePost(p.id);
+                            }}
+                            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <span className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-400">
+                          <BookOpen className="w-3 h-3" /> Read tutorial
+                        </span>
+                      )}
                     </div>
                   </motion.article>
                 ))
@@ -528,8 +577,9 @@ interface DetailProps {
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  canWrite: boolean;
 }
-const Detail: React.FC<DetailProps> = ({ post, onBack, onEdit, onDelete }) => (
+const Detail: React.FC<DetailProps> = ({ post, onBack, onEdit, onDelete, canWrite }) => (
   <motion.article
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
@@ -544,18 +594,22 @@ const Detail: React.FC<DetailProps> = ({ post, onBack, onEdit, onDelete }) => (
         ← Back to all tutorials
       </button>
       <div className="flex gap-2">
-        <button
-          onClick={onEdit}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors"
-        >
-          <Edit3 className="w-4 h-4" /> Edit
-        </button>
-        <button
-          onClick={onDelete}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
-        >
-          <Trash2 className="w-4 h-4" /> Delete
-        </button>
+        {canWrite && (
+          <>
+            <button
+              onClick={onEdit}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors"
+            >
+              <Edit3 className="w-4 h-4" /> Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
+            >
+              <Trash2 className="w-4 h-4" /> Delete
+            </button>
+          </>
+        )}
       </div>
     </div>
     <div className="p-8 md:p-12">
