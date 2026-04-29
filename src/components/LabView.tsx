@@ -14,9 +14,37 @@ interface LabViewProps {
   onClose: () => void;
   onComplete: (xp?: number) => void;
   projectTitle: string;
+  currentXp?: number;
 }
 
-export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, projectTitle }) => {
+const RANKS = [
+  { min: 0,     title: 'Trainee',               icon: '🎓' },
+  { min: 250,   title: 'Cloud Apprentice',       icon: '🌱' },
+  { min: 750,   title: 'Cloud Engineer I',       icon: '⚡' },
+  { min: 1500,  title: 'Cloud Engineer II',      icon: '🔧' },
+  { min: 3000,  title: 'Senior Cloud Engineer',  icon: '🚀' },
+  { min: 5000,  title: 'Cloud Architect',        icon: '🏛️' },
+  { min: 8000,  title: 'Principal Engineer',     icon: '💎' },
+  { min: 12000, title: 'Distinguished Engineer', icon: '👑' },
+];
+const getRank = (xp: number) => [...RANKS].reverse().find(r => xp >= r.min) ?? RANKS[0];
+
+const PARTICLES = [
+  { x: 25, y: 20, color: '#3B82F6', dy: -70 },
+  { x: 45, y: 15, color: '#F59E0B', dy: -90 },
+  { x: 65, y: 22, color: '#10B981', dy: -65 },
+  { x: 80, y: 18, color: '#EF4444', dy: -80 },
+  { x: 15, y: 30, color: '#8B5CF6', dy: -60 },
+  { x: 35, y: 25, color: '#F59E0B', dy: -75 },
+  { x: 55, y: 12, color: '#3B82F6', dy: -85 },
+  { x: 75, y: 28, color: '#10B981', dy: -70 },
+  { x: 20, y: 35, color: '#EF4444', dy: -55 },
+  { x: 50, y: 10, color: '#8B5CF6', dy: -95 },
+  { x: 70, y: 32, color: '#3B82F6', dy: -62 },
+  { x: 88, y: 25, color: '#F59E0B', dy: -78 },
+];
+
+export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, projectTitle, currentXp = 0 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [isStarted, setIsStarted] = useState(false);
@@ -24,6 +52,8 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [connectionProgress, setConnectionProgress] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
+  const [showReward, setShowReward] = useState(false);
+  const earnedXp = lab.xpReward ?? 250;
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -88,6 +118,16 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   };
 
   const progress = (completedSteps.length / lab.steps.length) * 100;
+
+  const handleLabComplete = () => {
+    onComplete(earnedXp);
+    setShowReward(true);
+  };
+
+  const newTotalXp = currentXp + earnedXp;
+  const oldRank = getRank(currentXp);
+  const newRank = getRank(newTotalXp);
+  const didRankUp = newRank.title !== oldRank.title;
 
   return (
     <motion.div
@@ -277,10 +317,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                     setCompletedSteps(prev => [...prev, stepId]);
                   }
                 }}
-                onComplete={() => {
-                  onComplete(lab.xpReward || 250);
-                  onClose();
-                }}
+                onComplete={handleLabComplete}
                 xpReward={lab.xpReward || 250}
                 flavor="ubuntu"
                 onCommand={(cmd) => {
@@ -357,6 +394,90 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
           </div>
         </div>
       </footer>
+
+      {/* XP + Rank Reward Overlay */}
+      <AnimatePresence>
+        {showReward && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[10] bg-zinc-900/75 backdrop-blur-md flex items-center justify-center p-6 rounded-[2.5rem]"
+          >
+            <motion.div
+              initial={{ scale: 0.75, y: 40, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              transition={{ type: 'spring', damping: 18, stiffness: 260 }}
+              className="bg-white rounded-[2rem] p-10 max-w-sm w-full text-center relative overflow-hidden shadow-2xl"
+            >
+              {/* Confetti particles */}
+              {PARTICLES.map((p, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute w-2.5 h-2.5 rounded-full pointer-events-none"
+                  style={{ left: `${p.x}%`, top: `${p.y}%`, background: p.color }}
+                  initial={{ scale: 0, opacity: 1, y: 0 }}
+                  animate={{ scale: [0, 1, 0.8, 0], opacity: [1, 1, 0.6, 0], y: p.dy }}
+                  transition={{ delay: 0.15 + i * 0.04, duration: 1.1, ease: 'easeOut' }}
+                />
+              ))}
+
+              {/* Trophy */}
+              <motion.div
+                animate={{ rotate: [0, -12, 12, -6, 6, 0], scale: [1, 1.15, 1] }}
+                transition={{ delay: 0.25, duration: 0.7, ease: 'easeInOut' }}
+                className="text-6xl select-none mb-4"
+              >
+                🏆
+              </motion.div>
+
+              <h2 className="text-3xl font-black text-zinc-900 tracking-tight mb-1">Lab Complete!</h2>
+              <p className="text-zinc-400 text-sm mb-7 truncate px-4">{projectTitle}</p>
+
+              {/* XP earned */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 300 }}
+                className="bg-amber-50 border-2 border-amber-100 rounded-2xl py-5 px-6 mb-5"
+              >
+                <div className="text-4xl font-black text-amber-500 leading-none">+{earnedXp}</div>
+                <div className="text-[10px] font-black text-amber-400 uppercase tracking-[0.25em] mt-1">XP Earned</div>
+              </motion.div>
+
+              {/* Rank */}
+              <motion.div
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.45 }}
+                className="bg-zinc-50 border border-zinc-100 rounded-2xl py-4 px-6 mb-7"
+              >
+                <div className="text-3xl mb-1">{newRank.icon}</div>
+                <div className="text-base font-black text-zinc-900">{newRank.title}</div>
+                <div className="text-xs text-zinc-400 mt-1 font-medium">{newTotalXp.toLocaleString()} XP total</div>
+                {didRankUp && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.6, type: 'spring', stiffness: 400 }}
+                    className="mt-3 inline-block px-3 py-1 bg-brand-blue text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full"
+                  >
+                    ✦ Rank Up!
+                  </motion.div>
+                )}
+              </motion.div>
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { setShowReward(false); onClose(); }}
+                className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all"
+              >
+                Claim Reward &amp; Continue
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   </motion.div>
 );

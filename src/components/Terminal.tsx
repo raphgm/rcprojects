@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Terminal as TerminalIcon, ChevronRight } from 'lucide-react';
 import { LinuxFlavor } from '../App';
 
@@ -457,6 +457,8 @@ export const Terminal: React.FC<TerminalProps> = ({
   const [pendingCommand, setPendingCommand] = useState<string | null>(null);
   const [isSudoAuthenticated, setIsSudoAuthenticated] = useState(false);
   const [sudoAuthTimeout, setSudoAuthTimeout] = useState<NodeJS.Timeout | null>(null);
+  const prevStepIndexRef = useRef(currentStepIndex);
+  const [stepDir, setStepDir] = useState(1);
   // Virtual filesystem: real shell-like persistence for files & dirs created during a session.
   const vfsRef = useRef<Record<string, string>>({});
   const vdirsRef = useRef<Set<string>>(new Set());
@@ -555,6 +557,13 @@ export const Terminal: React.FC<TerminalProps> = ({
 
     return () => clearTimeout(timeoutId);
   }, [history, isExecuting, isBooting]);
+
+  useEffect(() => {
+    if (currentStepIndex !== prevStepIndexRef.current) {
+      setStepDir(currentStepIndex > prevStepIndexRef.current ? 1 : -1);
+      prevStepIndexRef.current = currentStepIndex;
+    }
+  }, [currentStepIndex]);
 
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -947,6 +956,20 @@ export const Terminal: React.FC<TerminalProps> = ({
               </div>
             )}
             
+            <AnimatePresence mode="wait" initial={false} custom={stepDir}>
+            <motion.div
+              key={currentStepIndex}
+              custom={stepDir}
+              variants={{
+                enter: (d: number) => ({ x: d * 60, opacity: 0, scale: 0.97 }),
+                center: { x: 0, opacity: 1, scale: 1 },
+                exit: (d: number) => ({ x: d * -60, opacity: 0, scale: 0.97 }),
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            >
             <h2 className="text-xl font-bold text-brand-blue mb-4">{currentStep.title}</h2>
             <p className="text-sm leading-relaxed mb-6">{(currentStep as any).instruction || (currentStep as any).task}</p>
             
@@ -1010,6 +1033,8 @@ export const Terminal: React.FC<TerminalProps> = ({
                 {currentStep.pillarConnection}
               </div>
             )}
+            </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Navigation Controls */}
@@ -1037,18 +1062,20 @@ export const Terminal: React.FC<TerminalProps> = ({
             </button>
             <div className="flex gap-2">
               <button
-                onClick={onPrev}
-                disabled={isFirstStep}
-                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5 ${isFirstStep ? 'text-zinc-600 bg-zinc-900/50 cursor-not-allowed' : 'text-zinc-400 bg-zinc-900 hover:bg-zinc-800'}`}
+                onClick={() => onPrev?.()}
+                disabled={isFirstStep || !onPrev}
+                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5 ${(isFirstStep || !onPrev) ? 'text-zinc-600 bg-zinc-900/50 cursor-not-allowed' : 'text-zinc-400 bg-zinc-900 hover:bg-zinc-800'}`}
               >
                 Back
               </button>
-              <button
-                onClick={isLastStep ? onComplete : onNext}
-                className="flex-[2] py-3 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2"
+              <motion.button
+                whileTap={{ scale: 0.94 }}
+                onClick={() => isLastStep ? onComplete?.() : onNext?.()}
+                disabled={!onNext && !onComplete}
+                className="flex-[2] py-3 bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLastStep ? `Complete Lab (+${xpReward} XP)` : 'Next Mission'}
-              </button>
+                {isLastStep ? `Complete Lab (+${xpReward} XP)` : 'Next →'}
+              </motion.button>
             </div>
           </div>
         </div>

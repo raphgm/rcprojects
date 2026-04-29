@@ -228,6 +228,7 @@ export default function App() {
             key="lab-view"
             lab={activeLab.lab}
             projectTitle={activeLab.title}
+            currentXp={xp}
             onClose={() => setActiveLab(null)}
             onComplete={(xpReward) => completeLab(activeLab.lab.projectId, xpReward)}
           />

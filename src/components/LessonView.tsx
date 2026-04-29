@@ -255,6 +255,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
                   {currentLesson.demoType === 'terminal' ? (
                     <div className="flex-1 flex bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-200 shadow-xl">
                       <Terminal
+                        key={currentLessonIndex}
                         initialMessage={currentLesson.demoConfig?.initialMessage}
                         availableCommands={currentLesson.demoConfig?.availableCommands}
                         flavor={linuxFlavor}
@@ -265,6 +266,11 @@ export const LessonView: React.FC<LessonViewProps> = ({
                           instruction: l.task || '',
                         })) as any}
                         currentStepIndex={currentLessonIndex}
+                        onNext={nextLesson}
+                        onPrev={prevLesson}
+                        isFirstStep={isFirstLesson}
+                        isLastStep={isLastLesson}
+                        onComplete={() => { setIsSandboxOpen(false); onClose(); }}
                       />
                     </div>
                   ) : (
