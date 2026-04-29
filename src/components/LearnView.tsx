@@ -325,12 +325,12 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {paths.map((path) => (
+        {paths.map((path, index) => (
           <div key={path.id} className="relative">
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={false}
+              isLocked={index >= 4}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">
