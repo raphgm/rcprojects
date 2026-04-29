@@ -163,7 +163,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   Description
                 </h4>
                 <p className="text-zinc-500 text-sm leading-relaxed">
-                  {lab.steps[0].instruction}
+                  {lab.description || lab.steps[0].instruction}
                 </p>
               </div>
               <div>
@@ -172,7 +172,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   Objective
                 </h4>
                 <p className="text-zinc-500 text-sm leading-relaxed">
-                  Complete all {lab.steps.length} missions to master the core concepts of {projectTitle} and validate your practical skills in a live-cloud sandbox environment.
+                  {lab.objective || `Complete all ${lab.steps.length} missions to master the core concepts of ${projectTitle} and validate your practical skills in a live-cloud sandbox environment.`}
                 </p>
               </div>
             </div>

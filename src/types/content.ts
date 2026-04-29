@@ -60,6 +60,8 @@ export interface LabStep {
 export interface LabContent {
   projectId: string;
   environment: 'linux' | 'azure' | 'kubernetes';
+  description?: string;
+  objective?: string;
   missionNumber?: number;
   totalMissions?: number;
   xpReward?: number;

@@ -2676,5 +2676,169 @@ export const labContents: LabContent[] = [
         expectedOutput: 'API Security Verified'
       }
     ]
+  },
+  {
+    projectId: 'web-server-setup',
+    environment: 'linux',
+    description: 'Build a production-style LAMP stack on a fresh Ubuntu host: install and harden Apache, MySQL, and PHP, create a least-privilege application database, and validate the full request path with a real PHP page.',
+    objective: 'By the end of this lab you will have a working Linux + Apache + MySQL + PHP server with HTTP firewall rules, a hardened database, an app-scoped DB user, and an end-to-end smoke test confirming the stack serves dynamic content.',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Update Package Index',
+        instruction: 'Refresh the local package index so APT can install the latest versions of Apache, MySQL, and PHP.',
+        summary: 'Sync the package metadata before installing the LAMP components.',
+        whyNeeded: 'Installing software without an up-to-date package index can pull in stale or missing packages and break dependency resolution.',
+        pillarConnection: 'Operational Excellence — keeping package metadata current is the first guardrail against drifted, unreproducible builds.',
+        commands: [
+          {
+            text: 'sudo apt-get update',
+            explanation: 'Downloads the latest package lists from the configured Ubuntu/Debian repositories.'
+          }
+        ],
+        checkCommand: 'echo "package index refreshed"',
+        expectedOutput: 'package index refreshed'
+      },
+      {
+        id: 'step-2',
+        title: 'Install Apache HTTP Server',
+        instruction: 'Install the Apache2 web server — the "A" in LAMP — and enable it to start on boot.',
+        summary: 'Provision the HTTP layer that will serve your PHP application.',
+        whyNeeded: 'Apache is the web server that accepts HTTP requests on port 80 and routes them to your application. Without it, the stack has no front door.',
+        pillarConnection: 'Reliability — running Apache as a managed systemd service ensures it auto-restarts after a crash or reboot.',
+        commands: [
+          {
+            text: 'sudo apt-get install -y apache2',
+            explanation: 'Installs Apache2 and its default configuration.'
+          },
+          {
+            text: 'sudo systemctl enable --now apache2',
+            explanation: 'Starts Apache immediately and enables it to launch on every boot.'
+          }
+        ],
+        checkCommand: 'systemctl is-active apache2',
+        expectedOutput: 'active'
+      },
+      {
+        id: 'step-3',
+        title: 'Open the Web Firewall',
+        instruction: 'Allow inbound HTTP and HTTPS traffic through UFW so Apache can be reached from the network.',
+        summary: 'Permit web traffic at the host firewall.',
+        whyNeeded: 'A LAMP server with a closed firewall serves nothing. UFW rules explicitly authorize the ports your application listens on.',
+        pillarConnection: 'Security — least-privilege firewall rules limit exposure to only the services that must be reachable.',
+        commands: [
+          {
+            text: 'sudo ufw allow "Apache Full"',
+            explanation: 'Opens TCP 80 and 443 using UFW\'s built-in Apache profile.'
+          }
+        ],
+        checkCommand: 'sudo ufw status | grep "Apache Full"',
+        expectedOutput: 'Apache Full'
+      },
+      {
+        id: 'step-4',
+        title: 'Install MySQL Server',
+        instruction: 'Install MySQL — the "M" in LAMP — to act as the application\'s relational database.',
+        summary: 'Provision the database layer.',
+        whyNeeded: 'Most LAMP applications persist state (users, posts, sessions) in MySQL. The database must be running before the PHP code can connect to it.',
+        pillarConnection: 'Reliability — a managed database service ensures durable storage with crash recovery built in.',
+        commands: [
+          {
+            text: 'sudo apt-get install -y mysql-server',
+            explanation: 'Installs the MySQL server package and starts the mysql.service unit.'
+          },
+          {
+            text: 'sudo systemctl enable --now mysql',
+            explanation: 'Ensures MySQL is started now and on every boot.'
+          }
+        ],
+        checkCommand: 'systemctl is-active mysql',
+        expectedOutput: 'active'
+      },
+      {
+        id: 'step-5',
+        title: 'Harden MySQL',
+        instruction: 'Run the bundled security script to remove anonymous users, disable remote root login, and drop the test database.',
+        summary: 'Apply baseline database hardening.',
+        whyNeeded: 'Default MySQL installs ship with insecure settings that are common targets for automated scanners and bots.',
+        pillarConnection: 'Security — eliminating default credentials and unused accounts shrinks the attack surface dramatically.',
+        commands: [
+          {
+            text: 'sudo mysql_secure_installation',
+            explanation: 'Interactive helper that walks through password policy, anonymous user removal, and the test schema cleanup.'
+          }
+        ],
+        checkCommand: 'echo "mysql hardened"',
+        expectedOutput: 'mysql hardened'
+      },
+      {
+        id: 'step-6',
+        title: 'Create Application Database & User',
+        instruction: 'Create a dedicated database and a least-privilege user for the application instead of using the root account.',
+        summary: 'Provision an app-scoped MySQL identity.',
+        whyNeeded: 'Applications should never connect as root. A dedicated user with grants limited to a single schema contains the blast radius of any compromise.',
+        pillarConnection: 'Security — least-privilege database credentials are a core LAMP best practice.',
+        commands: [
+          {
+            text: 'sudo mysql -e "CREATE DATABASE lampapp; CREATE USER \'lampuser\'@\'localhost\' IDENTIFIED BY \'ChangeMe!123\'; GRANT ALL ON lampapp.* TO \'lampuser\'@\'localhost\'; FLUSH PRIVILEGES;"',
+            explanation: 'Creates the lampapp schema, a scoped lampuser, and grants only the privileges needed on that one database.'
+          }
+        ],
+        checkCommand: 'sudo mysql -e "SHOW DATABASES;" | grep lampapp',
+        expectedOutput: 'lampapp'
+      },
+      {
+        id: 'step-7',
+        title: 'Install PHP and Required Modules',
+        instruction: 'Install PHP — the "P" in LAMP — along with the Apache integration module and the MySQL driver.',
+        summary: 'Provision the application runtime.',
+        whyNeeded: 'PHP is the language Apache will execute on every dynamic request, and php-mysql gives it the driver it needs to talk to your database.',
+        pillarConnection: 'Operational Excellence — installing only the modules you need keeps the runtime lean and easier to patch.',
+        commands: [
+          {
+            text: 'sudo apt-get install -y php libapache2-mod-php php-mysql',
+            explanation: 'Installs PHP, the Apache mod_php integration, and the MySQL driver in one shot.'
+          },
+          {
+            text: 'sudo systemctl reload apache2',
+            explanation: 'Reloads Apache so it picks up the freshly registered PHP handler.'
+          }
+        ],
+        checkCommand: 'php -v | head -n1',
+        expectedOutput: 'PHP'
+      },
+      {
+        id: 'step-8',
+        title: 'Deploy a Test PHP Page',
+        instruction: 'Drop a phpinfo() page into the Apache document root to confirm PHP is being parsed end-to-end.',
+        summary: 'Verify the Apache → PHP integration.',
+        whyNeeded: 'A working phpinfo page proves Apache, mod_php, and the PHP interpreter are wired together correctly before you deploy real code.',
+        pillarConnection: 'Operational Excellence — explicit verification steps catch misconfigurations while they are still cheap to fix.',
+        commands: [
+          {
+            text: 'echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/info.php',
+            explanation: 'Writes a single-line PHP file to the Apache web root.'
+          }
+        ],
+        checkCommand: 'cat /var/www/html/info.php',
+        expectedOutput: '<?php phpinfo(); ?>'
+      },
+      {
+        id: 'step-9',
+        title: 'Validate the Stack End-to-End',
+        instruction: 'Issue an HTTP request to the test page and confirm the server returns rendered PHP — proof that the full LAMP stack is live.',
+        summary: 'Confirm the LAMP stack is serving dynamic content.',
+        whyNeeded: 'Smoke-testing with a real HTTP request is the canonical way to prove the whole stack works, not just each component in isolation.',
+        pillarConnection: 'Reliability — every deployment should end with an automated, repeatable validation step.',
+        commands: [
+          {
+            text: 'curl -s http://localhost/info.php | grep -o "PHP Version" | head -n1',
+            explanation: 'Fetches the PHP info page through Apache and greps for the version banner.'
+          }
+        ],
+        checkCommand: 'curl -s http://localhost/info.php | grep -o "PHP Version" | head -n1',
+        expectedOutput: 'PHP Version'
+      }
+    ]
   }
 ];
