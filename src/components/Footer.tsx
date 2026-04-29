@@ -1,8 +1,21 @@
 import React from 'react';
-import { Github, Twitter, Linkedin, Youtube, Instagram, Mail, Sparkle } from 'lucide-react';
+import { Github, Twitter, Linkedin, Youtube, Sparkle } from 'lucide-react';
+
+export type FooterTab =
+  | 'projects'
+  | 'learn'
+  | 'enterprise'
+  | 'docs'
+  | 'community'
+  | 'blog'
+  | 'changelog'
+  | 'about'
+  | 'careers'
+  | 'privacy'
+  | 'terms';
 
 interface FooterProps {
-  onTabChange: (tab: 'projects' | 'learn') => void;
+  onTabChange: (tab: FooterTab) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
@@ -10,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleLinkClick = (tab: 'projects' | 'learn') => {
+  const handleLinkClick = (tab: FooterTab) => {
     onTabChange(tab);
     scrollToTop();
   };
@@ -58,19 +71,19 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
             <h4 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] mb-8">Platform</h4>
             <ul className="space-y-4">
               <li>
-                <button onClick={() => handleLinkClick('learn')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
+                <button onClick={() => handleLinkClick('projects')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
                   <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
                   Interactive Labs
                 </button>
               </li>
               <li>
-                <button onClick={() => handleLinkClick('projects')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
+                <button onClick={() => handleLinkClick('learn')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
                   <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
                   Skill Trees
                 </button>
               </li>
               <li>
-                <button onClick={() => handleLinkClick('projects')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
+                <button onClick={() => handleLinkClick('enterprise')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group">
                   <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
                   Enterprise
                 </button>
@@ -81,20 +94,20 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
           <div>
             <h4 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] mb-8">Resources</h4>
             <ul className="space-y-4">
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Documentation</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Community</a></li>
-              <li><a href="#blog" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Blog</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Changelog</a></li>
+              <li><button onClick={() => handleLinkClick('docs')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Documentation</button></li>
+              <li><button onClick={() => handleLinkClick('community')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Community</button></li>
+              <li><button onClick={() => handleLinkClick('blog')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Blog</button></li>
+              <li><button onClick={() => handleLinkClick('changelog')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Changelog</button></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] mb-8">Company</h4>
             <ul className="space-y-4">
-              <li><a href="#about" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>About Us</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Careers</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Privacy Policy</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Terms of Service</a></li>
+              <li><button onClick={() => handleLinkClick('about')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>About Us</button></li>
+              <li><button onClick={() => handleLinkClick('careers')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Careers</button></li>
+              <li><button onClick={() => handleLinkClick('privacy')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Privacy Policy</button></li>
+              <li><button onClick={() => handleLinkClick('terms')} className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Terms of Service</button></li>
             </ul>
           </div>
         </div>

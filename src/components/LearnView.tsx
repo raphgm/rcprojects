@@ -7,7 +7,7 @@ import {
   Coffee, Cpu, Atom, Cloud, Wrench, Binary,
   Layers, Brain, FileCode, Server, Command,
   CloudFog, CloudSun, X, Clock, BarChart3,
-  CheckCircle2, PlayCircle
+  CheckCircle2, PlayCircle, Lock
 } from 'lucide-react';
 import { learningPaths, LearningPath, Course, Project } from '../data/learningPaths';
 import { SquigglyArrow, Sparkle, ZigZag, DoodleWrapper } from './Doodles';
@@ -20,15 +20,23 @@ const iconMap: Record<string, any> = {
   Server, Command, CloudFog, CloudSun
 };
 
-const PathCard: React.FC<{ path: LearningPath; onClick: () => void }> = ({ path, onClick }) => {
+const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: boolean }> = ({ path, onClick, isLocked }) => {
   const Icon = iconMap[path.icon] || BookOpen;
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      onClick={onClick}
-      className="bg-white border border-zinc-200 rounded-2xl p-6 hover:shadow-xl transition-all group cursor-pointer"
+      whileHover={isLocked ? undefined : { y: -5 }}
+      onClick={() => { if (!isLocked) onClick(); }}
+      className={`relative bg-white border border-zinc-200 rounded-2xl p-6 transition-all group ${isLocked ? 'cursor-not-allowed opacity-70 grayscale' : 'cursor-pointer hover:shadow-xl'}`}
     >
+      {isLocked && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900/55 backdrop-blur-[2px] rounded-2xl pointer-events-none">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
+            <Lock className="w-5 h-5 text-zinc-900" />
+          </div>
+          <span className="px-3 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Coming Soon</span>
+        </div>
+      )}
       <div className={`w-12 h-12 ${path.color} rounded-xl flex items-center justify-center mb-6 text-white shadow-lg`}>
         <Icon className="w-6 h-6" />
       </div>
@@ -322,6 +330,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
+              isLocked={path.id !== 'linux'}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">

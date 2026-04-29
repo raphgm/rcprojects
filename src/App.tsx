@@ -12,6 +12,8 @@ import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { AboutUs } from './components/AboutUs';
 import { Blog } from './components/Blog';
+import { StaticPage } from './components/StaticPage';
+import type { FooterTab } from './components/Footer';
 import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { labContents } from './data/labContent';
@@ -26,7 +28,7 @@ export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
 export type CloudProvider = 'azure';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'learn'>('projects');
+  const [activeTab, setActiveTab] = useState<FooterTab>('projects');
   const [activeLesson, setActiveLesson] = useState<{ lessons: Lesson[], title: string } | null>(null);
   const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
   const [completedLabs, setCompletedLabs] = useState<string[]>([]);
@@ -41,6 +43,10 @@ export default function App() {
     if (savedXp) setXp(parseInt(savedXp));
     if (savedLabs) setCompletedLabs(JSON.parse(savedLabs));
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [activeTab]);
 
   const completeLab = (projectId: string, xpReward?: number) => {
     if (!completedLabs.includes(projectId)) {
@@ -104,7 +110,11 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white font-sans selection:bg-zinc-900 selection:text-white">
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} xp={xp} />
+      <Navbar
+        activeTab={activeTab === 'projects' || activeTab === 'learn' ? activeTab : 'projects'}
+        onTabChange={(tab) => setActiveTab(tab)}
+        xp={xp}
+      />
       <main>
         {activeTab === 'projects' && (
           <Hero 
@@ -141,6 +151,26 @@ export default function App() {
         {activeTab === 'projects' && <AboutUs />}
 
         {activeTab === 'projects' && <Blog />}
+
+        {activeTab === 'about' && (
+          <div className="pt-12">
+            <AboutUs />
+          </div>
+        )}
+
+        {activeTab === 'blog' && (
+          <div className="pt-12">
+            <Blog />
+          </div>
+        )}
+
+        {activeTab === 'enterprise' && <StaticPage pageId="enterprise" onTabChange={setActiveTab} />}
+        {activeTab === 'docs' && <StaticPage pageId="docs" onTabChange={setActiveTab} />}
+        {activeTab === 'community' && <StaticPage pageId="community" onTabChange={setActiveTab} />}
+        {activeTab === 'changelog' && <StaticPage pageId="changelog" onTabChange={setActiveTab} />}
+        {activeTab === 'careers' && <StaticPage pageId="careers" onTabChange={setActiveTab} />}
+        {activeTab === 'privacy' && <StaticPage pageId="privacy" onTabChange={setActiveTab} />}
+        {activeTab === 'terms' && <StaticPage pageId="terms" onTabChange={setActiveTab} />}
         
         {/* Newsletter Section */}
         <section className="py-24 bg-zinc-50 border-y border-zinc-100">

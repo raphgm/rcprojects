@@ -8,7 +8,7 @@ import {
   GitBranch, Terminal, Search, Settings,
   MessageSquare, Layout, Layers, Radio,
   Hexagon, Key, ShieldCheck, Code, Workflow,
-  CheckCircle2
+  CheckCircle2, Lock
 } from 'lucide-react';
 import { Project } from '../data/projects';
 
@@ -16,6 +16,7 @@ interface ProjectCardProps {
   project: Project;
   onStart: () => void;
   isCompleted?: boolean;
+  isLocked?: boolean;
 }
 
 const categoryConfig: Record<string, { color: string }> = {
@@ -60,7 +61,7 @@ const getProjectIcon = (title: string, category: string) => {
   return Server;
 };
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCompleted }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCompleted, isLocked }) => {
   const config = categoryConfig[project.category] || { color: 'bg-zinc-500' };
   const Icon = getProjectIcon(project.title, project.category);
 
@@ -77,10 +78,18 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -8 }}
-      onClick={() => onStart()}
-      className="group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 transition-all duration-500 flex flex-col h-full cursor-pointer relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]"
+      whileHover={isLocked ? undefined : { y: -8 }}
+      onClick={() => { if (!isLocked) onStart(); }}
+      className={`group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] ${isLocked ? 'cursor-not-allowed opacity-70 grayscale' : 'cursor-pointer hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]'}`}
     >
+      {isLocked && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900/55 backdrop-blur-[2px] rounded-[2.5rem] pointer-events-none">
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
+            <Lock className="w-6 h-6 text-zinc-900" />
+          </div>
+          <span className="px-4 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Coming Soon</span>
+        </div>
+      )}
       {/* Bottom Depth Layer */}
       <div className="absolute bottom-0 left-6 right-6 h-2 bg-zinc-100/50 rounded-b-[2.5rem] -mb-1 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       <div className={`relative aspect-[16/10] ${config.color} flex items-center justify-center overflow-hidden`}>
