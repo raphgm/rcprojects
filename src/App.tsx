@@ -10,6 +10,8 @@ import { TrustedBy } from './components/TrustedBy';
 import { Features } from './components/Features';
 import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
+import { AboutUs } from './components/AboutUs';
+import { Blog } from './components/Blog';
 import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { labContents } from './data/labContent';
@@ -136,6 +138,10 @@ export default function App() {
         {activeTab === 'projects' && <Features />}
 
         {activeTab === 'projects' && <Testimonials />}
+
+        {activeTab === 'projects' && <AboutUs />}
+
+        {activeTab === 'projects' && <Blog />}
         
         {/* Newsletter Section */}
         <section className="py-24 bg-zinc-50 border-y border-zinc-100">

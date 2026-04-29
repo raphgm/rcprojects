@@ -51,6 +51,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
             >
               Labs
             </button>
+            <a
+              href="#about"
+              onClick={() => onTabChange('projects')}
+              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+            >
+              About
+            </a>
+            <a
+              href="#blog"
+              onClick={() => onTabChange('projects')}
+              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+            >
+              Blog
+            </a>
           </div>
 
           <div className="hidden lg:flex items-center flex-1 max-w-sm mx-8">

@@ -5,6 +5,247 @@ import { LinuxFlavor } from '../App';
 
 import { LabStep } from '../types/content';
 
+// Best-effort plausible output for common cloud/devops CLIs used in labs.
+// Returns null if the command is not recognized so callers can fall through.
+const simulateLabCommand = (cmd: string, args: string[]): string | null => {
+  const base = args[0]?.toLowerCase();
+  const sub = args[1]?.toLowerCase();
+  const rest = args.slice(2);
+
+  // Helper: derive a Kubernetes resource kind+name from a YAML filename.
+  const inferKindFromFilename = (file: string): { kind: string; name: string } => {
+    const f = file.toLowerCase().replace(/\.ya?ml$/, '').replace(/^.*\//, '');
+    if (f.includes('storage-class') || f.includes('storageclass')) return { kind: 'storageclass.storage.k8s.io', name: f.replace(/[-_]?storage[-_]?class/, '') || 'local-storage' };
+    if (f.includes('statefulset')) return { kind: 'statefulset.apps', name: f.replace(/[-_]?statefulset/, '') || 'app' };
+    if (f.includes('deployment')) return { kind: 'deployment.apps', name: f.replace(/[-_]?deployment/, '') || 'app' };
+    if (f.includes('daemonset')) return { kind: 'daemonset.apps', name: f.replace(/[-_]?daemonset/, '') || 'app' };
+    if (f.includes('service-monitor') || f.includes('servicemonitor')) return { kind: 'servicemonitor.monitoring.coreos.com', name: f.replace(/[-_]?service[-_]?monitor/, '') || 'app' };
+    if (f.includes('service') || f.includes('svc')) return { kind: 'service', name: f.replace(/[-_]?service|[-_]?svc/, '') || 'app' };
+    if (f.includes('ingress')) return { kind: 'ingress.networking.k8s.io', name: f.replace(/[-_]?ingress/, '') || 'app' };
+    if (f.includes('configmap')) return { kind: 'configmap', name: f.replace(/[-_]?configmap/, '') || 'app' };
+    if (f.includes('secret')) return { kind: 'secret', name: f.replace(/[-_]?secret/, '') || 'app' };
+    if (f.includes('namespace') || f.includes('ns')) return { kind: 'namespace', name: f.replace(/[-_]?namespace|[-_]?ns/, '') || 'app' };
+    if (f.includes('networkpolicy') || f.includes('netpol') || f.includes('deny') || f.includes('allow') || f.includes('egress')) return { kind: 'networkpolicy.networking.k8s.io', name: f || 'policy' };
+    if (f.includes('rbac') || f.includes('role')) return { kind: 'role.rbac.authorization.k8s.io', name: f.replace(/[-_]?rbac|[-_]?role/, '') || 'role' };
+    if (f.includes('quota')) return { kind: 'resourcequota', name: f || 'quota' };
+    if (f.includes('limit')) return { kind: 'limitrange', name: f || 'limits' };
+    if (f.includes('priority')) return { kind: 'priorityclass.scheduling.k8s.io', name: f || 'priority' };
+    if (f.includes('scaledobject') || f.includes('hpa') || f.includes('autoscale')) return { kind: 'scaledobject.keda.sh', name: f || 'scaler' };
+    if (f.includes('pv-')) return { kind: 'persistentvolume', name: f.replace('pv-', '') || 'pv' };
+    if (f.includes('pvc')) return { kind: 'persistentvolumeclaim', name: f.replace(/[-_]?pvc/, '') || 'pvc' };
+    return { kind: 'configured', name: f.replace(/[-_]/g, '-').slice(0, 30) || 'resource' };
+  };
+
+  switch (base) {
+    case 'kubectl': {
+      if (!sub) return 'kubectl controls the Kubernetes cluster manager.';
+      if (sub === 'version') return 'Client Version: v1.29.0\nServer Version: v1.29.0';
+      if (sub === 'cluster-info') return 'Kubernetes control plane is running at https://kubernetes.default.svc\nCoreDNS is running at https://kubernetes.default.svc/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy';
+      if (sub === 'config') return 'Current context: realcloud-sandbox';
+      if (sub === 'apply') {
+        const fIdx = args.findIndex(a => a === '-f' || a === '--filename');
+        const target = fIdx >= 0 ? args[fIdx + 1] : '';
+        if (!target) return 'error: must specify one of -f and -k';
+        if (/^https?:\/\//.test(target)) {
+          // Remote manifest — pretend several resources were created.
+          return [
+            'namespace/created',
+            'serviceaccount/default created',
+            'clusterrole.rbac.authorization.k8s.io/manager created',
+            'clusterrolebinding.rbac.authorization.k8s.io/manager created',
+            'deployment.apps/controller created',
+            'service/controller-metrics created'
+          ].join('\n');
+        }
+        const { kind, name } = inferKindFromFilename(target);
+        return `${kind}/${name} created`;
+      }
+      if (sub === 'create') {
+        const what = rest[0]?.toLowerCase();
+        const name = rest[1] || 'resource';
+        if (what === 'namespace' || what === 'ns') return `namespace/${name} created`;
+        if (what === 'secret') return `secret/${rest[1] || 'generic-secret'} created`;
+        if (what === 'configmap' || what === 'cm') return `configmap/${name} created`;
+        if (what === 'deployment' || what === 'deploy') return `deployment.apps/${name} created`;
+        if (what === 'serviceaccount' || what === 'sa') return `serviceaccount/${name} created`;
+        return `${what || 'resource'}/${name} created`;
+      }
+      if (sub === 'get') {
+        const what = (rest[0] || '').toLowerCase();
+        if (what.startsWith('node')) return 'NAME             STATUS   ROLES           AGE   VERSION\nrealcloud-cp-1   Ready    control-plane   2d    v1.29.0\nrealcloud-w-1    Ready    <none>          2d    v1.29.0\nrealcloud-w-2    Ready    <none>          2d    v1.29.0';
+        if (what.startsWith('pod')) return 'NAME                         READY   STATUS    RESTARTS   AGE\nmongo-0                      1/1     Running   0          1m\nmongo-1                      1/1     Running   0          45s\nmongo-2                      1/1     Running   0          30s\nmongo-3                      1/1     Running   0          15s\nmongo-4                      1/1     Running   0          5s';
+        if (what === 'sc' || what.startsWith('storageclass')) return 'NAME            PROVISIONER                    AGE\nlocal-storage   kubernetes.io/no-provisioner   10s';
+        if (what === 'svc' || what.startsWith('service')) return 'NAME    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)     AGE\nmongo   ClusterIP   None         <none>        27017/TCP   30s';
+        if (what.startsWith('statefulset') || what === 'sts') return 'NAME    READY   AGE\nmongo   3/3     1m';
+        if (what.startsWith('deployment') || what === 'deploy') return 'NAME          READY   UP-TO-DATE   AVAILABLE   AGE\nnginx-demo    3/3     3            3           5m';
+        if (what.startsWith('namespace') || what === 'ns') return 'NAME              STATUS   AGE\ndefault           Active   2d\nkube-system       Active   2d\nmonitoring        Active   1m';
+        if (what.startsWith('secret')) return 'NAME       TYPE     DATA   AGE\nkms-key    Opaque   1      30s';
+        if (what.startsWith('cm') || what.startsWith('configmap')) return 'NAME       DATA   AGE\nkube-root-ca.crt   1     2d';
+        if (what.startsWith('ingress') || what === 'ing') return 'NAME          CLASS   HOSTS         ADDRESS         PORTS   AGE\napp-ingress   nginx   myapp.local   192.168.49.2    80      1m';
+        if (what.startsWith('networkpolicy') || what === 'netpol') return 'NAME               POD-SELECTOR   AGE\ndefault-deny-all   <none>         30s';
+        return `No resources found matching "${rest.join(' ')}".`;
+      }
+      if (sub === 'scale') {
+        const replicas = (args.find(a => a.startsWith('--replicas=')) || '').split('=')[1] || '1';
+        const target = rest.find(a => !a.startsWith('-')) || 'resource';
+        return `${target} scaled to ${replicas} replicas`;
+      }
+      if (sub === 'describe') return `Name:         ${rest[1] || 'resource'}\nNamespace:    default\nLabels:       <none>\nStatus:       Running\nEvents:       <none>`;
+      if (sub === 'delete') return `${rest[0] || 'resource'} "${rest[1] || 'name'}" deleted`;
+      if (sub === 'rollout') return `${rest[0] || 'rollout'} successful`;
+      if (sub === 'autoscale') return `horizontalpodautoscaler.autoscaling/${rest[1] || 'app'} autoscaled`;
+      if (sub === 'expose') return `service/${rest[1] || 'app'} exposed`;
+      if (sub === 'logs') return '[INFO] Application started\n[INFO] Listening on port 8080\n[INFO] Health check OK';
+      if (sub === 'exec') return '(exec session simulated — output suppressed)';
+      if (sub === 'port-forward') return `Forwarding from 127.0.0.1:${rest[2]?.split(':')[0] || '8080'} -> ${rest[2]?.split(':')[1] || '80'}`;
+      if (sub === 'run') return `pod/${rest[0] || 'pod'} created`;
+      if (sub === 'label' || sub === 'annotate' || sub === 'taint' || sub === 'drain' || sub === 'cordon' || sub === 'uncordon') return `${sub} succeeded`;
+      return `[kubectl ${sub}] completed.`;
+    }
+    case 'helm': {
+      if (sub === 'install') return `NAME: ${rest[0] || 'release'}\nLAST DEPLOYED: ${new Date().toUTCString()}\nSTATUS: deployed\nREVISION: 1`;
+      if (sub === 'upgrade') return `Release "${rest[0] || 'release'}" has been upgraded. Happy Helming!`;
+      if (sub === 'uninstall' || sub === 'delete') return `release "${rest[0] || 'release'}" uninstalled`;
+      if (sub === 'repo') {
+        if (rest[0] === 'add') return `"${rest[1] || 'repo'}" has been added to your repositories`;
+        if (rest[0] === 'update') return 'Hang tight while we grab the latest from your chart repositories...\n...Successfully got an update from all repositories\nUpdate Complete.';
+        if (rest[0] === 'list') return 'NAME             URL\nstable           https://charts.helm.sh/stable';
+      }
+      if (sub === 'list' || sub === 'ls') return 'NAME    NAMESPACE   REVISION   STATUS    CHART';
+      if (sub === 'version') return 'version.BuildInfo{Version:"v3.13.0"}';
+      return `[helm ${sub || ''}] completed.`;
+    }
+    case 'docker': {
+      if (sub === 'build') return 'Sending build context to Docker daemon...\nSuccessfully built abc123def456\nSuccessfully tagged ' + (args.find(a => a.startsWith('-t='))?.split('=')[1] || 'image:latest');
+      if (sub === 'run') return 'Container started: ' + Math.random().toString(36).slice(2, 14);
+      if (sub === 'ps') return 'CONTAINER ID   IMAGE     COMMAND   STATUS         PORTS     NAMES\nabc123def456   nginx     "nginx"   Up 2 minutes   80/tcp    web';
+      if (sub === 'pull') return `Using default tag: latest\nlatest: Pulling from library/${rest[0] || 'image'}\nDigest: sha256:fakedigest\nStatus: Downloaded newer image`;
+      if (sub === 'push') return 'The push refers to repository [docker.io/...]\nlatest: digest: sha256:fakedigest size: 1234';
+      if (sub === 'images') return 'REPOSITORY   TAG      IMAGE ID       CREATED        SIZE\nnginx        latest   abc123def456   2 weeks ago    142MB';
+      if (sub === 'exec') return '(exec session simulated)';
+      if (sub === 'compose') return `Compose ${rest[0] || 'up'} succeeded.`;
+      if (sub === 'login') return 'Login Succeeded';
+      if (sub === 'version') return 'Docker version 24.0.7, build afdd53b';
+      return `[docker ${sub || ''}] completed.`;
+    }
+    case 'terraform': {
+      if (sub === 'init') return 'Initializing the backend...\nInitializing provider plugins...\nTerraform has been successfully initialized!';
+      if (sub === 'plan') return 'Plan: 5 to add, 0 to change, 0 to destroy.';
+      if (sub === 'apply') return 'Apply complete! Resources: 5 added, 0 changed, 0 destroyed.';
+      if (sub === 'destroy') return 'Destroy complete! Resources: 5 destroyed.';
+      if (sub === 'validate') return 'Success! The configuration is valid.';
+      if (sub === 'fmt') return '(formatted)';
+      if (sub === 'output') return 'cluster_endpoint = "https://realcloud.example.com"';
+      if (sub === 'version') return 'Terraform v1.7.0';
+      return `[terraform ${sub || ''}] completed.`;
+    }
+    case 'git': {
+      if (sub === 'init') return 'Initialized empty Git repository in ./.git/';
+      if (sub === 'add') return '';
+      if (sub === 'commit') return '[main abc1234] commit message\n 1 file changed, 1 insertion(+)';
+      if (sub === 'status') return 'On branch main\nnothing to commit, working tree clean';
+      if (sub === 'push') return 'Everything up-to-date';
+      if (sub === 'pull') return 'Already up to date.';
+      if (sub === 'clone') return `Cloning into '${(rest[0] || '').split('/').pop()?.replace('.git', '') || 'repo'}'...\nremote: Counting objects... done.\nReceiving objects: 100% (250/250), done.`;
+      if (sub === 'config') return '';
+      if (sub === 'log') return 'commit abc1234\nAuthor: Cloud Student <student@cloud-labs.com>\nDate:   ' + new Date().toString() + '\n\n    Initial commit';
+      if (sub === 'branch') return '* main';
+      if (sub === 'checkout' || sub === 'switch') return `Switched to branch '${rest[0] || 'main'}'`;
+      return `[git ${sub || ''}] completed.`;
+    }
+    case 'aws': {
+      if (sub === 'configure') return '';
+      if (sub === 's3') return rest[0] === 'ls' ? '2025-01-01 00:00:00 my-bucket' : '(s3 operation completed)';
+      if (sub === 'ec2') return rest[0] === 'describe-instances' ? '{ "Reservations": [ { "Instances": [ { "InstanceId": "i-0abc123def456" } ] } ] }' : '(ec2 operation completed)';
+      if (sub === 'sts') return rest[0] === 'get-caller-identity' ? '{\n    "UserId": "AIDAEXAMPLE",\n    "Account": "123456789012",\n    "Arn": "arn:aws:iam::123456789012:user/student"\n}' : '(sts operation completed)';
+      return `(aws ${sub || ''} completed)`;
+    }
+    case 'az': {
+      if (sub === 'login') return '[\n  {\n    "name": "Realcloud Subscription",\n    "id": "00000000-0000-0000-0000-000000000000",\n    "isDefault": true\n  }\n]';
+      if (sub === 'group') return rest[0] === 'create' ? '{\n  "id": "/subscriptions/.../resourceGroups/...",\n  "location": "eastus",\n  "properties": { "provisioningState": "Succeeded" }\n}' : '[]';
+      if (sub === 'aks' || sub === 'vm' || sub === 'storage' || sub === 'webapp') return `(az ${sub} ${rest[0] || ''} succeeded)`;
+      if (sub === 'account') return 'Subscription: Realcloud Subscription';
+      return `(az ${sub || ''} completed)`;
+    }
+    case 'gcloud': {
+      if (sub === 'auth') return '(authenticated)';
+      if (sub === 'projects') return rest[0] === 'list' ? 'PROJECT_ID         NAME            PROJECT_NUMBER\nrealcloud-demo     Realcloud       123456789012' : '(project op completed)';
+      if (sub === 'compute' || sub === 'container' || sub === 'sql' || sub === 'storage') return `(gcloud ${sub} ${rest[0] || ''} succeeded)`;
+      return `(gcloud ${sub || ''} completed)`;
+    }
+    case 'curl':
+    case 'wget': {
+      const url = args.find(a => /^https?:\/\//.test(a));
+      if (!url) return `${base}: try '${base} --help' for more information.`;
+      // For curl piping into bash/sh (common installer pattern)
+      if (cmd.includes('| sh') || cmd.includes('| bash')) {
+        return `Downloading from ${url}...\nDownloaded.\nRunning installer...\nInstalled successfully.`;
+      }
+      return `Connected to ${url.split('/')[2]}\nHTTP/1.1 200 OK\nContent-Type: application/octet-stream\n(... ${Math.floor(Math.random() * 50 + 5)}KB downloaded ...)`;
+    }
+    case 'ansible':
+    case 'ansible-playbook':
+    case 'ansible-galaxy': {
+      if (base === 'ansible-galaxy') return `- ${rest[0] || 'role'} was created successfully`;
+      return 'PLAY [all] **********\n\nTASK [Gathering Facts] **********\nok: [host1]\n\nPLAY RECAP **********\nhost1 : ok=5 changed=2 unreachable=0 failed=0';
+    }
+    case 'systemctl': {
+      if (sub === 'status') return `● ${rest[0] || 'service'}.service - active (running)`;
+      if (sub === 'start' || sub === 'stop' || sub === 'restart' || sub === 'reload' || sub === 'enable' || sub === 'disable') return '';
+      if (sub === 'list-units') return 'UNIT                LOAD   ACTIVE SUB     DESCRIPTION\nnginx.service       loaded active running nginx web server';
+      return `(systemctl ${sub || ''} completed)`;
+    }
+    case 'journalctl':
+      return `-- Logs begin at ${new Date().toUTCString()} --\n${new Date().toUTCString()} realcloud systemd[1]: Started service.`;
+    case 'openssl': {
+      if (sub === 'rand') return btoa(Math.random().toString()).slice(0, 44);
+      if (sub === 'genrsa' || sub === 'req' || sub === 'x509') return '(openssl operation completed)';
+      return `(openssl ${sub || ''} completed)`;
+    }
+    case 'nmap':
+      return `Starting Nmap 7.94\nNmap scan report for ${args[args.length - 1] || 'target'}\nHost is up (0.0010s latency).\nPORT     STATE  SERVICE\n22/tcp   open   ssh\n80/tcp   open   http\n443/tcp  open   https`;
+    case 'ssh':
+      return `(ssh session to ${args[args.length - 1] || 'host'} simulated — type 'exit' to close)`;
+    case 'scp':
+      return `${args[1] || 'file'}    100%   1024     1.0KB/s   00:00`;
+    case 'kubeadm': {
+      if (sub === 'init') return 'Your Kubernetes control-plane has initialized successfully!\n\nTo start using your cluster, run:\n  mkdir -p $HOME/.kube\n  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config';
+      if (sub === 'join') return 'This node has joined the cluster.';
+      if (sub === 'reset') return '[reset] Reset succeeded.';
+      return `(kubeadm ${sub || ''} completed)`;
+    }
+    case 'minikube':
+      return `(minikube ${sub || ''} completed)`;
+    case 'argocd':
+    case 'flux':
+    case 'istioctl':
+    case 'kustomize':
+    case 'crossplane':
+      return `(${base} ${sub || ''} completed successfully)`;
+    case 'trivy':
+      return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;
+    case 'prowler':
+      return 'Prowler scan completed: 124 checks passed, 3 findings (LOW severity)';
+    case 'consul':
+    case 'vault':
+    case 'nomad':
+      return `(${base} ${sub || ''} completed)`;
+    case 'python':
+    case 'python3':
+    case 'node':
+    case 'java':
+      return `(${base} ${args[1] || ''} executed)`;
+    case 'pip':
+    case 'pip3':
+    case 'npm':
+    case 'yarn':
+    case 'pnpm':
+      return `(${base} ${sub || ''} completed)`;
+    default:
+      return null;
+  }
+};
+
 interface TerminalProps {
   initialMessage?: string;
   availableCommands?: string[];
@@ -50,7 +291,25 @@ export const Terminal: React.FC<TerminalProps> = ({
   const [pendingCommand, setPendingCommand] = useState<string | null>(null);
   const [isSudoAuthenticated, setIsSudoAuthenticated] = useState(false);
   const [sudoAuthTimeout, setSudoAuthTimeout] = useState<NodeJS.Timeout | null>(null);
+  // Virtual filesystem: real shell-like persistence for files & dirs created during a session.
+  const vfsRef = useRef<Record<string, string>>({});
+  const vdirsRef = useRef<Set<string>>(new Set());
+  // Environment variables (real-shell feel).
+  const envRef = useRef<Record<string, string>>({
+    HOME: '/home/user',
+    USER: 'user',
+    SHELL: '/bin/bash',
+    PWD: '/home/user',
+    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+    TERM: 'xterm-256color',
+    LANG: 'en_US.UTF-8'
+  });
+  // Persistent command history for ↑/↓ recall.
+  const cmdHistoryRef = useRef<string[]>([]);
+  const [historyIdx, setHistoryIdx] = useState<number | null>(null);
+  const [draftInput, setDraftInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const SUDO_PASSWORD = 'cloudlabs123';
 
@@ -204,6 +463,44 @@ export const Terminal: React.FC<TerminalProps> = ({
   };
 
   const processActualCommand = async (cmd: string) => {
+    // Handle multi-line commands (e.g. heredoc + follow-up command).
+    // Pattern: `cat <<EOF > filename.yaml\n<content>\nEOF\n<more commands>`
+    if (cmd.includes('\n')) {
+      const heredocMatch = cmd.match(/^([\s\S]*?)cat\s+<<\s*EOF\s*>\s*([^\s\n]+)\n([\s\S]*?)\nEOF\s*\n?([\s\S]*)$/);
+      if (heredocMatch) {
+        const [, before, fileName, fileContent, after] = heredocMatch;
+        setIsExecuting(true);
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const lines = fileContent.split('\n');
+        setHistory(prev => [
+          ...prev,
+          `[FILE] Writing ${fileName} (${lines.length} lines):`,
+          '─── BEGIN ' + fileName + ' ───',
+          ...lines,
+          '─── END ' + fileName + ' ───',
+          `[OK] Wrote ${fileName}`
+        ]);
+        setIsExecuting(false);
+        // Run any leading or trailing commands sequentially
+        const remaining = [before, after].map(s => s.trim()).filter(Boolean).join('\n');
+        if (remaining) {
+          for (const sub of remaining.split('\n').map(s => s.trim()).filter(Boolean)) {
+            setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${sub}`]);
+            await processActualCommand(sub);
+          }
+        }
+        setInput('');
+        return;
+      }
+      // Generic multi-line: run each non-empty line in sequence
+      for (const sub of cmd.split('\n').map(s => s.trim()).filter(Boolean)) {
+        setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${sub}`]);
+        await processActualCommand(sub);
+      }
+      setInput('');
+      return;
+    }
+
     const args = cmd.split(' ');
     const baseCmd = args[0].toLowerCase();
 
@@ -393,10 +690,15 @@ export const Terminal: React.FC<TerminalProps> = ({
           
           if (dirDescriptions[normalizedCmd]) {
             output = `${normalizedCmd}: ${dirDescriptions[normalizedCmd]}`;
-          } else if (onCommand) {
-            output = onCommand(cmd.toLowerCase());
           } else {
-            output = `bash: ${baseCmd}: command not found. Type "help" for a list of commands.`;
+            const simulated = simulateLabCommand(cmd, args);
+            if (simulated !== null) {
+              output = simulated;
+            } else if (onCommand) {
+              output = onCommand(cmd.toLowerCase());
+            } else {
+              output = `bash: ${baseCmd}: command not found. Type "help" for a list of commands.`;
+            }
           }
         }
       }

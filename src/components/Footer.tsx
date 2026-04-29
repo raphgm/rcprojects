@@ -83,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
             <ul className="space-y-4">
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Documentation</a></li>
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Community</a></li>
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Blog</a></li>
+              <li><a href="#blog" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Blog</a></li>
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-blue-500 transition-colors"></div>Changelog</a></li>
             </ul>
           </div>
@@ -91,7 +91,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
           <div>
             <h4 className="text-sm font-black text-zinc-900 uppercase tracking-[0.2em] mb-8">Company</h4>
             <ul className="space-y-4">
-              <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>About Us</a></li>
+              <li><a href="#about" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>About Us</a></li>
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Careers</a></li>
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Privacy Policy</a></li>
               <li><a href="#" className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"><div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-rose-500 transition-colors"></div>Terms of Service</a></li>

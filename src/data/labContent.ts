@@ -1374,8 +1374,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — ensuring data persistence across infrastructure failures is critical for stateful cloud workloads.',
         commands: [
           {
-            text: 'kubectl apply -f local-storage-class.yaml',
-            explanation: 'Deploys a StorageClass that uses local disk for high-performance database operations.'
+            text: 'cat <<EOF > local-storage-class.yaml\napiVersion: storage.k8s.io/v1\nkind: StorageClass\nmetadata:\n  name: local-storage\nprovisioner: kubernetes.io/no-provisioner\nvolumeBindingMode: WaitForFirstConsumer\nreclaimPolicy: Retain\nEOF\nkubectl apply -f local-storage-class.yaml',
+            explanation: 'Writes the StorageClass manifest to disk, then applies it. Local volumes are bound only when a pod is scheduled (WaitForFirstConsumer) so the disk is co-located with the workload.'
           }
         ],
         checkCommand: 'kubectl get sc',
@@ -1390,8 +1390,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — stable network identifiers allow database clusters to maintain quorum and synchronization during node restarts.',
         commands: [
           {
-            text: 'kubectl apply -f mongo-service.yaml',
-            explanation: 'Creates a service with clusterIP: None, enabling direct DNS resolution to pod IPs.'
+            text: 'cat <<EOF > mongo-service.yaml\napiVersion: v1\nkind: Service\nmetadata:\n  name: mongo\n  labels:\n    app: mongo\nspec:\n  clusterIP: None\n  selector:\n    app: mongo\n  ports:\n  - port: 27017\n    name: mongo\nEOF\nkubectl apply -f mongo-service.yaml',
+            explanation: 'Writes the headless Service manifest (clusterIP: None) and applies it so each MongoDB pod is directly addressable via DNS like mongo-0.mongo, mongo-1.mongo, etc.'
           }
         ],
         checkCommand: 'kubectl get svc mongo',
@@ -1406,8 +1406,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — managing ordinality and stable storage ensures zero data loss during automated cluster updates.',
         commands: [
           {
-            text: 'kubectl apply -f mongo-statefulset.yaml',
-            explanation: 'Orchestrates the deployment of 3 MongoDB replicas with stabilized storage and naming.'
+            text: 'cat <<EOF > mongo-statefulset.yaml\napiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: mongo\nspec:\n  serviceName: mongo\n  replicas: 3\n  selector:\n    matchLabels:\n      app: mongo\n  template:\n    metadata:\n      labels:\n        app: mongo\n    spec:\n      containers:\n      - name: mongo\n        image: mongo:6.0\n        ports:\n        - containerPort: 27017\n        volumeMounts:\n        - name: data\n          mountPath: /data/db\n  volumeClaimTemplates:\n  - metadata:\n      name: data\n    spec:\n      accessModes: [ReadWriteOnce]\n      storageClassName: local-storage\n      resources:\n        requests:\n          storage: 1Gi\nEOF\nkubectl apply -f mongo-statefulset.yaml',
+            explanation: 'Writes the StatefulSet manifest and applies it. The volumeClaimTemplates ensure each replica (mongo-0, mongo-1, mongo-2) gets its own stable PVC bound to the local-storage class.'
           }
         ],
         checkCommand: 'kubectl get statefulset mongo',
