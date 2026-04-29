@@ -287,9 +287,6 @@ export const LessonView: React.FC<LessonViewProps> = ({
                           })}
                         </div>
                         <div className="border-t border-zinc-800 p-3 space-y-2">
-                          <button className="w-full px-3 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
-                            Check Progress
-                          </button>
                           <div className="flex gap-2">
                             <button
                               onClick={prevLesson}

@@ -241,8 +241,174 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'yarn':
     case 'pnpm':
       return `(${base} ${sub || ''} completed)`;
-    default:
+    // ---- Networking / system inspection
+    case 'ifconfig':
+    case 'ip':
+      return 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 10.0.0.42  netmask 255.255.255.0  broadcast 10.0.0.255\n        inet6 fe80::a00:27ff:fe4e:66a1  prefixlen 64\n        ether 08:00:27:4e:66:a1  txqueuelen 1000  (Ethernet)';
+    case 'netstat':
+    case 'ss':
+      return 'Proto Recv-Q Send-Q Local Address           Foreign Address         State\ntcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN\ntcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN\ntcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN';
+    case 'ping':
+      return `PING ${args[1] || 'target'} (10.0.0.1) 56(84) bytes of data.\n64 bytes from ${args[1] || 'target'}: icmp_seq=1 ttl=64 time=0.421 ms\n64 bytes from ${args[1] || 'target'}: icmp_seq=2 ttl=64 time=0.512 ms\n--- ${args[1] || 'target'} ping statistics ---\n2 packets transmitted, 2 received, 0% packet loss`;
+    case 'traceroute':
+    case 'tracepath':
+      return `traceroute to ${args[1] || 'target'} (10.0.0.1), 30 hops max\n 1  10.0.0.1  0.421 ms  0.388 ms  0.371 ms`;
+    case 'dig':
+      return `;; ANSWER SECTION:\n${args[1] || 'example.com'}.    300    IN    A    93.184.216.34`;
+    case 'nslookup':
+      return `Server:    8.8.8.8\nAddress:   8.8.8.8#53\n\nName:      ${args[1] || 'example.com'}\nAddress:   93.184.216.34`;
+    case 'host':
+      return `${args[1] || 'example.com'} has address 93.184.216.34`;
+    case 'tcpdump':
+      return 'tcpdump: listening on eth0, link-type EN10MB, capture size 262144 bytes\n10:00:01.123 IP 10.0.0.42.443 > 10.0.0.1.50321: Flags [P.], length 320';
+    case 'iptables':
+    case 'ufw':
+    case 'firewall-cmd':
+      return sub === 'status' || rest[0] === 'status' ? 'Status: active' : `(${base} ${sub || ''} succeeded)`;
+    // ---- Resource / process tools
+    case 'htop':
+    case 'free':
+      return base === 'free'
+        ? '              total        used        free      shared  buff/cache   available\nMem:        8048404     1245112     5102372       12340     1700920     6512384\nSwap:       2097148           0     2097148'
+        : '  PID USER       %CPU  %MEM     TIME+  COMMAND\n 1234 user        0.5   1.2   0:00.42 bash';
+    case 'df':
+      return 'Filesystem     1K-blocks    Used Available Use% Mounted on\n/dev/sda1       41152932 5120080  35900868  13% /';
+    case 'du':
+      return `${Math.floor(Math.random() * 500 + 50)}M\t${args[args.length - 1] || '.'}`;
+    case 'mount':
+    case 'umount':
+      return base === 'mount' ? '/dev/sda1 on / type ext4 (rw,relatime)' : `(unmounted ${args[1] || 'device'})`;
+    case 'lsblk':
+      return 'NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS\nsda      8:0    0   40G  0 disk\n└─sda1   8:1    0   40G  0 part /';
+    case 'fdisk':
+    case 'parted':
+      return 'Disk /dev/sda: 40 GiB, 42949672960 bytes, 83886080 sectors\nUnits: sectors of 1 * 512 = 512 bytes';
+    // ---- Files / text
+    case 'find':
+      return `${args[1] || '.'}/file1\n${args[1] || '.'}/file2\n${args[1] || '.'}/dir/file3`;
+    case 'grep':
+    case 'egrep':
+    case 'fgrep':
+    case 'rg':
+    case 'ag':
+      return `${args[args.length - 1] || 'file'}: ${args[1] || 'match'} found`;
+    case 'awk':
+    case 'sed':
+    case 'cut':
+    case 'sort':
+    case 'uniq':
+    case 'head':
+    case 'tail':
+    case 'wc':
+    case 'tee':
+    case 'tr':
+    case 'xargs':
+      return `(${base} processed input successfully)`;
+    case 'tar':
+      return sub?.includes('x') ? '(archive extracted)' : '(archive created)';
+    case 'zip':
+    case 'unzip':
+    case 'gzip':
+    case 'gunzip':
+    case 'bzip2':
+    case 'xz':
+      return `(${base} ${sub || ''} completed)`;
+    case 'chmod':
+    case 'chown':
+    case 'chgrp':
+      return '';
+    case 'ln':
+      return '';
+    case 'useradd':
+    case 'usermod':
+    case 'userdel':
+    case 'groupadd':
+    case 'groupdel':
+    case 'passwd':
+      return base === 'passwd' ? 'passwd: password updated successfully' : '';
+    case 'crontab':
+      return sub === '-l' ? '# m h  dom mon dow   command\n0 2 * * * /usr/local/bin/backup.sh' : '(crontab updated)';
+    // ---- Editors
+    case 'vi':
+    case 'vim':
+    case 'nano':
+    case 'emacs':
+      return `(opened ${args[1] || 'file'} in ${base} — type ':wq' to save and exit)`;
+    // ---- Build / language tooling
+    case 'make':
+    case 'cmake':
+    case 'gcc':
+    case 'g++':
+    case 'clang':
+    case 'go':
+    case 'cargo':
+    case 'rustc':
+    case 'mvn':
+    case 'gradle':
+    case 'sbt':
+    case 'dotnet':
+      return `(${base} ${sub || ''} completed successfully)`;
+    case 'tsc':
+    case 'eslint':
+    case 'prettier':
+    case 'jest':
+    case 'vitest':
+    case 'pytest':
+    case 'mocha':
+      return `(${base} ${sub || ''} completed — 0 errors)`;
+    // ---- Databases
+    case 'psql':
+    case 'mysql':
+    case 'sqlite3':
+    case 'mongo':
+    case 'mongosh':
+    case 'redis-cli':
+    case 'cqlsh':
+      if (cmd.includes('-c') || cmd.includes('--eval') || cmd.includes('-e')) {
+        return ' id | name | created_at\n----+------+-------------\n  1 | demo | 2026-01-01';
+      }
+      return `(connected to ${base}; type \\q to quit)`;
+    // ---- Web servers / runtimes
+    case 'nginx':
+    case 'apache2':
+    case 'httpd':
+      return sub === '-t' ? 'syntax is ok\nconfiguration test is successful' : `(${base} ${sub || 'reload'} succeeded)`;
+    // ---- Container / cloud-native add-ons
+    case 'podman':
+    case 'buildah':
+    case 'skopeo':
+    case 'oc':
+    case 'k9s':
+    case 'kind':
+    case 'k3d':
+    case 'k3s':
+      return `(${base} ${sub || ''} succeeded)`;
+    case 'cosign':
+      return sub === 'sign' ? 'tlog entry created with index: 12345' : 'Verified OK';
+    case 'syft':
+    case 'grype':
+      return base === 'syft'
+        ? 'NAME              VERSION    TYPE\nopenssl           3.0.7      apk\nzlib              1.2.13     apk'
+        : 'NAME              INSTALLED  FIXED-IN  TYPE  VULNERABILITY  SEVERITY\nopenssl           3.0.7      3.0.8     apk   CVE-2023-XXXX  Medium';
+    case 'opa':
+      return sub === 'eval' ? '{\n  "result": [{ "expressions": [{ "value": true }]}]\n}' : `(opa ${sub || ''} completed)`;
+    // ---- IaC + cloud
+    case 'pulumi':
+    case 'bicep':
+    case 'arm':
+    case 'cdk':
+    case 'azd':
+      return `(${base} ${sub || ''} succeeded)`;
+    // ---- Generic plausible fallback for any reasonable token
+    default: {
+      // Treat anything that looks like a real command as a successful no-op
+      // rather than failing — keeps simulations alive.
+      if (/^[a-z][a-z0-9_-]{1,40}$/i.test(base || '')) {
+        if (sub) return `(${base} ${sub} completed)`;
+        return `(${base} completed)`;
+      }
       return null;
+    }
   }
 };
 
