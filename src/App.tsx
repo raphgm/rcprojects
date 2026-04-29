@@ -15,7 +15,9 @@ import { Blog } from './components/Blog';
 import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { labContents } from './data/labContent';
+import { learningPaths } from './data/learningPaths';
 import { Lesson, LabContent } from './types/content';
+import { generateFallbackLessons } from './data/lessonGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { db } from './firebase';
 import { doc, getDocFromServer } from 'firebase/firestore';
@@ -63,17 +65,14 @@ export default function App() {
     if (content) {
       setActiveLesson({ lessons: content.lessons, title: courseTitle });
     } else {
-      // Fallback for demo purposes if content not found
+      // Generate a full set of interactive lessons for any course defined in learningPaths
+      let lessonCount = 20;
+      for (const path of learningPaths) {
+        const course = path.courses.find(c => c.id === courseId);
+        if (course) { lessonCount = course.lessons || 20; break; }
+      }
       setActiveLesson({
-        lessons: [
-          {
-            id: 'demo-lesson',
-            title: `Introduction to ${courseTitle}`,
-            content: `# Welcome to ${courseTitle}\n\nThis is a placeholder lesson for the demo. In a real application, this would contain detailed educational content, diagrams, and interactive exercises.\n\n## What you will learn\n- Core concepts of ${courseTitle}\n- Best practices and industry standards\n- Hands-on implementation techniques`,
-            demoType: 'terminal',
-            demoConfig: { initialMessage: `Sandbox environment for ${courseTitle} initialized...` }
-          }
-        ],
+        lessons: generateFallbackLessons(courseId, courseTitle, lessonCount),
         title: courseTitle
       });
     }
