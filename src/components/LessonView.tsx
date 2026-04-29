@@ -202,24 +202,6 @@ export const LessonView: React.FC<LessonViewProps> = ({
               </motion.button>
             </div>
             
-            <div className="mt-12 flex items-center justify-between pt-8 border-t border-zinc-100">
-              <button 
-                onClick={prevLesson}
-                disabled={isFirstLesson}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${isFirstLesson ? 'text-zinc-300 cursor-not-allowed' : 'text-zinc-900 hover:bg-zinc-100'}`}
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Previous Lesson
-              </button>
-              <button 
-                onClick={nextLesson}
-                disabled={isLastLesson}
-                className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all ${isLastLesson ? 'bg-brand-blue/10 text-brand-blue cursor-not-allowed' : 'bg-zinc-900 text-white hover:bg-zinc-800 shadow-xl shadow-zinc-900/20'}`}
-              >
-                {isLastLesson ? 'Course Completed' : 'Next Lesson'}
-                {!isLastLesson && <ChevronRight className="w-5 h-5" />}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -268,21 +250,79 @@ export const LessonView: React.FC<LessonViewProps> = ({
 
               {/* Modal Content */}
               <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-                {/* Sandbox Area */}
+                {/* Sandbox Area with Mission Progress */}
                 <div className="flex-1 p-8 overflow-hidden flex flex-col">
                   {currentLesson.demoType === 'terminal' ? (
-                    <Terminal 
-                      initialMessage={currentLesson.demoConfig?.initialMessage}
-                      availableCommands={currentLesson.demoConfig?.availableCommands}
-                      flavor={linuxFlavor}
-                      currentStep={currentLesson as any}
-                      allSteps={lessons.map(l => ({
-                        id: l.id,
-                        title: l.title,
-                        instruction: l.task || '',
-                      })) as any}
-                      currentStepIndex={currentLessonIndex}
-                    />
+                    <div className="flex-1 flex gap-0 bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-200 shadow-xl">
+                      {/* Mission Progress Sidebar */}
+                      <aside className="w-44 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+                        <div className="px-4 py-4 border-b border-zinc-800">
+                          <h4 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em]">Mission Progress</h4>
+                        </div>
+                        <div className="flex-1 overflow-y-auto py-2">
+                          {lessons.map((lesson, idx) => {
+                            const isActive = idx === currentLessonIndex;
+                            const isDone = idx < currentLessonIndex;
+                            return (
+                              <button
+                                key={lesson.id}
+                                onClick={() => setCurrentLessonIndex(idx)}
+                                className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${isActive ? 'bg-brand-blue/10 border-l-2 border-brand-blue' : 'hover:bg-zinc-800/50 border-l-2 border-transparent'}`}
+                              >
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${isActive ? 'bg-brand-blue text-white' : isDone ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-zinc-800 text-zinc-500 border border-zinc-700'}`}>
+                                  {isDone ? <CheckCircle className="w-3 h-3" /> : idx + 1}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className={`text-[10px] font-black uppercase tracking-wider truncate ${isActive ? 'text-white' : 'text-zinc-400'}`}>
+                                    {lesson.title}
+                                  </div>
+                                  {isActive && (
+                                    <div className="text-[8px] font-bold text-brand-blue uppercase tracking-widest mt-0.5">
+                                      Active Mission
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="border-t border-zinc-800 p-3 space-y-2">
+                          <button className="w-full px-3 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
+                            Check Progress
+                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={prevLesson}
+                              disabled={isFirstLesson}
+                              className={`flex-1 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors ${isFirstLesson ? 'bg-zinc-800/50 text-zinc-600 cursor-not-allowed' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}
+                            >
+                              Back
+                            </button>
+                            <button
+                              onClick={() => isLastLesson ? onClose() : nextLesson()}
+                              className="flex-1 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors shadow-lg bg-brand-blue hover:bg-brand-blue/90 text-white shadow-brand-blue/30"
+                            >
+                              {isLastLesson ? 'Finish' : 'Next Mission'}
+                            </button>
+                          </div>
+                        </div>
+                      </aside>
+                      {/* Terminal */}
+                      <div className="flex-1 min-w-0">
+                        <Terminal 
+                          initialMessage={currentLesson.demoConfig?.initialMessage}
+                          availableCommands={currentLesson.demoConfig?.availableCommands}
+                          flavor={linuxFlavor}
+                          currentStep={currentLesson as any}
+                          allSteps={lessons.map(l => ({
+                            id: l.id,
+                            title: l.title,
+                            instruction: l.task || '',
+                          })) as any}
+                          currentStepIndex={currentLessonIndex}
+                        />
+                      </div>
+                    </div>
                   ) : (
                     <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex-1 flex flex-col">
                       <div className="bg-zinc-50 px-4 py-3 border-b border-zinc-200 flex items-center justify-between">

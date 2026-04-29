@@ -6,9 +6,9 @@ export const Testimonials: React.FC = () => {
   const testimonials = [
     {
       content: "Realcloud changed how I learn DevOps. The instant sandbox environments are a game changer compared to setting up local VMs.",
-      author: "Sarah Chen",
-      role: "Senior SRE at TechFlow",
-      image: "https://picsum.photos/seed/sarah/100/100"
+      author: "Amara Okafor",
+      role: "Platform Engineer at Northwind",
+      image: "https://picsum.photos/seed/amara/100/100"
     },
     {
       content: "The Kubernetes labs are the most comprehensive I've found. I passed my CKA exam thanks to the hands-on practice here.",
