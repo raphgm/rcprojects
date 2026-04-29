@@ -201,6 +201,30 @@ export const LessonView: React.FC<LessonViewProps> = ({
                 Launch Sandbox
               </motion.button>
             </div>
+
+            {/* Lesson Navigation */}
+            <div className="mt-6 flex items-center justify-between">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={prevLesson}
+                disabled={isFirstLesson}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-colors ${isFirstLesson ? 'text-zinc-300 cursor-not-allowed' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'}`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </motion.button>
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                {currentLessonIndex + 1} / {lessons.length}
+              </span>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => isLastLesson ? onClose() : nextLesson()}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-colors text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
+              >
+                {isLastLesson ? 'Finish' : 'Next'}
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
+            </div>
             
           </div>
         </div>
