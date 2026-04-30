@@ -1,20 +1,56 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="1200" height="475" alt="Realcloud Projects Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Realcloud Projects
 
-This contains everything you need to run your app locally.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-View your app in AI Studio: https://ai.studio/apps/2f77dadb-2c5a-41a3-b403-4187f92bba57
+Open-source hands-on learning platform for cloud and DevOps engineers — built on **Microsoft Azure**.
 
-## Run Locally
+Practice real Azure, Kubernetes, Linux, and DevOps skills through guided labs and projects. No simulations — real infrastructure in your browser.
 
-**Prerequisites:**  Node.js
+## Tech Stack
 
+| Layer | Technology |
+|---|---|
+| Cloud | Microsoft Azure (AKS, App Service, Key Vault, Cosmos DB) |
+| Auth | Microsoft Entra ID (Azure AD) |
+| Frontend | React 18 + TypeScript + Vite + Tailwind CSS |
+| Database | Azure Cosmos DB |
+| Infrastructure | Kubernetes · Terraform · Azure DevOps |
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Getting Started
+
+**Prerequisites:** Node.js 18+
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/raphgm/rcprojects.git
+cd rcprojects
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment
+cp .env.example .env.local
+# Fill in your Azure credentials in .env.local
+
+# 4. Start the dev server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
+
+- **Bug reports** → open a GitHub Issue
+- **Feature requests** → open a GitHub Discussion
+- **Code contributions** → fork, branch, PR against `main`
+
+## License
+
+[MIT](LICENSE) © Realcloud Projects Contributors

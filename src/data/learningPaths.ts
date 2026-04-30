@@ -800,7 +800,7 @@ export const learningPaths: LearningPath[] = [
     skills: 120,
     coursesCount: 3,
     projectsCount: 15,
-    description: 'Cloud bills can spiral out of control without the right discipline — FinOps fixes that. You\'ll learn how to analyse cloud spend across AWS, Azure, and GCP, right-size resources, implement tagging strategies, and build the collaborative culture between engineering, finance, and operations that keeps costs predictable and accountable.',
+    description: 'Cloud bills can spiral out of control without the right discipline — FinOps fixes that. You\'ll learn how to analyse and optimise Azure spend, right-size resources, implement tagging and budgeting strategies with Azure Cost Management, and build the collaborative culture between engineering, finance, and operations that keeps costs predictable and accountable.',
     color: 'bg-emerald-500',
     courses: [
       { id: 'finops-fundamentals', title: 'FinOps Fundamentals', duration: '4h', level: 'Beginner', lessons: 12 },
@@ -811,7 +811,7 @@ export const learningPaths: LearningPath[] = [
       { id: '139', title: 'Kubernetes Cost Visibility with Kubecost', difficulty: 'Medium', estimatedTime: '2h' },
       { id: '140', title: 'Optimizing Kubernetes Resource Quotas for FinOps', difficulty: 'Medium', estimatedTime: '1.5h' },
       { id: 'aws-cost-explorer', title: 'AWS Cost Explorer Automation', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'gcp-billing-export', title: 'GCP Billing Export to BigQuery', difficulty: 'Hard', estimatedTime: '5h' }
+      { id: 'azure-cost-management', title: 'Azure Cost Management & Budgets', difficulty: 'Medium', estimatedTime: '3h' }
     ]
   }
 ];

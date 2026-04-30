@@ -167,11 +167,12 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'account') return 'Subscription: Realcloud Subscription';
       return `(az ${sub || ''} completed)`;
     }
-    case 'gcloud': {
-      if (sub === 'auth') return '(authenticated)';
-      if (sub === 'projects') return rest[0] === 'list' ? 'PROJECT_ID         NAME            PROJECT_NUMBER\nrealcloud-demo     Realcloud       123456789012' : '(project op completed)';
-      if (sub === 'compute' || sub === 'container' || sub === 'sql' || sub === 'storage') return `(gcloud ${sub} ${rest[0] || ''} succeeded)`;
-      return `(gcloud ${sub || ''} completed)`;
+    case 'az': {
+      if (sub === 'login') return '[\n  {\n    "name": "Realcloud Subscription",\n    "id": "00000000-0000-0000-0000-000000000000",\n    "isDefault": true\n  }\n]';
+      if (sub === 'group') return rest[0] === 'create' ? '{\n  "id": "/subscriptions/.../resourceGroups/...",\n  "location": "eastus",\n  "properties": { "provisioningState": "Succeeded" }\n}' : '[]';
+      if (sub === 'aks' || sub === 'vm' || sub === 'storage' || sub === 'webapp' || sub === 'network' || sub === 'keyvault' || sub === 'acr') return `(az ${sub} ${rest[0] || ''} succeeded)`;
+      if (sub === 'account') return 'Subscription: Realcloud Subscription';
+      return `(az ${sub || ''} completed)`;
     }
     case 'curl':
     case 'wget': {
