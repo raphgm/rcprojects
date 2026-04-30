@@ -34,7 +34,7 @@ export const learningPaths: LearningPath[] = [
     skills: 118,
     coursesCount: 7,
     projectsCount: 24,
-    description: 'Master the foundation of cloud computing and server administration.',
+    description: 'Linux powers over 90% of the world\'s servers and cloud infrastructure. You\'ll learn to navigate the command line, manage files and users, configure services, automate tasks with shell scripts, and keep systems secure — skills every cloud and DevOps engineer must have.',
     color: 'bg-orange-500',
     courses: [
       { id: 'linux-basics', title: 'Linux Fundamentals', duration: '4h', level: 'Beginner', lessons: 100 },
@@ -83,7 +83,7 @@ export const learningPaths: LearningPath[] = [
     skills: 360,
     coursesCount: 11,
     projectsCount: 30,
-    description: 'Learn CI/CD, IaC, and automation for modern software delivery.',
+    description: 'DevOps bridges the gap between writing code and running it reliably in production. You\'ll build automated deployment pipelines (CI/CD), provision infrastructure with code using tools like Terraform and Ansible, and monitor live systems — so software ships faster with fewer failures.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'devops-intro', title: 'Introduction to DevOps', duration: '3h', level: 'Beginner', lessons: 10 },
@@ -131,7 +131,7 @@ export const learningPaths: LearningPath[] = [
     skills: 229,
     coursesCount: 13,
     projectsCount: 30,
-    description: 'Protect infrastructure and applications from modern threats.',
+    description: 'Cybersecurity is about thinking like an attacker to defend like a pro. You\'ll learn how hackers exploit systems, how to detect and respond to incidents, secure networks and applications, and build the security posture that organisations depend on to protect their data.',
     color: 'bg-rose-600',
     courses: [
       { id: 'security-basics', title: 'Cybersecurity Essentials', duration: '5h', level: 'Beginner', lessons: 15 },
@@ -180,7 +180,7 @@ export const learningPaths: LearningPath[] = [
     skills: 22,
     coursesCount: 2,
     projectsCount: 15,
-    description: 'Advanced penetration testing and security auditing.',
+    description: 'Kali Linux is the industry-standard OS for ethical hackers. You\'ll use its 600+ pre-installed security tools to perform real penetration tests — scanning networks with Nmap, cracking passwords, exploiting vulnerabilities, and auditing wireless networks, all in a legal, controlled environment.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'kali-intro', title: 'Kali Linux for Beginners', duration: '4h', level: 'Beginner', lessons: 12 },
@@ -201,7 +201,7 @@ export const learningPaths: LearningPath[] = [
     skills: 126,
     coursesCount: 5,
     projectsCount: 20,
-    description: 'Master SQL, NoSQL, and database administration.',
+    description: 'Every application needs to store and retrieve data efficiently. You\'ll master relational databases with SQL and PostgreSQL, explore NoSQL solutions like MongoDB and Redis, and learn how to design schemas, optimise slow queries, and manage databases in production at scale.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'sql-basics', title: 'SQL Fundamentals', duration: '6h', level: 'Beginner', lessons: 20 },
@@ -227,7 +227,7 @@ export const learningPaths: LearningPath[] = [
     skills: 192,
     coursesCount: 7,
     projectsCount: 91,
-    description: 'Analyze data and build machine learning models.',
+    description: 'Data is the new oil, but only if you can refine it. You\'ll learn to clean and explore datasets with Python and Pandas, apply statistical thinking, build predictive models, and communicate insights through compelling visualisations — turning raw numbers into decisions that drive real value.',
     color: 'bg-purple-600',
     courses: [
       { id: 'data-analysis', title: 'Data Analysis with Python', duration: '12h', level: 'Beginner', lessons: 35 },
@@ -254,7 +254,7 @@ export const learningPaths: LearningPath[] = [
     skills: 32,
     coursesCount: 3,
     projectsCount: 10,
-    description: 'Containerize applications for consistent deployment.',
+    description: 'Docker solved the "it works on my machine" problem once and for all. You\'ll learn to package applications into portable containers, compose multi-service environments, push images to registries, and adopt container-first thinking — the foundation for every modern cloud deployment pipeline.',
     color: 'bg-sky-500',
     courses: [
       { id: 'docker-basics', title: 'Docker Fundamentals', duration: '4h', level: 'Beginner', lessons: 12 },
@@ -274,7 +274,7 @@ export const learningPaths: LearningPath[] = [
     skills: 27,
     coursesCount: 2,
     projectsCount: 30,
-    description: 'Orchestrate containers at scale in production.',
+    description: 'Kubernetes is the operating system of the cloud. You\'ll learn to deploy, scale, and self-heal containerised applications across clusters, configure networking and storage, enforce security policies, and run production-grade workloads using the same platform that powers Google, Spotify, and thousands of enterprises worldwide.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'k8s-intro', title: 'Kubernetes Essentials', duration: '8h', level: 'Intermediate', lessons: 100 },
@@ -338,7 +338,7 @@ export const learningPaths: LearningPath[] = [
     skills: 60,
     coursesCount: 4,
     projectsCount: 92,
-    description: 'The most versatile language for cloud and data.',
+    description: 'Python reads like plain English but runs in production at Google, Netflix, and NASA. You\'ll go from core syntax and data structures to writing web APIs with Flask and Django, automating infrastructure tasks, and building the glue scripts that tie entire systems together — all with one of the most in-demand skills in tech.',
     color: 'bg-yellow-500',
     courses: [
       { id: 'python-basics', title: 'Python for Beginners', duration: '10h', level: 'Beginner', lessons: 100 },
@@ -366,7 +366,7 @@ export const learningPaths: LearningPath[] = [
     skills: 31,
     coursesCount: 3,
     projectsCount: 10,
-    description: 'Master version control and collaborative development.',
+    description: 'Git is the single most important tool every software engineer uses every day. You\'ll learn to track changes, collaborate without stepping on teammates\' toes, resolve merge conflicts, use branching strategies like GitFlow, and contribute to open-source projects — skills that are non-negotiable in any engineering role.',
     color: 'bg-orange-600',
     courses: [
       { id: 'git-basics', title: 'Git Fundamentals', duration: '3h', level: 'Beginner', lessons: 100 },
@@ -385,7 +385,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 5,
     projectsCount: 130,
     icon: 'Globe',
-    description: 'Build modern, responsive web applications.',
+    description: 'The web is the world\'s largest platform, and you\'ll learn to build on it from scratch. Starting with HTML and CSS fundamentals, you\'ll progress through JavaScript, responsive design, and modern frameworks — building real projects like portfolios, dashboards, and full-stack applications that work beautifully on every device.',
     color: 'bg-pink-600',
     courses: [
       { id: 'html-css', title: 'HTML5 & CSS3 Mastery', duration: '15h', level: 'Beginner', lessons: 100 },
@@ -413,7 +413,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 1,
     projectsCount: 15,
     icon: 'Zap',
-    description: 'Efficient cloud-native systems programming.',
+    description: 'Go was designed at Google to handle the scale of the internet. You\'ll learn its clean syntax, powerful concurrency model with goroutines and channels, and how to build fast, lightweight services — making Go the go-to choice for cloud infrastructure tools, microservices, and performance-critical backends.',
     color: 'bg-cyan-500',
     courses: [
       { id: 'go-intro', title: 'Go Programming Language', duration: '12h', level: 'Intermediate', lessons: 35 },
@@ -433,7 +433,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 8,
     projectsCount: 42,
     icon: 'Coffee',
-    description: 'Enterprise-grade application development and backend systems.',
+    description: 'Java has powered enterprise software for over 25 years — and for good reason. You\'ll master object-oriented design, build production-grade REST APIs with Spring Boot, handle concurrency at scale, and work with persistence layers using Hibernate — skills that open doors in banking, fintech, and large-scale SaaS companies.',
     color: 'bg-red-600',
     courses: [
       { id: 'java-basics', title: 'Java Fundamentals', duration: '15h', level: 'Beginner', lessons: 45 },
@@ -454,7 +454,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 6,
     projectsCount: 15,
     icon: 'Cpu',
-    description: 'High-performance systems and game development.',
+    description: 'C++ gives you the raw power to write code that runs as fast as hardware allows. You\'ll master memory management, object-oriented and generic programming, the STL, and build projects like game engines and ray tracers — the same foundations used in AAA games, operating systems, and real-time trading systems.',
     color: 'bg-blue-700',
     courses: [
       { id: 'cpp-basics', title: 'C++ for Beginners', duration: '18h', level: 'Beginner', lessons: 50 },
@@ -475,7 +475,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 4,
     projectsCount: 65,
     icon: 'Atom',
-    description: 'Build modern user interfaces with the most popular frontend library.',
+    description: 'React is the library behind the UIs at Facebook, Airbnb, and Notion. You\'ll learn components, hooks, state management, and the React ecosystem — then go further with React Native for mobile apps and Next.js for full-stack development, so you can build polished, performant products across every platform.',
     color: 'bg-cyan-400',
     courses: [
       { id: 'react-basics', title: 'React Fundamentals', duration: '12h', level: 'Beginner', lessons: 35 },
@@ -496,7 +496,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 3,
     projectsCount: 12,
     icon: 'Wrench',
-    description: 'Safe and fast systems programming for the modern era.',
+    description: 'Rust eliminates entire categories of bugs — memory leaks, data races, null pointer crashes — without sacrificing performance. You\'ll learn its ownership model, build web services and CLI tools, and compile to WebAssembly — skills that are transforming how developers write systems software, browsers, and cloud infrastructure.',
     color: 'bg-stone-700',
     courses: [
       { id: 'rust-intro', title: 'Rust Programming Language', duration: '15h', level: 'Intermediate', lessons: 45 },
@@ -516,7 +516,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 5,
     projectsCount: 10,
     icon: 'Binary',
-    description: 'Master the core logic behind efficient software solutions.',
+    description: 'Algorithms are the difference between code that works and code that scales. You\'ll learn sorting, searching, graph traversal, dynamic programming, and complexity analysis — the foundations that show up in every technical interview and underpin every system that needs to handle millions of users without grinding to a halt.',
     color: 'bg-violet-600',
     courses: [
       { id: 'algo-basics', title: 'Algorithm Design & Analysis', duration: '20h', level: 'Intermediate', lessons: 50 },
@@ -536,7 +536,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 4,
     projectsCount: 10,
     icon: 'Layers',
-    description: 'Learn how to organize and store data effectively.',
+    description: 'The right data structure can make your code a hundred times faster — the wrong one can cripple it. You\'ll deeply understand arrays, linked lists, trees, heaps, hash tables, and graphs, learning when and why to use each one so you can design efficient solutions to complex problems from first principles.',
     color: 'bg-fuchsia-600',
     courses: [
       { id: 'ds-basics', title: 'Data Structures Fundamentals', duration: '15h', level: 'Beginner', lessons: 40 },
@@ -555,7 +555,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 9,
     projectsCount: 45,
     icon: 'Brain',
-    description: 'Build intelligent systems that learn from data.',
+    description: 'Machine learning is turning data into decisions — and it\'s reshaping every industry. You\'ll build and train neural networks, work with computer vision and natural language processing, and deploy models to production, gaining the hands-on skills to build AI products that go well beyond simple demos.',
     color: 'bg-teal-600',
     courses: [
       { id: 'ml-math', title: 'Mathematics for ML', duration: '12h', level: 'Intermediate', lessons: 30 },
@@ -576,7 +576,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 3,
     projectsCount: 28,
     icon: 'FileCode',
-    description: 'JavaScript with syntax for types for better development.',
+    description: 'TypeScript brings discipline to JavaScript without slowing you down. You\'ll learn type systems, interfaces, generics, and advanced patterns that catch bugs at compile time rather than at 2am in production — making it the standard choice for any serious frontend, backend, or full-stack codebase.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'ts-intro', title: 'TypeScript Fundamentals', duration: '8h', level: 'Beginner', lessons: 25 },
@@ -594,7 +594,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 5,
     projectsCount: 35,
     icon: 'Server',
-    description: 'Scalable network applications with JavaScript on the server.',
+    description: 'Node.js lets JavaScript developers build the entire stack. You\'ll learn event-driven architecture, build REST and real-time APIs with Express and Socket.io, connect to databases, and handle authentication — so you can ship production backends fast without switching languages from your frontend work.',
     color: 'bg-green-600',
     courses: [
       { id: 'node-basics', title: 'Node.js Fundamentals', duration: '10h', level: 'Beginner', lessons: 30 },
@@ -613,7 +613,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 4,
     projectsCount: 18,
     icon: 'Command',
-    description: 'Automate tasks and manage systems with Bash and Zsh.',
+    description: 'Shell scripting turns repetitive manual work into one-line commands. You\'ll master Bash to automate backups, deployments, log analysis, and server configuration — the kind of glue scripting that every sysadmin, DevOps engineer, and cloud professional relies on daily to get more done with less effort.',
     color: 'bg-zinc-700',
     courses: [
       { id: 'shell-basics', title: 'Bash Scripting Mastery', duration: '6h', level: 'Beginner', lessons: 20 },
@@ -632,7 +632,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 12,
     projectsCount: 30,
     icon: 'CloudSun',
-    description: 'Enterprise cloud solutions with Microsoft Azure.',
+    description: 'Azure is the cloud of choice for the majority of Fortune 500 companies. You\'ll learn to architect and administer virtual machines, networking, storage, identity, and managed services — preparing you for the AZ-900, AZ-104, and AZ-305 certifications and the enterprise cloud roles that demand them.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'azure-basics', title: 'Azure Fundamentals (AZ-900)', duration: '10h', level: 'Beginner', lessons: 30 },
@@ -679,7 +679,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 5,
     projectsCount: 10,
     icon: 'Cpu',
-    description: 'The foundation of modern computing and systems.',
+    description: 'C is the language everything else is built on — from Linux to Python to your browser. You\'ll learn manual memory management, pointers, and low-level systems concepts that make you a far better programmer in any language, and build projects like custom shells and HTTP servers that run close to the metal.',
     color: 'bg-slate-600',
     courses: [
       { id: 'c-basics', title: 'C Programming Fundamentals', duration: '20h', level: 'Beginner', lessons: 60 },
@@ -698,7 +698,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 4,
     projectsCount: 12,
     icon: 'Cloud',
-    description: 'Design and build resilient, scalable cloud-native systems.',
+    description: 'Cloud-native isn\'t just about running in the cloud — it\'s a philosophy for building systems that never go down. You\'ll learn microservices design patterns, service meshes, serverless architectures, and observability practices that let you build and operate systems that self-heal and scale automatically under real production load.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'cloud-native-intro', title: 'Cloud Native Fundamentals', duration: '6h', level: 'Beginner', lessons: 15 },
@@ -719,7 +719,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 3,
     projectsCount: 8,
     icon: 'Shield',
-    description: 'Integrate security into every stage of the software development lifecycle.',
+    description: 'Security can\'t be bolted on after the fact — it has to be built in from the start. DevSecOps teaches you to embed automated security scanning, compliance checks, and vulnerability management directly into your CI/CD pipelines, so security becomes a shared responsibility rather than a final-step blocker.',
     color: 'bg-red-500',
     courses: [
       { id: 'devsecops-intro', title: 'DevSecOps Principles', duration: '5h', level: 'Beginner', lessons: 12 },
@@ -738,7 +738,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 4,
     projectsCount: 10,
     icon: 'Activity',
-    description: 'Master Site Reliability Engineering to build highly available systems.',
+    description: 'SRE is how Google, Netflix, and Spotify keep services running at 99.99% uptime. You\'ll learn to define SLIs, SLOs, and error budgets, manage on-call effectively, run chaos engineering experiments, and build the systems thinking that bridges the gap between engineering teams and operations at scale.',
     color: 'bg-indigo-500',
     courses: [
       { id: 'sre-fundamentals', title: 'SRE Fundamentals', duration: '6h', level: 'Beginner', lessons: 14 },
@@ -758,7 +758,7 @@ export const learningPaths: LearningPath[] = [
     coursesCount: 3,
     projectsCount: 6,
     icon: 'Link',
-    description: 'Learn decentralized technologies and smart contract development.',
+    description: 'Blockchain technology removes the need to trust a central authority by making trust a mathematical guarantee. You\'ll understand how distributed ledgers work, write and deploy smart contracts in Solidity, and build decentralised applications — skills at the frontier of finance, gaming, and digital ownership.',
     color: 'bg-orange-500',
     courses: [
       { id: 'blockchain-basics', title: 'Blockchain Fundamentals', duration: '5h', level: 'Beginner', lessons: 12 },
@@ -777,7 +777,7 @@ export const learningPaths: LearningPath[] = [
     skills: 150,
     coursesCount: 5,
     projectsCount: 20,
-    description: 'Master Generative AI, LLMs, and Prompt Engineering.',
+    description: 'AI is the most transformative technology of our generation — and it\'s becoming a core skill for every engineer. You\'ll learn how large language models work, craft effective prompts, build AI-powered applications with tools like Gemini and LangChain, and understand the ethical guardrails that responsible AI development requires.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'ai-fundamentals', title: 'AI & LLM Fundamentals', duration: '6h', level: 'Beginner', lessons: 10 },
@@ -800,7 +800,7 @@ export const learningPaths: LearningPath[] = [
     skills: 120,
     coursesCount: 3,
     projectsCount: 15,
-    description: 'Master the art of cloud financial management and cost optimization.',
+    description: 'Cloud bills can spiral out of control without the right discipline — FinOps fixes that. You\'ll learn how to analyse cloud spend across AWS, Azure, and GCP, right-size resources, implement tagging strategies, and build the collaborative culture between engineering, finance, and operations that keeps costs predictable and accountable.',
     color: 'bg-emerald-500',
     courses: [
       { id: 'finops-fundamentals', title: 'FinOps Fundamentals', duration: '4h', level: 'Beginner', lessons: 12 },
