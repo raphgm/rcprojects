@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
 
 const stats = [
-  { value: 50,   suffix: 'k+',  label: 'Engineers trained',  emoji: '👩‍💻' },
-  { value: 1000, suffix: '+',   label: 'Hands-on labs',      emoji: '🧪' },
-  { value: 28,   suffix: '',    label: 'Skill paths',         emoji: '🗺️' },
-  { value: 4.9,  suffix: '/5',  label: 'Average rating',     emoji: '⭐' },
+  { value: 50,   suffix: 'k+',  label: 'Engineers trained' },
+  { value: 1000, suffix: '+',   label: 'Hands-on labs' },
+  { value: 28,   suffix: '',    label: 'Skill paths' },
+  { value: 4.9,  suffix: '/5',  label: 'Average rating' },
 ];
 
 function AnimatedNumber({ value, suffix, inView }: { value: number; suffix: string; inView: boolean }) {
@@ -34,7 +34,7 @@ export const StatsBar: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section ref={ref} className="py-16 bg-zinc-900 overflow-hidden relative">
+    <section ref={ref} className="py-8 bg-zinc-900 overflow-hidden relative">
       <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -44,9 +44,8 @@ export const StatsBar: React.FC = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="text-center p-6 rounded-2xl bg-white/4 border border-white/6 hover:bg-white/7 transition-colors"
+              className="text-center py-4 px-6 rounded-2xl bg-white/4 border border-white/6 hover:bg-white/7 transition-colors"
             >
-              <div className="text-2xl mb-2">{stat.emoji}</div>
               <div className="text-4xl font-black text-white mb-1 tabular-nums">
                 <AnimatedNumber value={stat.value} suffix={stat.suffix} inView={inView} />
               </div>
