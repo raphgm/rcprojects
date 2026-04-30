@@ -1,13 +1,12 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  Clock, ArrowUpRight, Cloud, Box, 
+import {
+  Clock, ArrowUpRight, Cloud, Box,
   Infinity, Shield, Server, Database,
   Cpu, Globe, Lock, Zap, Activity,
-  BarChart3, Network, Brain, HardDrive,
-  GitBranch, Terminal, Search, Settings,
-  MessageSquare, Layout, Layers, Radio,
-  Hexagon, Key, ShieldCheck, Code, Workflow,
+  Network, Brain, HardDrive,
+  GitBranch, Layers, Radio,
+  Hexagon, Key, ShieldCheck, Code,
   CheckCircle2
 } from 'lucide-react';
 import { Project } from '../data/projects';
@@ -61,107 +60,112 @@ const getProjectIcon = (title: string, category: string) => {
   return Server;
 };
 
+const difficultyConfig = {
+  Beginner: { label: 'Beginner', dot: 'bg-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50' },
+  Intermediate: { label: 'Intermediate', dot: 'bg-amber-400', text: 'text-amber-600', bg: 'bg-amber-50' },
+  Advanced: { label: 'Advanced', dot: 'bg-rose-400', text: 'text-rose-600', bg: 'bg-rose-50' },
+};
+
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCompleted, isLocked }) => {
   const config = categoryConfig[project.category] || { color: 'bg-zinc-500' };
   const Icon = getProjectIcon(project.title, project.category);
-
-  const difficultyColor = {
-    Beginner: 'text-brand-blue bg-brand-blue/10',
-    Intermediate: 'text-amber-600 bg-amber-50',
-    Advanced: 'text-rose-600 bg-rose-50',
-  };
+  const diff = difficultyConfig[project.difficulty];
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={isLocked ? undefined : { y: -8 }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={isLocked ? undefined : { y: -6, transition: { duration: 0.2 } }}
       onClick={() => { if (!isLocked) onStart(); }}
-      className={`group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]'}`}
+      className={`group bg-white border border-zinc-100 rounded-3xl overflow-hidden flex flex-col h-full relative transition-shadow duration-300 ${isLocked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.14)] hover:border-zinc-200'}`}
     >
+      {/* Cute lock badge */}
       {isLocked && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
           <Lock className="w-2.5 h-2.5 text-zinc-400" />
           <span className="text-[9px] font-semibold text-zinc-400 tracking-wide">Coming soon</span>
         </div>
       )}
-      {/* Bottom Depth Layer */}
-      <div className="absolute bottom-0 left-6 right-6 h-2 bg-zinc-100/50 rounded-b-[2.5rem] -mb-1 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <div className={`relative aspect-[16/10] ${config.color} flex items-center justify-center overflow-hidden`}>
-        {/* Abstract Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
-        </div>
-        
-        <motion.div 
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          className="relative z-10 w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-3xl flex items-center justify-center text-white shadow-2xl border border-white/20"
+
+      {/* Coloured header band with icon */}
+      <div className={`relative h-36 ${config.color} flex items-center justify-center overflow-hidden shrink-0`}>
+        {/* Soft noise texture */}
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'200\' height=\'200\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
+        {/* Glow blob */}
+        <div className="absolute w-32 h-32 rounded-full bg-white/20 blur-2xl" />
+
+        <motion.div
+          whileHover={{ rotate: 8, scale: 1.1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+          className="relative z-10 w-16 h-16 bg-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/25 shadow-lg"
         >
-          <Icon className="w-12 h-12" />
+          <Icon className="w-8 h-8" />
         </motion.div>
 
-        <div className="absolute top-6 left-6 flex items-center gap-2">
-          <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-white/40 bg-white/20 text-white backdrop-blur-md shadow-sm">
-            {project.difficulty}
-          </span>
-          {isCompleted && (
-            <motion.div 
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="p-1.5 bg-emerald-500 text-white rounded-full shadow-lg border border-emerald-400/50"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-            </motion.div>
-          )}
-        </div>
-
-        <div className="absolute bottom-6 right-6 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-500 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0 flex flex-col gap-2 items-end">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => { e.stopPropagation(); onStart(); }}
-            className="bg-white px-4 py-2 rounded-xl shadow-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 hover:bg-brand-blue hover:text-white transition-all cursor-pointer w-full justify-center"
+        {/* Completed checkmark */}
+        {isCompleted && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-3 left-3 p-1 bg-emerald-500 rounded-full shadow-md border border-emerald-400/60"
           >
-            Start Lab
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </motion.button>
-        </div>
+            <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+          </motion.div>
+        )}
       </div>
 
-      <div className="p-10 flex flex-col flex-1">
-        <div className="flex items-center gap-3 mb-4 flex-wrap">
-          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${difficultyColor[project.difficulty]}`}>
-            {project.difficulty}
+      {/* Body */}
+      <div className="p-6 flex flex-col flex-1 gap-3">
+        {/* Meta row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${diff.bg} ${diff.text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${diff.dot}`} />
+            {diff.label}
           </span>
-          <div className="w-1 h-1 rounded-full bg-zinc-200"></div>
-          <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">{project.category}</span>
-          <div className="w-1 h-1 rounded-full bg-zinc-200"></div>
-          <div className="flex items-center gap-2 text-zinc-400">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{project.duration}</span>
-          </div>
+          <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">{project.category}</span>
+          <span className="ml-auto flex items-center gap-1 text-zinc-400">
+            <Clock className="w-3 h-3" />
+            <span className="text-[10px] font-semibold">{project.duration}</span>
+          </span>
         </div>
 
-        <h3 className="text-2xl font-bold text-zinc-900 mb-4 group-hover:text-brand-blue transition-colors leading-tight tracking-tight">
+        {/* Title */}
+        <h3 className="text-base font-bold text-zinc-900 leading-snug group-hover:text-brand-blue transition-colors">
           {project.title}
         </h3>
-        <p className="text-zinc-500 text-sm leading-relaxed mb-8 line-clamp-2 font-medium">
+
+        {/* Description */}
+        <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 flex-1">
           {project.description}
         </p>
 
-        <div className="mt-auto flex flex-wrap gap-2">
-          {project.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-zinc-50 border border-zinc-100 rounded-full text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-              {tag}
-            </span>
-          ))}
-          {project.tags.length > 3 && (
-            <span className="px-3 py-1 bg-zinc-50 border border-zinc-100 rounded-full text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-              +{project.tags.length - 3}
-            </span>
+        {/* Tags + CTA */}
+        <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-50">
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.slice(0, 2).map((tag) => (
+              <span key={tag} className="px-2 py-0.5 bg-zinc-50 border border-zinc-100 rounded-full text-[9px] font-bold text-zinc-400 uppercase tracking-wide">
+                {tag}
+              </span>
+            ))}
+            {project.tags.length > 2 && (
+              <span className="px-2 py-0.5 bg-zinc-50 border border-zinc-100 rounded-full text-[9px] font-bold text-zinc-400 uppercase tracking-wide">
+                +{project.tags.length - 2}
+              </span>
+            )}
+          </div>
+          {!isLocked && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => { e.stopPropagation(); onStart(); }}
+              className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wide hover:bg-brand-blue transition-colors shadow-sm"
+            >
+              Start
+              <ArrowUpRight className="w-3 h-3" />
+            </motion.button>
           )}
         </div>
       </div>
