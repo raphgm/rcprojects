@@ -237,6 +237,19 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
         </div>
       </header>
 
+      {/* Login-to-save banner */}
+      <div className="bg-gradient-to-r from-brand-blue/8 to-blue-50 border-b border-brand-blue/10 px-8 py-3 shrink-0">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
+          <p className="text-xs text-zinc-600 font-medium">
+            <span className="font-bold text-zinc-900">Log in to save your progress and XP.</span>
+            {' '}Your work won't be saved in guest mode.
+          </p>
+          <button className="shrink-0 px-4 py-1.5 bg-zinc-900 text-white rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-brand-blue transition-colors">
+            Log in
+          </button>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-zinc-50/50">
         <div className="max-w-6xl mx-auto py-12 px-8">
@@ -598,12 +611,26 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                 )}
               </motion.div>
 
+              {/* Login-to-save nudge */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 }}
+                className="bg-brand-blue/6 border border-brand-blue/15 rounded-2xl px-5 py-4 mb-4 text-left"
+              >
+                <p className="text-xs font-bold text-zinc-900 mb-1">Don't lose your progress!</p>
+                <p className="text-[11px] text-zinc-500 leading-relaxed mb-3">Log in to permanently save your XP, rank, and completed labs.</p>
+                <button className="w-full py-2.5 bg-brand-blue text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors">
+                  Log in &amp; Save Progress
+                </button>
+              </motion.div>
+
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => { setShowReward(false); onClose(); }}
-                className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all"
+                className="w-full py-3.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-500 rounded-2xl font-black uppercase tracking-widest text-xs transition-all"
               >
-                Claim Reward &amp; Continue
+                Continue as guest
               </motion.button>
             </motion.div>
           </motion.div>
