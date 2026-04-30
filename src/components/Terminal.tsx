@@ -427,10 +427,15 @@ interface TerminalProps {
   onComplete?: () => void;
   onStepComplete?: (stepId: string) => void;
   xpReward?: number;
+  // Real terminal mode — when provided, all input is forwarded to a live container
+  sessionId?: string;
+  authToken?: string;
 }
 
-export const Terminal: React.FC<TerminalProps> = ({ 
-  initialMessage = 'Welcome to the Realcloud Sandbox!', 
+const SESSION_API = import.meta.env.VITE_SESSION_API_URL ?? 'ws://localhost:3001';
+
+export const Terminal: React.FC<TerminalProps> = ({
+  initialMessage = 'Welcome to the Realcloud Sandbox!',
   availableCommands = ['ls', 'pwd', 'whoami', 'date', 'clear'],
   onCommand,
   flavor = 'ubuntu',
@@ -443,7 +448,9 @@ export const Terminal: React.FC<TerminalProps> = ({
   isLastStep,
   onComplete,
   onStepComplete,
-  xpReward = 250
+  xpReward = 250,
+  sessionId,
+  authToken,
 }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [input, setInput] = useState('');
@@ -459,25 +466,23 @@ export const Terminal: React.FC<TerminalProps> = ({
   const [sudoAuthTimeout, setSudoAuthTimeout] = useState<NodeJS.Timeout | null>(null);
   const prevStepIndexRef = useRef(currentStepIndex);
   const [stepDir, setStepDir] = useState(1);
-  // Virtual filesystem: real shell-like persistence for files & dirs created during a session.
-  const vfsRef = useRef<Record<string, string>>({});
-  const vdirsRef = useRef<Set<string>>(new Set());
-  // Environment variables (real-shell feel).
-  const envRef = useRef<Record<string, string>>({
-    HOME: '/home/user',
-    USER: 'user',
-    SHELL: '/bin/bash',
-    PWD: '/home/user',
-    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-    TERM: 'xterm-256color',
-    LANG: 'en_US.UTF-8'
-  });
-  // Persistent command history for ↑/↓ recall.
-  const cmdHistoryRef = useRef<string[]>([]);
-  const [historyIdx, setHistoryIdx] = useState<number | null>(null);
-  const [draftInput, setDraftInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const isLiveMode = Boolean(sessionId && authToken);
+
+  // Connect to real container session when sessionId + authToken are provided
+  useEffect(() => {
+    if (!sessionId || !authToken) return;
+    const ws = new WebSocket(
+      `${SESSION_API}/sessions?sessionId=${encodeURIComponent(sessionId)}&token=${encodeURIComponent(authToken)}`
+    );
+    wsRef.current = ws;
+    ws.onopen = () => setHistory(h => [...h, '\r\n\x1b[32m● Connected to live environment\x1b[0m\r\n']);
+    ws.onmessage = (evt) => setHistory(h => [...h, evt.data as string]);
+    ws.onerror = () => setHistory(h => [...h, '\r\n\x1b[31m● Connection error — falling back to simulator\x1b[0m\r\n']);
+    ws.onclose = () => setHistory(h => [...h, '\r\n\x1b[33m● Session closed\x1b[0m\r\n']);
+    return () => ws.close();
+  }, [sessionId, authToken]);
 
   const SUDO_PASSWORD = 'cloudlabs123';
 
@@ -565,7 +570,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     }
   }, [currentStepIndex]);
 
-  const handleCommand = async (e: React.FormEvent) => {
+  const handleCommand = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isBooting || isExecuting || !input.trim()) return;
     const cmd = input.trim();
@@ -580,9 +585,16 @@ export const Terminal: React.FC<TerminalProps> = ({
   };
 
   const runCommandWithSudoCheck = async (cmd: string) => {
+    // Live mode: forward directly to the container via WebSocket
+    if (isLiveMode && wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(cmd + '\n');
+      setInput('');
+      return;
+    }
+
     const args = cmd.split(' ');
     const baseCmd = args[0].toLowerCase();
-    
+
     // Add command to history immediately (handle password separately)
     if (isWaitingForPassword) {
       setHistory(prev => [...prev, '●●●●●●●●']); // Mask password in history
