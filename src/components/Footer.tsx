@@ -114,7 +114,7 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
 
         <div className="pt-12 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-zinc-400 text-xs font-medium">
-            © {new Date().getFullYear()} Realcloudprojects. All rights reserved.
+            © {new Date().getFullYear()} Realcloudprojects. Built by Raphael Gab-Momoh. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
