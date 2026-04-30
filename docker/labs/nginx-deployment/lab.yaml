@@ -1,0 +1,12 @@
+id: nginx-deployment
+title: Deploy a Web Server on EC2
+description: |
+  Deploy an nginx web server using a Kubernetes deployment manifest,
+  verify it is running, and expose it via a ClusterIP service.
+
+hint: Try running `kubectl apply -f deployment.yaml` then `kubectl get pods` to check status.
+
+checks:
+  - check: kubectl get deployment nginx-server --ignore-not-found | grep -q nginx-server
+  - check: kubectl get pods -l app=nginx-server | grep -q Running
+  - check: kubectl get service nginx-service --ignore-not-found | grep -q nginx-service

@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# realcloud CLI — available inside every lab container
+set -euo pipefail
+
+LAB_ID="${LAB_ID:-unknown}"
+SESSION_ID="${SESSION_ID:-unknown}"
+LAB_SPEC="/etc/realcloud/lab.yaml"
+VERIFY_API="${REALCLOUD_API:-http://host.docker.internal:3001}"
+
+usage() {
+  cat <<EOF
+realcloud — Realcloud lab CLI
+
+Commands:
+  init [--env <name>]   Initialise the lab environment
+  verify                Check your work and mark the lab complete
+  status                Show current lab and session info
+  reset                 Reset the lab environment to its initial state
+  hint                  Show a hint for the current step
+EOF
+}
+
+cmd_init() {
+  local env="${1:-sandbox}"
+  echo ""
+  echo "  Initializing secure container..."
+  sleep 0.5
+  echo "  Environment   : $env"
+  echo "  Lab           : $LAB_ID"
+  echo "  Session       : $SESSION_ID"
+  echo ""
+
+  # Source lab-specific init script if present
+  if [[ -f /etc/realcloud/init.sh ]]; then
+    bash /etc/realcloud/init.sh "$env"
+  fi
+
+  echo "  Provisioning complete ✓"
+  echo ""
+}
+
+cmd_verify() {
+  echo ""
+  echo "  Running verification checks..."
+  echo ""
+
+  if [[ ! -f "$LAB_SPEC" ]]; then
+    echo "  ✗ No lab spec found at $LAB_SPEC"
+    exit 1
+  fi
+
+  local passed=0
+  local failed=0
+
+  # Parse checks from lab.yaml  (format: "check: <shell command>")
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^[[:space:]]*check:[[:space:]]*(.+)$ ]]; then
+      local check_cmd="${BASH_REMATCH[1]}"
+      if eval "$check_cmd" &>/dev/null; then
+        echo "  ✓ $check_cmd"
+        ((passed++)) || true
+      else
+        echo "  ✗ $check_cmd"
+        ((failed++)) || true
+      fi
+    fi
+  done < "$LAB_SPEC"
+
+  echo ""
+  if [[ $failed -eq 0 && $passed -gt 0 ]]; then
+    echo "  ✓ Verification successful! Lab complete."
+    # Signal completion back to the session API
+    curl -sf -X POST "$VERIFY_API/sessions/$SESSION_ID/complete" \
+      -H "Content-Type: application/json" \
+      -d "{\"passed\":$passed,\"failed\":$failed}" || true
+  else
+    echo "  $passed check(s) passed, $failed failed. Keep going!"
+    exit 1
+  fi
+  echo ""
+}
+
+cmd_status() {
+  echo ""
+  echo "  Lab      : $LAB_ID"
+  echo "  Session  : $SESSION_ID"
+  echo ""
+}
+
+cmd_reset() {
+  echo ""
+  echo "  Resetting lab environment..."
+  if [[ -f /etc/realcloud/reset.sh ]]; then
+    bash /etc/realcloud/reset.sh
+  fi
+  echo "  Reset complete ✓"
+  echo ""
+}
+
+cmd_hint() {
+  if [[ -f "$LAB_SPEC" ]]; then
+    local hint
+    hint=$(grep -m1 '^[[:space:]]*hint:' "$LAB_SPEC" | sed 's/.*hint:[[:space:]]*//')
+    echo ""
+    echo "  Hint: $hint"
+    echo ""
+  else
+    echo "  No hints available for this lab."
+  fi
+}
+
+case "${1:-}" in
+  init)    shift; cmd_init "$@" ;;
+  verify)  cmd_verify ;;
+  status)  cmd_status ;;
+  reset)   cmd_reset ;;
+  hint)    cmd_hint ;;
+  help|--help|-h) usage ;;
+  *) usage; exit 1 ;;
+esac
