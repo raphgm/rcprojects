@@ -20,11 +20,12 @@ interface ProjectCardProps {
 }
 
 const categoryConfig: Record<string, { color: string }> = {
+  AWS: { color: 'bg-orange-500' },
   Azure: { color: 'bg-blue-500' },
+  GCP: { color: 'bg-red-500' },
   Kubernetes: { color: 'bg-brand-blue' },
   DevOps: { color: 'bg-brand-blue' },
   Security: { color: 'bg-rose-500' },
-  Linux: { color: 'bg-orange-500' },
 };
 
 const getProjectIcon = (title: string, category: string) => {
@@ -33,24 +34,26 @@ const getProjectIcon = (title: string, category: string) => {
   // Specific technologies & patterns
   if (t.includes('terraform') || t.includes('ansible') || t.includes('pulumi') || t.includes('cdk') || t.includes('cloudformation') || t.includes('iac')) return Code;
   if (t.includes('prometheus') || t.includes('grafana') || t.includes('monitor') || t.includes('observability') || t.includes('logging') || t.includes('trace')) return Activity;
-  if (t.includes('kubernetes') || t.includes('k8s') || t.includes('kubeadm') || t.includes('helm') || t.includes('aks') || t.includes('cluster')) return Hexagon;
-  if (t.includes('docker') || t.includes('container') || t.includes('aci')) return Box;
+  if (t.includes('kubernetes') || t.includes('k8s') || t.includes('kubeadm') || t.includes('helm') || t.includes('aks') || t.includes('eks') || t.includes('gke') || t.includes('cluster')) return Hexagon;
+  if (t.includes('docker') || t.includes('container') || t.includes('ecs') || t.includes('fargate') || t.includes('aci')) return Box;
   if (t.includes('ci/cd') || t.includes('pipeline') || t.includes('github actions') || t.includes('workflow') || t.includes('automation')) return Infinity;
   if (t.includes('gitops') || t.includes('argocd') || t.includes('flux')) return GitBranch;
   if (t.includes('vault') || t.includes('secret') || t.includes('key vault') || t.includes('kms') || t.includes('encryption')) return Key;
   if (t.includes('security') || t.includes('compliance') || t.includes('audit') || t.includes('shield') || t.includes('prowler') || t.includes('sentinel')) return ShieldCheck;
   if (t.includes('network') || t.includes('vpn') || t.includes('dns') || t.includes('vpc') || t.includes('vnet') || t.includes('bastion') || t.includes('front door')) return Network;
   if (t.includes('serverless') || t.includes('lambda') || t.includes('functions') || t.includes('logic app') || t.includes('event')) return Zap;
-  if (t.includes('database') || t.includes('sql') || t.includes('cosmos') || t.includes('synapse') || t.includes('sql managed')) return Database;
-  if (t.includes('ai') || t.includes('machine learning') || t.includes('cognitive') || t.includes('openai') || t.includes('azure ai')) return Brain;
-  if (t.includes('storage') || t.includes('blob') || t.includes('harddrive')) return HardDrive;
+  if (t.includes('database') || t.includes('sql') || t.includes('rds') || t.includes('dynamodb') || t.includes('cosmos') || t.includes('bigquery') || t.includes('spanner')) return Database;
+  if (t.includes('ai') || t.includes('machine learning') || t.includes('sagemaker') || t.includes('vertex') || t.includes('cognitive')) return Brain;
+  if (t.includes('storage') || t.includes('s3') || t.includes('bucket') || t.includes('blob') || t.includes('harddrive')) return HardDrive;
   if (t.includes('api') || t.includes('gateway') || t.includes('endpoint')) return Globe;
   if (t.includes('mesh') || t.includes('istio') || t.includes('envoy') || t.includes('service mesh')) return Layers;
   if (t.includes('iot')) return Radio;
-  if (t.includes('compute') || t.includes('vm') || t.includes('virtual machine') || t.includes('instance')) return Cpu;
+  if (t.includes('compute') || t.includes('ec2') || t.includes('vm') || t.includes('instance')) return Cpu;
   
   // Category fallbacks
+  if (category === 'AWS') return Cloud;
   if (category === 'Azure') return Cloud;
+  if (category === 'GCP') return Cloud;
   if (category === 'Kubernetes') return Hexagon;
   if (category === 'DevOps') return Infinity;
   if (category === 'Security') return Shield;

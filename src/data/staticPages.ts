@@ -36,7 +36,7 @@ export const staticPages: Record<StaticPageId, StaticPageContent> = {
           'Move beyond slide-deck training. Engineers learn faster when they break and fix real systems. Realcloud gives every team member a sandboxed cloud account with guardrails and reset-on-demand environments.',
         bullets: [
           'Role-based skill paths for SRE, Platform, Security, and Cloud engineers',
-          'Up-to-date labs covering Azure, Kubernetes, Linux, DevOps, and Microsoft-first cloud stacks',
+          'Up-to-date labs covering AWS, Azure, GCP, Kubernetes and modern DevOps stacks',
           'Skill assessments mapped to internal levelling frameworks',
         ],
       },
@@ -184,7 +184,7 @@ export const staticPages: Record<StaticPageId, StaticPageContent> = {
       {
         heading: 'Sub-processors',
         body:
-          'Microsoft Entra ID (auth), Azure Cosmos DB (data), Resend (transactional email), Cloudflare (CDN, DDoS protection). Data residency is EU + US. Full sub-processor list available on request.',
+          'Google Firebase (auth, Firestore), Resend (transactional email), Cloudflare (CDN, DDoS protection). Data residency is EU + US. Full sub-processor list available on request.',
       },
       {
         heading: 'Your rights',

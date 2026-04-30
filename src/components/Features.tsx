@@ -14,7 +14,7 @@ export const Features: React.FC = () => {
     {
       icon: <Cpu className="w-5 h-5 text-brand-blue" />,
       title: 'Real Infrastructure',
-      description: 'Real Azure, Kubernetes, and Linux infrastructure. No simulations, just the real deal in your browser.',
+      description: 'Real AWS, Azure, and GCP resources. No simulations, just the real deal in your browser.',
       color: 'brand-blue'
     },
     {
@@ -110,7 +110,7 @@ export const Features: React.FC = () => {
             <div>
               <div className="text-[10px] font-black text-brand-blue uppercase tracking-widest mb-2">Global Infrastructure</div>
               <h4 className="text-xl font-bold mb-2">Multi-Region Deployment</h4>
-              <p className="text-zinc-500 text-sm max-w-md">Practice high-availability setups across Azure regions — UK South, West Europe, East US — with zero latency.</p>
+              <p className="text-zinc-500 text-sm max-w-md">Practice high-availability setups across AWS, Azure, and GCP regions with zero latency.</p>
             </div>
           </div>
           <div className="bg-brand-blue rounded-[2rem] p-8 flex flex-col justify-between group hover:bg-brand-blue/90 transition-all cursor-pointer shadow-lg shadow-brand-blue/20">
