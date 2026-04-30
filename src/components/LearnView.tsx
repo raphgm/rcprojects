@@ -328,7 +328,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={index >= 4}
+              isLocked={index >= 4 && path.id !== 'cka' && path.id !== 'ckad'}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">
