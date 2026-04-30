@@ -30,7 +30,7 @@ export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
 export type CloudProvider = 'azure';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<FooterTab>('projects');
+  const [activeTab, setActiveTab] = useState<FooterTab>('learn');
   const [activeLesson, setActiveLesson] = useState<{ lessons: Lesson[], title: string } | null>(null);
   const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
   const [completedLabs, setCompletedLabs] = useState<string[]>([]);
