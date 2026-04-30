@@ -23,7 +23,7 @@ export const AboutUs: React.FC = () => {
               <span className="text-brand-blue font-mono font-medium tracking-tight">Zero Barriers.</span>
             </h2>
             <p className="text-lg text-zinc-600 leading-relaxed mb-6">
-              This is <strong className="text-zinc-900">Raphael Gab-Momoh's</strong> MVP contribution to making cloud
+              This is <strong className="text-zinc-900">Raphael Gab-Momoh's</strong> contribution to making cloud
               engineering accessible to everyone — regardless of background.
             </p>
             <p className="text-base text-zinc-500 leading-relaxed mb-6">

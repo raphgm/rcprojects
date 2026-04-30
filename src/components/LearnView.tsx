@@ -30,9 +30,8 @@ const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: b
       className={`relative bg-white border border-zinc-200 rounded-2xl p-6 transition-all group ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'}`}
     >
       {isLocked && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
-          <Lock className="w-2.5 h-2.5 text-zinc-400" />
-          <span className="text-[9px] font-semibold text-zinc-400 tracking-wide">Coming soon</span>
+        <div className="absolute top-3 right-3 z-20 flex items-center justify-center w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
+          <Lock className="w-3 h-3 text-zinc-400" />
         </div>
       )}
       <div className={`w-12 h-12 ${path.color} rounded-xl flex items-center justify-center mb-6 text-white shadow-lg`}>
@@ -328,7 +327,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={index >= 4}
+              isLocked={index >= 4 && path.id !== 'cka' && path.id !== 'ckad' && path.id !== 'kubernetes' && path.id !== 'docker' && !path.id.startsWith('k8s-')}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">
