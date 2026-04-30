@@ -196,32 +196,6 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
           >
             <TypingTerminal />
 
-            {/* Floating XP badge */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-5 -right-4 bg-white border border-zinc-100 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3 hidden sm:flex"
-            >
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-lg">🏆</div>
-              <div>
-                <div className="text-xs font-black text-zinc-900">+250 XP</div>
-                <div className="text-[10px] text-zinc-400 font-medium">Lab completed</div>
-              </div>
-            </motion.div>
-
-            {/* Floating streak badge */}
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              className="absolute -bottom-5 -left-4 bg-white border border-zinc-100 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3 hidden sm:flex"
-            >
-              <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-lg">🔥</div>
-              <div>
-                <div className="text-xs font-black text-zinc-900">14-day streak</div>
-                <div className="text-[10px] text-zinc-400 font-medium">Keep it up!</div>
-              </div>
-            </motion.div>
-
             {/* Topic pills scattered around */}
             <div className="absolute -right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 hidden lg:flex">
               {PILLS.slice(0, 3).map((p, i) => (
