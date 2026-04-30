@@ -83,11 +83,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onStart, isCo
       className={`group bg-white border border-zinc-100 rounded-[2.5rem] overflow-hidden shadow-[0_16px_32px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative after:absolute after:inset-0 after:rounded-[2.5rem] after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-4px_0_0_rgba(0,0,0,0.02)] ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.18)] hover:border-zinc-200 hover:after:shadow-[inset_0_-1px_1px_rgba(255,255,255,0.6),inset_0_-8px_0_0_rgba(0,0,0,0.04)]'}`}
     >
       {isLocked && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-10 bg-zinc-900/15 rounded-[2.5rem] pointer-events-none">
-          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-3">
-            <Lock className="w-6 h-6 text-zinc-900" />
-          </div>
-          <span className="px-4 py-1.5 rounded-full bg-white text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">Under Development</span>
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
+          <Lock className="w-2.5 h-2.5 text-zinc-400" />
+          <span className="text-[9px] font-semibold text-zinc-400 tracking-wide">Coming soon</span>
         </div>
       )}
       {/* Bottom Depth Layer */}
