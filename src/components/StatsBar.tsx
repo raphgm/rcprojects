@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
 
 const stats = [
-  { value: 50,   suffix: 'k+',  label: 'Engineers trained' },
+  { value: 10,   suffix: 'k',   label: 'Engineers trained' },
   { value: 1000, suffix: '+',   label: 'Hands-on labs' },
   { value: 28,   suffix: '',    label: 'Skill paths' },
   { value: 4.9,  suffix: '/5',  label: 'Average rating' },

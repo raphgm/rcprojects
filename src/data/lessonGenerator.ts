@@ -59,6 +59,20 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Shell Scripting Basics', cmd: 'bash --version', focus: 'Automate repetitive tasks with portable Bash scripts.' },
     { topic: 'Systemd & Services', cmd: 'systemctl list-units --type=service', focus: 'Manage background daemons and system boot targets.' },
     { topic: 'Network Diagnostics', cmd: 'ip addr show', focus: 'Troubleshoot connectivity using modern iproute2 tools.' },
+    { topic: 'Package Management (APT)', cmd: 'apt list --installed', focus: 'Manage software lifecycle using the Advanced Package Tool.' },
+    { topic: 'User Account Management', cmd: 'whoami', focus: 'Manage user identities and understand the /etc/passwd structure.' },
+    { topic: 'Text Processing (Grep)', cmd: 'grep "root" /etc/passwd', focus: 'Search through large text files using regular expressions.' },
+    { topic: 'Log Analysis', cmd: 'journalctl -n 20', focus: 'Inspect system and application logs to debug failures.' },
+    { topic: 'Storage Inspection', cmd: 'df -h', focus: 'Monitor disk space and understand mount points.' },
+    { topic: 'Directory Traversal', cmd: 'pwd', focus: 'Master the concept of the Working Directory and path navigation.' },
+    { topic: 'SSH & Remote Access', cmd: 'ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub', focus: 'Understand secure shell communication and key-based auth.' },
+    { topic: 'Environment Variables', cmd: 'env | head', focus: 'Configure your shell environment and application secrets.' },
+    { topic: 'Archive & Compression', cmd: 'tar --version', focus: 'Learn to bundle and compress files for transfer and backup.' },
+    { topic: 'Crontab & Automation', cmd: 'crontab -l', focus: 'Schedule recurring tasks using the system cron daemon.' },
+    { topic: 'Hardware Discovery', cmd: 'lsblk', focus: 'List all block devices and understand partitioning schemes.' },
+    { topic: 'Kernel Inspection', cmd: 'uname -a', focus: 'Check kernel versions and understand system architecture.' },
+    { topic: 'Network Sockets', cmd: 'ss -tuln', focus: 'Identify listening ports and active network connections.' },
+    { topic: 'Text Stream Editing (Sed)', cmd: 'sed --version', focus: 'Perform non-interactive text transformations on the fly.' },
   ],
   terraform: [
     { topic: 'HCL Syntax & Providers', cmd: 'terraform version', focus: 'Understand declarative configuration and provider plugins.' },
@@ -89,6 +103,47 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Vector Embeddings', cmd: 'pip show qdrant-client', focus: 'Convert unstructured data into high-dimensional numerical vectors.' },
     { topic: 'Model Deployment & MLOps', cmd: 'mlflow --version', focus: 'Manage the full lifecycle of machine learning models in production.' },
   ],
+  ansible: [
+    { topic: 'Inventory Management', cmd: 'ansible-inventory --list', focus: 'Define and manage groups of hosts for automated configuration.' },
+    { topic: 'Playbook Orchestration', cmd: 'ansible-playbook --syntax-check site.yml', focus: 'Master declarative configuration using YAML-based playbooks.' },
+    { topic: 'Module Execution', cmd: 'ansible all -m ping', focus: 'Execute ad-hoc commands across your entire infrastructure fleet.' },
+    { topic: 'Roles & Reusability', cmd: 'ansible-galaxy role list', focus: 'Organize complex automation tasks into modular, reusable roles.' },
+    { topic: 'Variable Precedence', cmd: 'ansible-debug --version', focus: 'Understand how variables are merged and overridden in Ansible.' },
+    { topic: 'Vault & Secret Encryption', cmd: 'ansible-vault --version', focus: 'Securely manage sensitive data like passwords and API keys.' },
+  ],
+  jenkins: [
+    { topic: 'Pipeline as Code', cmd: 'jenkins-cli version', focus: 'Define end-to-end CI/CD workflows using Groovy-based Jenkinsfiles.' },
+    { topic: 'Distributed Build Agents', cmd: 'echo "node { ... }"', focus: 'Scale your build infrastructure using remote worker nodes.' },
+    { topic: 'Plugin Ecosystem', cmd: 'echo "install-plugin git"', focus: 'Extend Jenkins functionality with thousands of community-built plugins.' },
+    { topic: 'Shared Libraries', cmd: 'echo "library \'my-shared-lib\'"', focus: 'Standardize pipeline logic across hundreds of repositories.' },
+    { topic: 'Declarative vs Scripted', cmd: 'echo "pipeline { agent any }"', focus: 'Understand the two primary syntax styles for Jenkins pipelines.' },
+  ],
+  gitops: [
+    { topic: 'Declarative State', cmd: 'argocd version', focus: 'Understand why Git should be the single source of truth for infrastructure.' },
+    { topic: 'Application Synchronization', cmd: 'argocd app list', focus: 'Master automated reconciliation between Git and Kubernetes.' },
+    { topic: 'Canary & Blue/Green', cmd: 'kubectl get rollouts', focus: 'Implement advanced deployment strategies using Argo Rollouts.' },
+    { topic: 'Image Automation', cmd: 'flux version', focus: 'Automatically update your cluster when a new container image is pushed.' },
+    { topic: 'Multi-cluster Management', cmd: 'argocd cluster list', focus: 'Scale GitOps workflows across dozens of distributed clusters.' },
+  ],
+  sre: [
+    { topic: 'Observability Pillars', cmd: 'prometheus --version', focus: 'Master the three pillars: Metrics, Logs, and Traces.' },
+    { topic: 'SLIs, SLOs & Error Budgets', cmd: 'echo "99.9% Availability"', focus: 'Quantify reliability and make data-driven deployment decisions.' },
+    { topic: 'Distributed Tracing', cmd: 'echo "Jaeger/Zipkin"', focus: 'Track requests as they travel through complex microservices.' },
+    { topic: 'Incident Response', cmd: 'echo "On-call Rotation"', focus: 'Build a repeatable process for detecting and resolving outages.' },
+    { topic: 'Log Aggregation', cmd: 'echo "ELK / Loki"', focus: 'Centralize and index millions of logs for rapid troubleshooting.' },
+  ],
+  prom: [
+    { topic: 'Time-Series Database Architecture', cmd: 'prometheus --version', focus: 'Understand how Prometheus stores multi-dimensional data as time series.' },
+    { topic: 'Metric Collection (Scraping)', cmd: 'curl http://localhost:9090/metrics', focus: 'Explore how Prometheus pulls metrics from targets using HTTP.' },
+    { topic: 'Configuration Validation', cmd: 'promtool check config prometheus.yml', focus: 'Use promtool to ensure your scrape configurations and global settings are valid.' },
+    { topic: 'PromQL: Selection & Filtering', cmd: 'echo "up{job=\'prometheus\'}"', focus: 'Master basic label matching and metric selection in the Prometheus Query Language.' },
+    { topic: 'PromQL: Rate & Increase', cmd: 'echo "rate(prometheus_http_requests_total[5m])"', focus: 'Learn to calculate the per-second average rate of increase for counters.' },
+    { topic: 'PromQL: Aggregation Operators', cmd: 'echo "sum(up) by (instance)"', focus: 'Use operators like sum, min, max, and avg to aggregate metrics across dimensions.' },
+    { topic: 'Recording & Alerting Rules', cmd: 'promtool check rules rules.yml', focus: 'Validate the syntax of your alerting and recording rules before deployment.' },
+    { topic: 'Exporter Ecosystem', cmd: 'node_exporter --version', focus: 'Understand how exporters translate non-Prometheus metrics into the correct format.' },
+    { topic: 'Service Discovery', cmd: 'prometheus --config.file=prometheus.yml', focus: 'Learn how Prometheus dynamically discovers targets in cloud environments.' },
+    { topic: 'Storage Retention & WAL', cmd: 'ls -R /prometheus/data', focus: 'Inspect the Write-Ahead Log (WAL) and block structure of the TSDB.' },
+  ],
 };
 
 const GENERIC: Topic[] = [
@@ -114,9 +169,14 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
   else if (lowerId.includes('linux') || lowerTitle.includes('linux')) bank = TOPIC_BANKS.linux;
   else if (lowerId.includes('terraform') || lowerTitle.includes('terraform')) bank = TOPIC_BANKS.terraform;
+  else if (lowerId.includes('ansible') || lowerTitle.includes('ansible')) bank = TOPIC_BANKS.ansible;
+  else if (lowerId.includes('jenkins') || lowerTitle.includes('jenkins')) bank = TOPIC_BANKS.jenkins;
+  else if (lowerId.includes('gitops') || lowerTitle.includes('argo') || lowerTitle.includes('flux')) bank = TOPIC_BANKS.gitops;
+  else if (lowerId.includes('sre') || lowerTitle.includes('reliability') || lowerTitle.includes('monitoring') || lowerTitle.includes('observability')) bank = TOPIC_BANKS.sre;
   else if (lowerId.includes('azure') || lowerTitle.includes('azure')) bank = TOPIC_BANKS.azure;
   else if (lowerId.includes('net') || lowerTitle.includes('network')) bank = TOPIC_BANKS.networking;
   else if (lowerId.includes('ai') || lowerTitle.includes('intelligence') || lowerTitle.includes('ml')) bank = TOPIC_BANKS.ai;
+  else if (lowerId.includes('prom') || lowerTitle.includes('prometheus') || lowerTitle.includes('promql')) bank = TOPIC_BANKS.prom;
 
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];

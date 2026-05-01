@@ -221,6 +221,17 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'istioctl':
     case 'kustomize':
     case 'crossplane':
+    case 'prometheus':
+    case 'promtool':
+    case 'node_exporter':
+    case 'grafana-cli':
+    case 'amtool':
+    case 'ansible':
+    case 'ansible-playbook':
+    case 'ansible-galaxy':
+    case 'jenkins-cli':
+    case 'argocd':
+    case 'flux':
       return `(${base} ${sub || ''} completed successfully)`;
     case 'trivy':
       return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;
