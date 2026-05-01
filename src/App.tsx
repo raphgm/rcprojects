@@ -25,6 +25,9 @@ import { generateFallbackLessons } from './data/lessonGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { db } from './firebase';
 import { doc, getDocFromServer } from 'firebase/firestore';
+import { projects } from './data/projects';
+import { generateFallbackLab } from './data/labGenerator';
+
 
 export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
 export type CloudProvider = 'azure';
@@ -83,30 +86,24 @@ export default function App() {
         lessons: generateFallbackLessons(courseId, courseTitle, lessonCount),
         title: courseTitle
       });
-    }
-  };
-
   const startLab = (projectId: string, projectTitle: string) => {
     setActiveLesson(null); // Clear active lesson
     const content = labContents.find(l => l.projectId === projectId);
     if (content) {
       setActiveLab({ lab: content, title: projectTitle });
     } else {
-      // Fallback for demo purposes
+      // Find category for specific fallback
+      let category = 'General';
+      const project = projects.find(p => p.id === projectId);
+      if (project) category = project.category;
+
       setActiveLab({
-        lab: {
-          projectId,
-          environment: 'linux',
-          steps: [
-            { id: 'step-1', title: 'Initialize Environment', instruction: `Prepare the environment for ${projectTitle}.`, hint: 'Check if you have the necessary CLI tools installed.' },
-            { id: 'step-2', title: 'Core Implementation', instruction: `Execute the main tasks for ${projectTitle}.`, hint: 'Follow the architecture diagram provided in the documentation.' },
-            { id: 'step-3', title: 'Verification', instruction: 'Verify that all components are working as expected.', hint: 'Use the check commands to validate your deployment.' }
-          ]
-        },
+        lab: generateFallbackLab(projectId, projectTitle, category),
         title: projectTitle
       });
     }
   };
+
 
 
   return (
