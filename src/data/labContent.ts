@@ -7,15 +7,15 @@ export const labContents: LabContent[] = [
     steps: [
       {
         id: 'step-1',
-        title: 'Git Repository Initialization',
-        instruction: 'Initialize a new Git repository to begin tracking your workflow configuration.',
-        summary: 'Initialize source control for the project.',
-        whyNeeded: 'Git is required as the foundation for GitHub Actions. It allows the platform to detect code changes and trigger the appropriate automation jobs.',
-        pillarConnection: 'Operational Excellence — version control provides a traceable history of all pipeline modifications.',
+        title: 'Project Workspace & Git Initialization',
+        instruction: 'Create a dedicated directory for your CI/CD project and initialize a Git repository to begin tracking your workflow.',
+        summary: 'Set up the local environment and source control.',
+        whyNeeded: 'Every professional DevOps pipeline starts with a clean workspace and version control. This ensures isolation and provides a traceable history of all automation changes.',
+        pillarConnection: 'Operational Excellence — organized file systems and version control are the bedrock of reliable automation.',
         commands: [
           {
-            text: 'git init',
-            explanation: 'Initializes a local Git repository in the current workspace.'
+            text: 'mkdir -p github-actions-lab && cd github-actions-lab && git init',
+            explanation: 'Creates the project folder, enters it, and initializes a local Git repository in one sequence.'
           }
         ],
         checkCommand: 'ls -d .git',
