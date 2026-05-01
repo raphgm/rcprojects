@@ -531,7 +531,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     setSudoAuthTimeout(timeout);
   };
 
-  const fileSystem: Record<string, string[]> = {
+  const [fileSystem, setFileSystem] = useState<Record<string, string[]>>({
     '/': ['bin', 'etc', 'home', 'var', 'tmp', 'usr', 'root', 'dev', 'proc'],
     '/bin': ['bash', 'ls', 'pwd', 'cat', 'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo', 'ps', 'apt', 'top', 'uname'],
     '/etc': ['passwd', 'shadow', 'group', 'hosts', 'hostname', 'network', 'ssh', 'os-release'],
@@ -542,7 +542,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     '/home/user/projects': ['cloud-app', 'devops-scripts'],
     '/var': ['log', 'mail', 'spool', 'www'],
     '/tmp': []
-  };
+  });
 
   const bootSequence = [
     `[    0.000000] Linux version 5.15.0-generic (buildd@lgw01-amd64-060) (${flavor})`,
@@ -812,15 +812,78 @@ export const Terminal: React.FC<TerminalProps> = ({
             output = `cat: ${args[1]}: No such file or directory`;
           }
           break;
-        case 'mkdir':
-          output = args[1] ? `Created directory ${args[1]}` : 'mkdir: missing operand';
+        case 'mkdir': {
+          const name = args[1];
+          if (!name) {
+            output = 'mkdir: missing operand';
+          } else {
+            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
+            
+            const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
+            const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+            
+            if (fileSystem[parentDir]) {
+              setFileSystem(prev => ({
+                ...prev,
+                [parentDir]: [...(prev[parentDir] || []), baseName],
+                [targetPath]: []
+              }));
+              output = `Created directory ${baseName}`;
+            } else {
+              output = `mkdir: cannot create directory '${name}': No such file or directory`;
+            }
+          }
           break;
-        case 'touch':
-          output = args[1] ? `Created file ${args[1]}` : 'touch: missing file operand';
+        }
+        case 'touch': {
+          const name = args[1];
+          if (!name) {
+            output = 'touch: missing file operand';
+          } else {
+            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
+            
+            const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
+            const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+            
+            if (fileSystem[parentDir]) {
+              setFileSystem(prev => ({
+                ...prev,
+                [parentDir]: prev[parentDir].includes(baseName) ? prev[parentDir] : [...prev[parentDir], baseName]
+              }));
+              output = `Created file ${baseName}`;
+            } else {
+              output = `touch: cannot touch '${name}': No such file or directory`;
+            }
+          }
           break;
-        case 'rm':
-          output = args[1] ? `Removed ${args[1]}` : 'rm: missing operand';
+        }
+        case 'rm': {
+          const name = args[1];
+          if (!name) {
+            output = 'rm: missing operand';
+          } else {
+            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
+            
+            const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
+            const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+            
+            if (fileSystem[parentDir] && fileSystem[parentDir].includes(baseName)) {
+              setFileSystem(prev => {
+                const newParent = prev[parentDir].filter(f => f !== baseName);
+                const nextFs = { ...prev, [parentDir]: newParent };
+                if (nextFs[targetPath]) delete nextFs[targetPath];
+                return nextFs;
+              });
+              output = `Removed ${baseName}`;
+            } else {
+              output = `rm: cannot remove '${name}': No such file or directory`;
+            }
+          }
           break;
+        }
         case 'apt':
           if (flavor === 'ubuntu') {
             output = 'Reading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\nAll packages are up to date.';
