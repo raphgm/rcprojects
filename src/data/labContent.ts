@@ -4811,4 +4811,75 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'ingress-nginx',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Ingress Controller Installation',
+        instruction: 'Install the NGINX Ingress Controller using Helm.',
+        summary: 'Deploy the traffic entry point.',
+        whyNeeded: 'An Ingress Controller is required to route external HTTP/S traffic to services inside the cluster based on hostnames or paths.',
+        pillarConnection: 'Performance Efficiency — NGINX provides high-performance load balancing and SSL termination at the edge of your cluster.',
+        commands: [
+          { text: 'helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace', explanation: 'Installs the NGINX ingress controller via its official Helm chart.' }
+        ],
+        checkCommand: 'kubectl get pods -n ingress-nginx',
+        expectedOutput: 'ingress-nginx-controller'
+      }
+    ]
+  },
+  {
+    projectId: '20',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'External Secrets Operator Setup',
+        instruction: 'Install the External Secrets Operator to sync secrets from external APIs.',
+        summary: 'Provision the secret synchronization engine.',
+        whyNeeded: 'External Secrets Operator allows you to store sensitive data in managed services (like Vault or Azure Key Vault) while consuming them as native Kubernetes Secrets.',
+        pillarConnection: 'Security — centralizing secrets in dedicated managers reduces the risk of credential leakage in Git repositories or manifests.',
+        commands: [
+          { text: 'helm repo add external-secrets https://charts.external-secrets.io && helm repo update\nhelm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace', explanation: 'Deploys the operator and its CRDs.' }
+        ],
+        checkCommand: 'kubectl get pods -n external-secrets',
+        expectedOutput: 'external-secrets-operator'
+      }
+    ]
+  },
+  {
+    projectId: 'multi-tier-app',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Backend Deployment',
+        instruction: 'Deploy a Redis backend to serve as the data store for your multi-tier application.',
+        summary: 'Launch the data layer.',
+        whyNeeded: 'A multi-tier application separates concerns by using dedicated services for data, logic, and presentation.',
+        pillarConnection: 'Reliability — decoupling the data layer allows for independent scaling and failover strategies.',
+        commands: [
+          { text: 'kubectl run redis --image=redis --labels="app=redis"', explanation: 'Starts a simple Redis pod.' }
+        ],
+        checkCommand: 'kubectl get pods -l app=redis',
+        expectedOutput: 'Running'
+      },
+      {
+        id: 'step-2',
+        title: 'Frontend Service Exposure',
+        instruction: 'Create a Service to expose your frontend application to the cluster.',
+        summary: 'Expose the application front door.',
+        whyNeeded: 'Services provide a stable IP and DNS name for a set of pods, allowing them to be discovered by other components or external users.',
+        pillarConnection: 'Reliability — services handle load balancing across healthy pod replicas automatically.',
+        commands: [
+          { text: 'kubectl expose pod redis --port=6379 --name=redis-service', explanation: 'Creates a ClusterIP service for the Redis backend.' }
+        ],
+        checkCommand: 'kubectl get svc redis-service',
+        expectedOutput: '6379'
+      }
+    ]
+  }
 ];

@@ -408,22 +408,20 @@ export const learningPaths: LearningPath[] = [
     color: 'bg-brand-blue',
     courses: [
       { id: 'k8s-intro', title: 'Kubernetes Essentials', duration: '8h', level: 'Intermediate', lessons: 100 },
-      { id: 'k8s-ops', title: 'Kubernetes in Production', duration: '12h', level: 'Advanced', lessons: 100 },
-      { id: 'k8s-security', title: 'Securing Kubernetes Clusters', duration: '10h', level: 'Advanced', lessons: 100 },
-      { id: 'k8s-networking', title: 'Advanced K8s Networking', duration: '9h', level: 'Intermediate', lessons: 100 }
+      { id: 'k8s-ops', title: 'Kubernetes in Production', duration: '12h', level: 'Advanced', lessons: 100 }
     ],
     projects: [
-      { id: 'k8s-cluster', title: 'Highly Available K8s Cluster', difficulty: 'Hard', estimatedTime: '10h' },
+      { id: '19', title: 'Highly Available K8s Cluster', difficulty: 'Hard', estimatedTime: '10h' },
       { id: 'multi-tier-app', title: 'Deploy a Multi-tier Application', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'ingress-nginx', title: 'Configure Ingress with Nginx', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'hpa-setup', title: 'Implement Horizontal Pod Autoscaling', difficulty: 'Medium', estimatedTime: '2h' },
-      { id: 'monitor-prom-graf', title: 'Prometheus & Grafana Monitoring', difficulty: 'Hard', estimatedTime: '6h' },
-      { id: 'vault-k8s', title: 'Manage Secrets with HashiCorp Vault', difficulty: 'Hard', estimatedTime: '5h' },
+      { id: '21', title: 'Implement Horizontal Pod Autoscaling', difficulty: 'Medium', estimatedTime: '2h' },
+      { id: '2', title: 'Prometheus & Grafana Monitoring', difficulty: 'Hard', estimatedTime: '6h' },
+      { id: '20', title: 'Manage Secrets with External Secrets', difficulty: 'Hard', estimatedTime: '5h' },
       { id: 'statefulset-mongo', title: 'Deploy a StatefulSet MongoDB', difficulty: 'Hard', estimatedTime: '6h' },
       { id: 'netpol-micro', title: 'Network Policies for Microservices', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'rbac-isolation', title: 'Configure RBAC for Isolation', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'argocd-pipeline', title: 'CI/CD Pipeline with ArgoCD', difficulty: 'Hard', estimatedTime: '7h' },
-      { id: 'istio-canary', title: 'Canary Deployments with Istio', difficulty: 'Hard', estimatedTime: '8h' },
+      { id: '10', title: 'CI/CD Pipeline with ArgoCD', difficulty: 'Hard', estimatedTime: '7h' },
+      { id: '9', title: 'Canary Deployments with Istio', difficulty: 'Hard', estimatedTime: '8h' },
       { id: 'pv-nfs', title: 'Persistent Volumes with NFS', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'helm-redis', title: 'Deploy a Helm Chart for Redis', difficulty: 'Easy', estimatedTime: '2h' },
       { id: 'pdb-setup', title: 'Implement Pod Disruption Budgets', difficulty: 'Medium', estimatedTime: '3h' },
@@ -438,34 +436,11 @@ export const learningPaths: LearningPath[] = [
       { id: 'cockroachdb-k8s', title: 'Deploy Distributed CockroachDB', difficulty: 'Hard', estimatedTime: '10h' },
       { id: 'flux-gitops', title: 'Implement GitOps with Flux', difficulty: 'Hard', estimatedTime: '8h' },
       { id: 'k8s-crds', title: 'Configure Custom Resource Definitions', difficulty: 'Hard', estimatedTime: '6h' },
-      { id: 'multi-cluster-k8s', title: 'Multi-cluster K8s Environment', difficulty: 'Hard', estimatedTime: '12h' },
-      { id: 'security-contexts', title: 'Implement Security Contexts', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'externaldns-azure-dns', title: 'Configure ExternalDNS for Azure DNS', difficulty: 'Medium', estimatedTime: '5h' },
-      { id: 'kubeflow-ml', title: 'ML Pipelines with Kubeflow', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'mlflow-tracking', title: 'Experiment Tracking with MLflow', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'kserve-inference', title: 'Model Serving with KServe', difficulty: 'Hard', estimatedTime: '5h' },
       { id: 'ollama-llm', title: 'Self-hosted LLMs with Ollama', difficulty: 'Medium', estimatedTime: '3h' },
       { id: 'inference-gateway', title: 'LLM Traffic Routing with Inference Gateway', difficulty: 'Hard', estimatedTime: '4h' },
       { id: 'crossplane-platform', title: 'Platform Engineering with Crossplane', difficulty: 'Hard', estimatedTime: '6h' },
-      { id: 'cilium-networking', title: 'Advanced Networking with Cilium', difficulty: 'Hard', estimatedTime: '5h' },
-      { id: 'terraform-k8s', title: 'Kubernetes Provisioning with Terraform', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'admission-controllers', title: 'Implement Admission Controllers', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'local-k8s-kind', title: 'Local K8s Cluster with Kind', difficulty: 'Easy', estimatedTime: '1h' },
-      { id: '139', title: 'Kubernetes Cost Visibility with Kubecost', difficulty: 'Medium', estimatedTime: '2h' },
-      { id: '140', title: 'Optimizing Kubernetes Resource Quotas for FinOps', difficulty: 'Medium', estimatedTime: '1.5h' },
-      // Programmatically generate remaining projects up to 100
-      ...Array.from({ length: 70 }, (_, i) => ({
-        id: `k8s-proj-ext-${i + 1}`,
-        title: `Cloud Native Lab ${i + 31}: ${[
-          'Service Mesh Security', 'Custom Controller Dev', 'Admission Webhooks',
-          'Cluster API Management', 'Multi-cluster Federation', 'Serverless on K8s',
-          'GPU Scheduling for ML', 'Edge Computing with K3s', 'Windows Container Support',
-          'Advanced CNI Configuration', 'Storage Class Performance', 'Backup with Velero',
-          'Policy Enforcement with OPA', 'Kyverno Rules Engine', 'Kube-bench Auditing'
-        ][i % 15]}`,
-        difficulty: 'Hard' as const,
-        estimatedTime: '12h'
-      }))
+      { id: 'cilium-networking', title: 'Advanced Networking with Cilium', difficulty: 'Hard', estimatedTime: '5h' }
     ]
   },
   {

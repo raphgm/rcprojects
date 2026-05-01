@@ -1011,7 +1011,7 @@ export const projects: Project[] = [
     image: 'https://picsum.photos/seed/sentinel-policy-as-code/800/600'
   },
   {
-    id: '138',
+    id: 'opa-gatekeeper',
     title: 'OPA Gatekeeper for Kubernetes Policy',
     description: 'Enforce policies on your Kubernetes clusters using Open Policy Agent (OPA) and Gatekeeper.',
     category: 'Security',
