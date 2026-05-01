@@ -236,13 +236,26 @@ export const learningPaths: LearningPath[] = [
       { id: 'redis-caching', title: 'Redis for High-Performance Caching', duration: '6h', level: 'Intermediate', lessons: 15 }
     ],
     projects: [
-      { id: 'ecommerce-db', title: 'E-commerce Database Schema', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'blog-nosql', title: 'Blog Platform with MongoDB', difficulty: 'Medium', estimatedTime: '5h' },
-      { id: 'db-migration', title: 'Zero-Downtime DB Migration', difficulty: 'Hard', estimatedTime: '8h' },
-      { id: 'sharding-setup', title: 'Database Sharding Implementation', difficulty: 'Hard', estimatedTime: '10h' },
+      { id: 'ecommerce-db', title: 'E-commerce Schema Design', difficulty: 'Medium', estimatedTime: '4h' },
+      { id: 'blog-nosql', title: 'MongoDB Blog Platform', difficulty: 'Medium', estimatedTime: '5h' },
+      { id: 'db-migration', title: 'Zero-Downtime Migration', difficulty: 'Hard', estimatedTime: '8h' },
+      { id: 'sharding-setup', title: 'Database Sharding', difficulty: 'Hard', estimatedTime: '10h' },
       { id: 'query-optimization', title: 'Advanced Query Optimization', difficulty: 'Medium', estimatedTime: '6h' },
       { id: 'db-backup-recovery', title: 'Automated Backup & Recovery', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'graph-db-social', title: 'Social Graph with Neo4j', difficulty: 'Hard', estimatedTime: '12h' }
+      { id: 'graph-db-social', title: 'Social Graph with Neo4j', difficulty: 'Hard', estimatedTime: '12h' },
+      { id: 'influxdb-ts', title: 'Time-series with InfluxDB', difficulty: 'Intermediate', estimatedTime: '4h' },
+      { id: 'cockroachdb-dist', title: 'Distributed SQL Mastery', difficulty: 'Advanced', estimatedTime: '8h' },
+      { id: 'elasticsearch-search', title: 'Search with Elasticsearch', difficulty: 'Intermediate', estimatedTime: '6h' },
+      { id: 'clickhouse-analytics', title: 'Analytics with ClickHouse', difficulty: 'Advanced', estimatedTime: '7h' },
+      { id: 'redis-kv', title: 'Key-Value Store with Redis', difficulty: 'Beginner', estimatedTime: '3h' },
+      { id: 'postgis-geo', title: 'Geospatial with PostGIS', difficulty: 'Intermediate', estimatedTime: '5h' },
+      { id: 'debezium-cdc', title: 'CDC with Debezium', difficulty: 'Advanced', estimatedTime: '9h' },
+      { id: 'milvus-vector', title: 'Vector DB for AI', difficulty: 'Advanced', estimatedTime: '8h' },
+      { id: 'arangodb-multi', title: 'Multi-model with ArangoDB', difficulty: 'Intermediate', estimatedTime: '6h' },
+      { id: 'druid-analytics', title: 'Real-time Analytics with Druid', difficulty: 'Advanced', estimatedTime: '10h' },
+      { id: 'pmm-monitor', title: 'Database Monitoring with PMM', difficulty: 'Intermediate', estimatedTime: '4h' },
+      { id: 'postgres-hardening', title: 'PostgreSQL Hardening', difficulty: 'Intermediate', estimatedTime: '4h' },
+      { id: 'planetscale-serverless', title: 'Serverless with PlanetScale', difficulty: 'Beginner', estimatedTime: '3h' }
     ]
   },
   {

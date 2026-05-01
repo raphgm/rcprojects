@@ -4586,4 +4586,100 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'ecommerce-db',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'PostgreSQL Schema Design',
+        instruction: 'Create an e-commerce database and define tables for products, users, and orders.',
+        summary: 'Initialize the relational schema.',
+        whyNeeded: 'Proper relational modeling is the bedrock of data integrity and query performance in enterprise applications.',
+        pillarConnection: 'Reliability — using foreign keys and constraints ensures that the database remains in a consistent state.',
+        commands: [
+          { text: 'psql -c "CREATE DATABASE ecommerce;"\npsql -d ecommerce -c "CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT, email TEXT UNIQUE);"\npsql -d ecommerce -c "CREATE TABLE products (id SERIAL PRIMARY KEY, name TEXT, price NUMERIC);"\npsql -d ecommerce -c "CREATE TABLE orders (id SERIAL PRIMARY KEY, user_id INT REFERENCES users(id), product_id INT REFERENCES products(id));"', explanation: 'Creates the database and core tables.' }
+        ],
+        checkCommand: 'psql -d ecommerce -c "\\dt" | grep -c "table"',
+        expectedOutput: '3'
+      }
+    ]
+  },
+  {
+    projectId: 'blog-nosql',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'MongoDB Document Modeling',
+        instruction: 'Insert a complex blog post document into the "posts" collection.',
+        summary: 'Leverage NoSQL flexibility.',
+        whyNeeded: 'NoSQL databases like MongoDB allow for rapid development by supporting flexible, nested data structures.',
+        pillarConnection: 'Performance Efficiency — embedding comments directly in a post document avoids expensive joins at read time.',
+        commands: [
+          { text: 'mongosh --eval \'db.posts.insertOne({ title: "My First Post", body: "Hello World", tags: ["tech", "nosql"], comments: [{ user: "bob", text: "Great post!" }] })\'', explanation: 'Inserts a document with nested arrays.' }
+        ],
+        checkCommand: 'mongosh --eval "db.posts.countDocuments()" --quiet',
+        expectedOutput: '1'
+      }
+    ]
+  },
+  {
+    projectId: 'influxdb-ts',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'InfluxDB Data Ingestion',
+        instruction: 'Create a bucket and write a temperature measurement from an IoT sensor.',
+        summary: 'Store time-series data.',
+        whyNeeded: 'Time-series databases are optimized for high-write loads and efficient time-based range queries.',
+        pillarConnection: 'Cost Optimization — InfluxDB\'s compression algorithms significantly reduce the storage footprint for telemetry data.',
+        commands: [
+          { text: 'influx bucket create -n iot_data\ninflux write --bucket iot_data "temperature,sensor_id=tlm01 value=22.5"', explanation: 'Creates a bucket and writes a point in Line Protocol.' }
+        ],
+        checkCommand: 'influx bucket list | grep iot_data',
+        expectedOutput: 'iot_data'
+      }
+    ]
+  },
+  {
+    projectId: 'redis-kv',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Redis Caching Operations',
+        instruction: 'Set a session token with a 60-second expiration time.',
+        summary: 'Implement temporary data storage.',
+        whyNeeded: 'Caching session data in Redis offloads the primary database and provides sub-millisecond response times.',
+        pillarConnection: 'Performance Efficiency — in-memory storage is orders of magnitude faster than disk-based databases for hot data.',
+        commands: [
+          { text: 'redis-cli set session:user123 "token_xyz" EX 60', explanation: 'Sets a key with an expiration (TTL).' }
+        ],
+        checkCommand: 'redis-cli ttl session:user123',
+        expectedOutput: '5'
+      }
+    ]
+  },
+  {
+    projectId: 'postgres-hardening',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'PostgreSQL HBA Configuration',
+        instruction: 'Restrict database access to specific IP ranges using the pg_hba.conf file.',
+        summary: 'Implement network-level security.',
+        whyNeeded: 'The Host-Based Authentication (HBA) file is the first line of defense for a PostgreSQL server.',
+        pillarConnection: 'Security — restricting access to known IPs prevents unauthorized remote connection attempts.',
+        commands: [
+          { text: 'echo "host all all 10.0.0.0/24 scram-sha-256" | sudo tee -a /etc/postgresql/15/main/pg_hba.conf\nsudo systemctl reload postgresql', explanation: 'Adds a restrictive HBA rule and reloads the service.' }
+        ],
+        checkCommand: 'sudo grep "10.0.0.0/24" /etc/postgresql/15/main/pg_hba.conf',
+        expectedOutput: 'scram-sha-256'
+      }
+    ]
+  }
 ];

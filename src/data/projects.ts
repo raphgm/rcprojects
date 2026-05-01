@@ -1419,5 +1419,205 @@ export const projects: Project[] = [
     duration: '3 hours',
     tags: ['Hardening', 'Kali Linux', 'Linux Security', 'Security'],
     image: 'https://picsum.photos/seed/kali-hardening/800/600'
+  },
+  {
+    id: 'ecommerce-db',
+    title: 'E-commerce Database Schema',
+    description: 'Design and implement a robust relational database schema for a complex e-commerce platform using PostgreSQL.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['PostgreSQL', 'SQL', 'Schema Design', 'Database'],
+    image: 'https://picsum.photos/seed/ecommerce-db/800/600'
+  },
+  {
+    id: 'blog-nosql',
+    title: 'Blog Platform with MongoDB',
+    description: 'Build a high-performance blog backend using MongoDB, focusing on document modeling and aggregation pipelines.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['MongoDB', 'NoSQL', 'Aggregation', 'Database'],
+    image: 'https://picsum.photos/seed/blog-nosql/800/600'
+  },
+  {
+    id: 'db-migration',
+    title: 'Zero-Downtime DB Migration',
+    description: 'Perform a complex database migration between versions or providers without interrupting service using blue-green techniques.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Migration', 'High Availability', 'Database', 'SRE'],
+    image: 'https://picsum.photos/seed/db-migration/800/600'
+  },
+  {
+    id: 'sharding-setup',
+    title: 'Database Sharding Implementation',
+    description: 'Implement horizontal scaling by sharding a large dataset across multiple database instances.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Sharding', 'Scalability', 'Distributed Systems', 'Database'],
+    image: 'https://picsum.photos/seed/sharding-setup/800/600'
+  },
+  {
+    id: 'query-optimization',
+    title: 'Advanced Query Optimization',
+    description: 'Analyze slow queries and implement indexing, caching, and rewriting strategies to improve performance by 10x.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Performance', 'Indexing', 'SQL', 'Optimization'],
+    image: 'https://picsum.photos/seed/query-optimization/800/600'
+  },
+  {
+    id: 'db-backup-recovery',
+    title: 'Automated Backup & Recovery',
+    description: 'Design and test an automated backup and disaster recovery system for mission-critical databases.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Backup', 'Disaster Recovery', 'Security', 'Database'],
+    image: 'https://picsum.photos/seed/db-backup/800/600'
+  },
+  {
+    id: 'graph-db-social',
+    title: 'Social Graph with Neo4j',
+    description: 'Model and query complex social relationships using Neo4j and the Cypher query language.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Neo4j', 'Graph Database', 'Social Network', 'Cypher'],
+    image: 'https://picsum.photos/seed/neo4j-graph/800/600'
+  },
+  {
+    id: 'influxdb-ts',
+    title: 'Time-series with InfluxDB',
+    description: 'Store and analyze high-velocity time-series data from IoT sensors using InfluxDB.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['InfluxDB', 'Time-series', 'IoT', 'Monitoring'],
+    image: 'https://picsum.photos/seed/influxdb-ts/800/600'
+  },
+  {
+    id: 'cockroachdb-dist',
+    title: 'Distributed SQL with CockroachDB',
+    description: 'Deploy and manage a globally distributed, resilient SQL database using CockroachDB.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['CockroachDB', 'Distributed SQL', 'High Availability', 'Database'],
+    image: 'https://picsum.photos/seed/cockroachdb-security/800/600'
+  },
+  {
+    id: 'elasticsearch-search',
+    title: 'Full-text Search with Elasticsearch',
+    description: 'Implement a powerful full-text search engine with autocomplete and relevance ranking using Elasticsearch.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Elasticsearch', 'Search', 'NoSQL', 'Indexing'],
+    image: 'https://picsum.photos/seed/elasticsearch-search/800/600'
+  },
+  {
+    id: 'clickhouse-analytics',
+    title: 'Columnar DB with ClickHouse',
+    description: 'Build a real-time analytics dashboard powered by the ClickHouse columnar database.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '7 hours',
+    tags: ['ClickHouse', 'Analytics', 'OLAP', 'Big Data'],
+    image: 'https://picsum.photos/seed/clickhouse-analytics/800/600'
+  },
+  {
+    id: 'redis-kv',
+    title: 'Key-Value Store with Redis',
+    description: 'Master Redis data structures for caching, session management, and real-time pub/sub.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Redis', 'Caching', 'Key-Value', 'Database'],
+    image: 'https://picsum.photos/seed/redis-kv/800/600'
+  },
+  {
+    id: 'postgis-geo',
+    title: 'Geospatial with PostGIS',
+    description: 'Extend PostgreSQL with PostGIS to store and query complex geospatial data and perform spatial analysis.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['PostGIS', 'PostgreSQL', 'Geospatial', 'GIS'],
+    image: 'https://picsum.photos/seed/postgis-geo/800/600'
+  },
+  {
+    id: 'debezium-cdc',
+    title: 'Change Data Capture with Debezium',
+    description: 'Implement a real-time data streaming pipeline using Debezium to capture database changes and stream them to Kafka.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '9 hours',
+    tags: ['Debezium', 'CDC', 'Kafka', 'Streaming'],
+    image: 'https://picsum.photos/seed/debezium-cdc/800/600'
+  },
+  {
+    id: 'milvus-vector',
+    title: 'Vector DB for AI with Milvus',
+    description: 'Store and search high-dimensional vector embeddings for AI applications using the Milvus vector database.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Milvus', 'Vector Database', 'AI', 'Embeddings'],
+    image: 'https://picsum.photos/seed/milvus-vector/800/600'
+  },
+  {
+    id: 'arangodb-multi',
+    title: 'Multi-model with ArangoDB',
+    description: 'Leverage the power of document, graph, and key-value models in a single database with ArangoDB.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['ArangoDB', 'Multi-model', 'NoSQL', 'Database'],
+    image: 'https://picsum.photos/seed/arangodb-security/800/600'
+  },
+  {
+    id: 'druid-analytics',
+    title: 'Real-time Analytics with Druid',
+    description: 'Implement low-latency analytics over large datasets using Apache Druid.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Druid', 'Analytics', 'OLAP', 'Big Data'],
+    image: 'https://picsum.photos/seed/druid-analytics/800/600'
+  },
+  {
+    id: 'pmm-monitor',
+    title: 'DB Monitoring with PMM',
+    description: 'Set up Percona Monitoring and Management (PMM) to gain deep visibility into your database performance.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['PMM', 'Monitoring', 'Database', 'Performance'],
+    image: 'https://picsum.photos/seed/pmm-monitoring/800/600'
+  },
+  {
+    id: 'postgres-hardening',
+    title: 'PostgreSQL Security Hardening',
+    description: 'Secure your PostgreSQL installations by implementing SSL, row-level security, and hardened configurations.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['PostgreSQL', 'Hardening', 'Security', 'Database'],
+    image: 'https://picsum.photos/seed/postgres-security/800/600'
+  },
+  {
+    id: 'planetscale-serverless',
+    title: 'Serverless DB with PlanetScale',
+    description: 'Learn to manage a serverless Vitess-powered database with branching and safe migrations using PlanetScale.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['PlanetScale', 'Vitess', 'Serverless', 'MySQL'],
+    image: 'https://picsum.photos/seed/planetscale-security/800/600'
   }
 ];
