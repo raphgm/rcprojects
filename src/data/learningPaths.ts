@@ -385,9 +385,16 @@ export const learningPaths: LearningPath[] = [
       { id: 'docker-security', title: 'Securing Docker Containers', duration: '8h', level: 'Advanced', lessons: 20 }
     ],
     projects: [
-      { id: 'microservices-docker', title: 'Dockerizing a Microservices App', difficulty: 'Medium', estimatedTime: '4h' },
+      { id: 'microservices-docker', title: 'Dockerizing Microservices', difficulty: 'Medium', estimatedTime: '4h' },
       { id: 'docker-registry-setup', title: 'Private Docker Registry', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'docker-swarm-lb', title: 'Load Balancing with Swarm', difficulty: 'Hard', estimatedTime: '6h' }
+      { id: 'docker-swarm-lb', title: 'Load Balancing with Swarm', difficulty: 'Hard', estimatedTime: '6h' },
+      { id: 'docker-optimization', title: 'Multi-stage Build Optimization', difficulty: 'Intermediate', estimatedTime: '3h' },
+      { id: 'docker-volumes-persistent', title: 'Persistent Storage', difficulty: 'Beginner', estimatedTime: '2h' },
+      { id: 'docker-networking-custom', title: 'Custom Bridge Networking', difficulty: 'Intermediate', estimatedTime: '4h' },
+      { id: 'docker-cicd-github', title: 'Docker CI/CD Pipelines', difficulty: 'Intermediate', estimatedTime: '5h' },
+      { id: 'docker-monitoring-prom', title: 'Container Monitoring', difficulty: 'Advanced', estimatedTime: '6h' },
+      { id: 'docker-hardening-trivy', title: 'Image Security Hardening', difficulty: 'Intermediate', estimatedTime: '3h' },
+      { id: 'dockerizing-legacy-app', title: 'Dockerizing Legacy Apps', difficulty: 'Advanced', estimatedTime: '6h' }
     ]
   },
   {

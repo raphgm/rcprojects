@@ -2429,5 +2429,75 @@ export const projects: Project[] = [
     duration: '15 hours',
     tags: ['Security', 'Binary Analysis', 'Deep Learning'],
     image: 'https://picsum.photos/seed/malware-ml-ds/800/600'
+  },
+  {
+    id: 'docker-optimization',
+    title: 'Multi-stage Build Optimization',
+    description: 'Learn to use multi-stage builds to create tiny, secure, and efficient production Docker images.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Docker', 'Optimization', 'Security'],
+    image: 'https://picsum.photos/seed/docker-opt/800/600'
+  },
+  {
+    id: 'docker-volumes-persistent',
+    title: 'Persistent Storage with Docker Volumes',
+    description: 'Master Docker volumes and bind mounts to ensure data persistence across container restarts.',
+    category: 'DevOps',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Docker', 'Storage', 'Persistence'],
+    image: 'https://picsum.photos/seed/docker-storage/800/600'
+  },
+  {
+    id: 'docker-networking-custom',
+    title: 'Container Networking with Bridges',
+    description: 'Design and implement custom Docker bridge networks to isolate and connect your multi-container applications.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Docker', 'Networking', 'Security'],
+    image: 'https://picsum.photos/seed/docker-net/800/600'
+  },
+  {
+    id: 'docker-cicd-github',
+    title: 'CI/CD with Docker & GitHub Actions',
+    description: 'Automate the building, testing, and pushing of Docker images to registries using GitHub Actions.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Docker', 'CI/CD', 'GitHub Actions'],
+    image: 'https://picsum.photos/seed/docker-cicd/800/600'
+  },
+  {
+    id: 'docker-monitoring-prom',
+    title: 'Monitoring Containers with Prometheus',
+    description: 'Set up a monitoring stack using Prometheus and Grafana to track the health and performance of your Docker containers.',
+    category: 'DevOps',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Docker', 'Monitoring', 'Prometheus'],
+    image: 'https://picsum.photos/seed/docker-mon/800/600'
+  },
+  {
+    id: 'docker-hardening-trivy',
+    title: 'Hardening Docker Images with Trivy',
+    description: 'Identify and remediate security vulnerabilities in your Docker images using the Trivy vulnerability scanner.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Docker', 'Security', 'Trivy'],
+    image: 'https://picsum.photos/seed/docker-security/800/600'
+  },
+  {
+    id: 'dockerizing-legacy-app',
+    title: 'Dockerizing a Legacy Application',
+    description: 'Learn the techniques for containerizing older applications with complex dependencies and environment requirements.',
+    category: 'DevOps',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Docker', 'Legacy', 'Migration'],
+    image: 'https://picsum.photos/seed/docker-legacy/800/600'
   }
 ];

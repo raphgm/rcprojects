@@ -4753,4 +4753,62 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'docker-optimization',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Multi-stage Dockerfile Design',
+        instruction: 'Create a multi-stage Dockerfile for a Go application to reduce image size.',
+        summary: 'Optimize the build process.',
+        whyNeeded: 'Smaller images are faster to pull, require less storage, and have a smaller attack surface.',
+        pillarConnection: 'Performance Efficiency — multi-stage builds separate build-time dependencies from the final runtime image.',
+        commands: [
+          { text: 'cat <<EOF > Dockerfile\nFROM golang:1.20-alpine AS builder\nWORKDIR /app\nCOPY . .\nRUN go build -o main .\n\nFROM alpine:latest\nWORKDIR /root/\nCOPY --from=builder /app/main .\nCMD ["./main"]\nEOF', explanation: 'Defines a two-stage build process.' }
+        ],
+        checkCommand: 'grep "FROM .* AS builder" Dockerfile',
+        expectedOutput: 'AS builder'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-volumes-persistent',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Volume Creation & Mounting',
+        instruction: 'Create a named Docker volume and mount it to a MySQL container.',
+        summary: 'Ensure data persistence.',
+        whyNeeded: 'Containers are ephemeral. Volumes are required to persist data like databases beyond the container lifecycle.',
+        pillarConnection: 'Reliability — persistent volumes prevent data loss during container updates or failures.',
+        commands: [
+          { text: 'docker volume create mysql_data\ndocker run -d --name db -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root mysql:latest', explanation: 'Creates a volume and attaches it to the database container.' }
+        ],
+        checkCommand: 'docker volume inspect mysql_data',
+        expectedOutput: 'mysql_data'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-hardening-trivy',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Vulnerability Scanning with Trivy',
+        instruction: 'Install Trivy and scan a public image for security vulnerabilities.',
+        summary: 'Audit container security.',
+        whyNeeded: 'Docker images often contain outdated packages with known vulnerabilities. Scanning is vital for production safety.',
+        pillarConnection: 'Security — proactive vulnerability scanning is a core component of a secure software supply chain.',
+        commands: [
+          { text: 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin\ntrivy image --severity HIGH,CRITICAL alpine:3.10', explanation: 'Installs Trivy and scans an old (vulnerable) Alpine image.' }
+        ],
+        checkCommand: 'trivy --version',
+        expectedOutput: 'Version'
+      }
+    ]
+  }
 ];
