@@ -74,6 +74,42 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Network Sockets', cmd: 'ss -tuln', focus: 'Identify listening ports and active network connections.' },
     { topic: 'Text Stream Editing (Sed)', cmd: 'sed --version', focus: 'Perform non-interactive text transformations on the fly.' },
   ],
+
+  linux_admin: [
+    { topic: 'User Account Management', cmd: 'useradd -m newuser', focus: 'Manage system users and their home directories.' },
+    { topic: 'Sudoers & Privileges', cmd: 'visudo -c', focus: 'Control administrative access using the sudoers file.' },
+    { topic: 'Systemd Service Lifecycle', cmd: 'systemctl status nginx', focus: 'Master the management of background daemons and service states.' },
+    { topic: 'Log Rotation Policies', cmd: 'logrotate -d /etc/logrotate.conf', focus: 'Understand how Linux manages disk space for system logs.' },
+    { topic: 'System Runlevels & Targets', cmd: 'systemctl get-default', focus: 'Manage system boot states and target environments.' },
+  ],
+  linux_security: [
+    { topic: 'Firewall Management', cmd: 'iptables -L -n', focus: 'Configure packet filtering rules to protect the network perimeter.' },
+    { topic: 'System Auditing', cmd: 'auditctl -l', focus: 'Track system events and file access for compliance and security.' },
+    { topic: 'SELinux & AppArmor', cmd: 'sestatus', focus: 'Implement Mandatory Access Control (MAC) to restrict process capabilities.' },
+    { topic: 'SSH Hardening', cmd: 'sshd -t', focus: 'Secure remote access by disabling password auth and restricting protocols.' },
+    { topic: 'File Integrity Monitoring', cmd: 'aide --version', focus: 'Detect unauthorized changes to critical system binaries.' },
+  ],
+  linux_networking: [
+    { topic: 'Interface Configuration', cmd: 'ip addr show', focus: 'Manage network interfaces and IP address assignments.' },
+    { topic: 'Routing Tables', cmd: 'ip route show', focus: 'Understand how packets are directed across different networks.' },
+    { topic: 'Packet Inspection', cmd: 'tcpdump -i eth0 -c 5', focus: 'Analyze raw network traffic to diagnose connectivity issues.' },
+    { topic: 'DNS Resolution', cmd: 'dig +short google.com', focus: 'Troubleshoot hostname resolution across recursive and authoritative servers.' },
+    { topic: 'Socket Statistics', cmd: 'ss -atp', focus: 'Examine active TCP/UDP connections and the processes that own them.' },
+  ],
+  linux_storage: [
+    { topic: 'Partition Management', cmd: 'lsblk', focus: 'List block devices and understand disk partitioning.' },
+    { topic: 'Logical Volume Management', cmd: 'vgs', focus: 'Manage flexible storage using LVM Volume Groups and Logical Volumes.' },
+    { topic: 'Filesystem Creation', cmd: 'mkfs.ext4 -n /dev/sdb1', focus: 'Format raw partitions with modern Linux filesystems.' },
+    { topic: 'Mount Points & Fstab', cmd: 'findmnt', focus: 'Manage persistent mounts and understand the /etc/fstab structure.' },
+    { topic: 'Disk Usage Analysis', cmd: 'du -sh /var/log', focus: 'Identify space-consuming directories and manage disk quotas.' },
+  ],
+  linux_kernel: [
+    { topic: 'Kernel Modules', cmd: 'lsmod | head', focus: 'Load and unload dynamic kernel components on the fly.' },
+    { topic: 'Sysctl Parameters', cmd: 'sysctl net.ipv4.ip_forward', focus: 'Tune kernel behavior at runtime using the /proc/sys interface.' },
+    { topic: 'System Buffer Logs', cmd: 'dmesg | tail -n 20', focus: 'Inspect kernel-level messages and hardware events.' },
+    { topic: 'Interrupt Distribution', cmd: 'cat /proc/interrupts | head', focus: 'Understand how the CPU handles hardware and software interrupts.' },
+    { topic: 'Boot Parameters', cmd: 'cat /proc/cmdline', focus: 'Inspect the arguments passed to the kernel at system boot.' },
+  ],
   terraform: [
     { topic: 'HCL Syntax & Providers', cmd: 'terraform version', focus: 'Understand declarative configuration and provider plugins.' },
     { topic: 'State Management', cmd: 'terraform state list', focus: 'Learn how Terraform tracks managed infrastructure in state files.' },
@@ -167,6 +203,11 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
   else if (lowerId.includes('cyber') || lowerId.includes('security') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber;
   else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
+  else if (lowerId.includes('kernel') || lowerTitle.includes('kernel')) bank = TOPIC_BANKS.linux_kernel;
+  else if (lowerId.includes('security') || lowerTitle.includes('hardening')) bank = TOPIC_BANKS.linux_security;
+  else if (lowerId.includes('net') || lowerTitle.includes('network') || lowerTitle.includes('troubleshooting')) bank = TOPIC_BANKS.linux_networking;
+  else if (lowerId.includes('storage') || lowerTitle.includes('file system')) bank = TOPIC_BANKS.linux_storage;
+  else if (lowerId.includes('admin') || lowerTitle.includes('administration')) bank = TOPIC_BANKS.linux_admin;
   else if (lowerId.includes('linux') || lowerTitle.includes('linux')) bank = TOPIC_BANKS.linux;
   else if (lowerId.includes('terraform') || lowerTitle.includes('terraform')) bank = TOPIC_BANKS.terraform;
   else if (lowerId.includes('ansible') || lowerTitle.includes('ansible')) bank = TOPIC_BANKS.ansible;

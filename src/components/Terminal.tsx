@@ -232,6 +232,13 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'jenkins-cli':
     case 'argocd':
     case 'flux':
+    case 'useradd':
+    case 'visudo':
+    case 'logrotate':
+    case 'auditctl':
+    case 'sestatus':
+    case 'sshd':
+    case 'findmnt':
       return `(${base} ${sub || ''} completed successfully)`;
     case 'trivy':
       return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;
