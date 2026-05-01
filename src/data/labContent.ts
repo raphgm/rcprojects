@@ -764,8 +764,8 @@ export const labContents: LabContent[] = [
             explanation: 'Deploys Prometheus, Grafana, and Alertmanager as a unified observability suite.'
           }
         ],
-        checkCommand: 'helm install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring',
-        expectedOutput: 'deployed'
+        checkCommand: 'helm status monitoring -n monitoring',
+        expectedOutput: 'STATUS: deployed'
       },
       {
         id: 'step-4',
@@ -1064,8 +1064,8 @@ export const labContents: LabContent[] = [
             explanation: 'Deploys the VPA controller components to the cluster.'
           }
         ],
-        checkCommand: 'kubectl get vpa',
-        expectedOutput: 'vpa'
+        checkCommand: 'kubectl get customresourcedefinition verticalpodautoscalers.autoscaling.k8s.io',
+        expectedOutput: 'verticalpodautoscalers.autoscaling.k8s.io'
       },
       {
         id: 'step-5',
@@ -1902,7 +1902,7 @@ export const labContents: LabContent[] = [
             explanation: 'Deploys a template that defines how Argo should query Prometheus to validate the health of a new version.'
           }
         ],
-        checkCommand: 'kubectl get analysistemplate',
+        checkCommand: 'kubectl get analysistemplate -A',
         expectedOutput: 'success-rate'
       },
       {
