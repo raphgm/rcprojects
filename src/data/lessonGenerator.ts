@@ -6,14 +6,18 @@ type Topic = { topic: string; cmd: string; focus: string };
 // Domain-specific topic banks.
 const TOPIC_BANKS: Record<string, Topic[]> = {
   docker: [
-    { topic: 'Container Architecture', cmd: 'docker version', focus: 'Understand the client-server architecture and the OCI runtime.' },
-    { topic: 'Image Layers & UnionFS', cmd: 'docker history alpine', focus: 'Learn how Docker builds immutable layers to optimize storage and speed.' },
-    { topic: 'Volume Persistence', cmd: 'docker volume ls', focus: 'Master the difference between bind mounts and managed volumes.' },
-    { topic: 'Container Networking', cmd: 'docker network ls', focus: 'Explore bridge, host, and overlay networks for service discovery.' },
-    { topic: 'Multi-stage Builds', cmd: 'grep "FROM" Dockerfile', focus: 'Optimize image size and security by separating build and runtime.' },
-    { topic: 'Docker Compose Logic', cmd: 'docker compose ps', focus: 'Orchestrate multi-container applications with service dependencies.' },
-    { topic: 'Healthchecks & Restarts', cmd: 'docker inspect --format "{{.State.Health.Status}}"', focus: 'Configure self-healing containers that recover from failures.' },
-    { topic: 'Image Hardening', cmd: 'trivy image alpine', focus: 'Scan and remediate vulnerabilities in your base images.' },
+    { topic: 'Runtime Architecture', cmd: 'docker version', focus: 'Understand the relationship between the Docker CLI, Host, and Daemon.' },
+    { topic: 'Image Layer Analysis', cmd: 'docker history alpine', focus: 'Learn how Docker optimizes storage using immutable, cached layers.' },
+    { topic: 'Storage Persistence', cmd: 'docker volume ls', focus: 'Master the lifecycle of persistent data using named volumes.' },
+    { topic: 'Network Segmentation', cmd: 'docker network ls', focus: 'Explore how Docker isolates container traffic using bridge and overlay networks.' },
+    { topic: 'Optimized Multi-stage Builds', cmd: 'docker images', focus: 'Understand how to separate build dependencies from production binaries.' },
+    { topic: 'Service Orchestration', cmd: 'docker compose ps', focus: 'Manage complex, multi-container applications with a single manifest.' },
+    { topic: 'Container Self-Healing', cmd: 'docker inspect --format "{{.State.Health.Status}}"', focus: 'Implement healthchecks to ensure containers automatically recover.' },
+    { topic: 'Supply Chain Security', cmd: 'trivy --version', focus: 'Scan container images for known vulnerabilities before deployment.' },
+    { topic: 'Resource Observability', cmd: 'docker stats --no-stream', focus: 'Monitor CPU and memory consumption across your container fleet.' },
+    { topic: 'Log Aggregation', cmd: 'docker logs --tail 20', focus: 'Debug application failures by inspecting stdout and stderr streams.' },
+    { topic: 'Registry Operations', cmd: 'docker search alpine', focus: 'Learn how to discover and manage images in remote repositories.' },
+    { topic: 'Runtime Cleanup', cmd: 'docker system df', focus: 'Maintain system health by pruning unused images, containers, and networks.' },
   ],
   k8s: [
     { topic: 'Cluster Architecture', cmd: 'kubectl get nodes', focus: 'Understand the relationship between the control plane and worker nodes.' },
