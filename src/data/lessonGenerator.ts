@@ -3,34 +3,95 @@ import { Lesson } from '../types/content';
 // Course-specific topic banks. Each topic has a focus and a sandbox command.
 type Topic = { topic: string; cmd: string; focus: string };
 
+// Domain-specific topic banks.
+const TOPIC_BANKS: Record<string, Topic[]> = {
+  docker: [
+    { topic: 'Container Architecture', cmd: 'docker version', focus: 'Understand the client-server architecture and the OCI runtime.' },
+    { topic: 'Image Layers & UnionFS', cmd: 'docker history alpine', focus: 'Learn how Docker builds immutable layers to optimize storage and speed.' },
+    { topic: 'Volume Persistence', cmd: 'docker volume ls', focus: 'Master the difference between bind mounts and managed volumes.' },
+    { topic: 'Container Networking', cmd: 'docker network ls', focus: 'Explore bridge, host, and overlay networks for service discovery.' },
+    { topic: 'Multi-stage Builds', cmd: 'grep "FROM" Dockerfile', focus: 'Optimize image size and security by separating build and runtime.' },
+    { topic: 'Docker Compose Logic', cmd: 'docker compose ps', focus: 'Orchestrate multi-container applications with service dependencies.' },
+    { topic: 'Healthchecks & Restarts', cmd: 'docker inspect --format "{{.State.Health.Status}}"', focus: 'Configure self-healing containers that recover from failures.' },
+    { topic: 'Image Hardening', cmd: 'trivy image alpine', focus: 'Scan and remediate vulnerabilities in your base images.' },
+  ],
+  k8s: [
+    { topic: 'Cluster Architecture', cmd: 'kubectl get nodes', focus: 'Understand the relationship between the control plane and worker nodes.' },
+    { topic: 'Pod Lifecycle', cmd: 'kubectl get pods', focus: 'Master the smallest deployable unit and its ephemeral nature.' },
+    { topic: 'Deployments & Replicas', cmd: 'kubectl get deployments', focus: 'Manage desired state and automated rollouts with controllers.' },
+    { topic: 'Service Discovery', cmd: 'kubectl get svc', focus: 'Expose pods to the cluster or external traffic via stable IPs.' },
+    { topic: 'Ingress Controllers', cmd: 'kubectl get ingress', focus: 'Route HTTP traffic using hostname and path-based rules.' },
+    { topic: 'ConfigMaps & Secrets', cmd: 'kubectl get configmaps', focus: 'Externalize application configuration and sensitive data.' },
+    { topic: 'Storage Classes & PVCs', cmd: 'kubectl get pvc', focus: 'Provision persistent storage dynamically for stateful workloads.' },
+    { topic: 'RBAC & Identity', cmd: 'kubectl auth can-i create pods', focus: 'Implement fine-grained access control using ServiceAccounts.' },
+  ],
+  cyber: [
+    { topic: 'Network Reconnaissance', cmd: 'nmap -sS localhost', focus: 'Identify active hosts and open ports on a target network.' },
+    { topic: 'Vulnerability Scanning', cmd: 'nmap --script vuln localhost', focus: 'Automate the discovery of known security weaknesses.' },
+    { topic: 'Traffic Analysis', cmd: 'tcpdump -i eth0 -c 5', focus: 'Inspect raw packets to identify insecure protocols and data leaks.' },
+    { topic: 'Exploit Research', cmd: 'searchsploit drupal', focus: 'Map vulnerabilities to known proof-of-concept exploits.' },
+    { topic: 'Password Cracking', cmd: 'john --list=formats', focus: 'Understand hashing algorithms and brute-force techniques.' },
+    { topic: 'Privilege Escalation', cmd: 'find / -perm -4000 2>/dev/null', focus: 'Locate misconfigured SUID binaries to escalate local access.' },
+  ],
+  python: [
+    { topic: 'Data Structures', cmd: 'python3 -c "print([x for x in range(10)])"', focus: 'Master lists, dictionaries, and list comprehensions.' },
+    { topic: 'Asynchronous Programming', cmd: 'python3 -c "import asyncio"', focus: 'Build high-performance concurrent applications with async/await.' },
+    { topic: 'Web APIs with Flask', cmd: 'pip show flask', focus: 'Develop microservices and RESTful endpoints.' },
+    { topic: 'Automation Scripts', cmd: 'python3 -c "import os; print(os.listdir())"', focus: 'Automate system tasks and file manipulations.' },
+    { topic: 'Data Analysis with Pandas', cmd: 'pip show pandas', focus: 'Clean, filter, and aggregate large datasets efficiently.' },
+    { topic: 'Type Hinting & Pydantic', cmd: 'pip show pydantic', focus: 'Enforce data validation and improve code maintainability.' },
+  ],
+  db: [
+    { topic: 'Relational Schemas', cmd: 'psql -c "\\dt"', focus: 'Design structured tables with strict integrity constraints.' },
+    { topic: 'Index Optimization', cmd: 'psql -c "EXPLAIN ANALYZE SELECT..."', focus: 'Identify slow queries and speed them up with proper indexing.' },
+    { topic: 'ACID Transactions', cmd: 'psql -c "BEGIN; ... COMMIT;"', focus: 'Ensure data consistency in multi-step operations.' },
+    { topic: 'Document Modeling', cmd: 'mongosh --eval "db.stats()"', focus: 'Structure unstructured data for high scalability in NoSQL.' },
+    { topic: 'Key-Value Caching', cmd: 'redis-cli info', focus: 'Reduce database load by caching frequently accessed data.' },
+  ],
+  linux: [
+    { topic: 'Process Management', cmd: 'top -n 1', focus: 'Monitor system resources and manage process lifecycles.' },
+    { topic: 'File System Hierarchy', cmd: 'ls -F /', focus: 'Navigate the standard Linux directory structure (FHS).' },
+    { topic: 'Permissions & Ownership', cmd: 'ls -l /etc/shadow', focus: 'Understand UGO permissions and secure file access.' },
+    { topic: 'Shell Scripting Basics', cmd: 'bash --version', focus: 'Automate repetitive tasks with portable Bash scripts.' },
+    { topic: 'Systemd & Services', cmd: 'systemctl list-units --type=service', focus: 'Manage background daemons and system boot targets.' },
+    { topic: 'Network Diagnostics', cmd: 'ip addr show', focus: 'Troubleshoot connectivity using modern iproute2 tools.' },
+  ],
+  terraform: [
+    { topic: 'HCL Syntax & Providers', cmd: 'terraform version', focus: 'Understand declarative configuration and provider plugins.' },
+    { topic: 'State Management', cmd: 'terraform state list', focus: 'Learn how Terraform tracks managed infrastructure in state files.' },
+    { topic: 'Variable Interpolation', cmd: 'echo "var.region"', focus: 'Make configurations reusable using input variables and locals.' },
+    { topic: 'Module Composition', cmd: 'ls modules/', focus: 'Organize infrastructure into reusable, logical components.' },
+    { topic: 'Plan & Speculative Runs', cmd: 'terraform plan', focus: 'Preview infrastructure changes before applying them.' },
+    { topic: 'Resource Dependencies', cmd: 'terraform graph', focus: 'Visualize and manage implicit and explicit resource dependencies.' },
+  ],
+};
+
 const GENERIC: Topic[] = [
   { topic: 'Core Concepts', cmd: 'help', focus: 'Foundational ideas and terminology you will use throughout this course.' },
-  { topic: 'Environment Setup', cmd: 'pwd', focus: 'Preparing your workstation and verifying the toolchain.' },
-  { topic: 'First Hands-On Exercise', cmd: 'ls', focus: 'A guided first task to build muscle memory.' },
   { topic: 'Common Patterns', cmd: 'echo "pattern"', focus: 'Recurring patterns you will recognize in real systems.' },
-  { topic: 'Best Practices', cmd: 'echo "12-factor"', focus: 'Industry-standard practices and why they exist.' },
-  { topic: 'Troubleshooting Basics', cmd: 'echo "check logs first"', focus: 'A repeatable diagnostic loop for failures.' },
-  { topic: 'Tooling Overview', cmd: 'which bash', focus: 'The CLI and IDE tools every practitioner relies on.' },
-  { topic: 'Working With Files', cmd: 'ls -la', focus: 'Reading, writing, and organizing artifacts on disk.' },
-  { topic: 'Logging & Output', cmd: 'echo "log line"', focus: 'Structured logging and signal vs noise.' },
-  { topic: 'Configuration Management', cmd: 'cat config.example', focus: 'Externalizing configuration from code.' },
-  { topic: 'Secrets & Credentials', cmd: 'echo "use a secret manager"', focus: 'Never commit secrets; use a vault.' },
-  { topic: 'Automation Scripts', cmd: 'bash --version', focus: 'Turning manual toil into repeatable scripts.' },
-  { topic: 'Testing & Validation', cmd: 'echo "run tests"', focus: 'Verifying behavior before shipping.' },
-  { topic: 'Performance Awareness', cmd: 'time echo done', focus: 'Measuring before optimizing.' },
-  { topic: 'Security Basics', cmd: 'echo "least privilege"', focus: 'Default to least privilege and defense in depth.' },
-  { topic: 'Networking Essentials', cmd: 'echo "tcp/ip"', focus: 'How packets travel and where things go wrong.' },
-  { topic: 'Observability', cmd: 'echo "metrics, logs, traces"', focus: 'The three pillars of observability.' },
-  { topic: 'Reliability Engineering', cmd: 'echo "SLO 99.9"', focus: 'Designing systems that fail gracefully.' },
-  { topic: 'Documentation Habits', cmd: 'echo "README first"', focus: 'Documentation as a first-class deliverable.' },
-  { topic: 'Capstone Mission', cmd: 'echo "ship it"', focus: 'Bringing the course concepts together end-to-end.' },
+  { topic: 'Best Practices', cmd: 'echo "best practices"', focus: 'Industry-standard practices and why they exist.' },
+  { topic: 'Troubleshooting Basics', cmd: 'echo "check logs"', focus: 'A repeatable diagnostic loop for failures.' },
 ];
 
 export function generateFallbackLessons(courseId: string, courseTitle: string, count: number): Lesson[] {
   const total = Math.max(1, count);
   const lessons: Lesson[] = [];
+  
+  // Determine the best bank to use based on the courseId or title
+  let bank = GENERIC;
+  const lowerTitle = courseTitle.toLowerCase();
+  const lowerId = courseId.toLowerCase();
+  
+  if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
+  else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s;
+  else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
+  else if (lowerId.includes('cyber') || lowerId.includes('security') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber;
+  else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
+  else if (lowerId.includes('linux') || lowerTitle.includes('linux')) bank = TOPIC_BANKS.linux;
+  else if (lowerId.includes('terraform') || lowerTitle.includes('terraform')) bank = TOPIC_BANKS.terraform;
+
   for (let i = 0; i < total; i++) {
-    const m = GENERIC[i % GENERIC.length];
+    const m = bank[i % bank.length];
     lessons.push({
       id: `${courseId}-lesson-${i + 1}`,
       title: i === 0 ? `Introduction to ${courseTitle}` : `${courseTitle}: ${m.topic}`,
