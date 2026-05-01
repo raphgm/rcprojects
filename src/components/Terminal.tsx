@@ -534,7 +534,7 @@ export const Terminal: React.FC<TerminalProps> = ({
   const fileSystem: Record<string, string[]> = {
     '/': ['bin', 'etc', 'home', 'var', 'tmp', 'usr', 'root', 'dev', 'proc'],
     '/bin': ['bash', 'ls', 'pwd', 'cat', 'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo', 'ps', 'apt', 'top', 'uname'],
-    '/etc': ['passwd', 'group', 'hosts', 'hostname', 'network', 'ssh', 'os-release'],
+    '/etc': ['passwd', 'shadow', 'group', 'hosts', 'hostname', 'network', 'ssh', 'os-release'],
     '/home': ['user'],
     '/home/user': ['Documents', 'Downloads', 'README.md', 'projects'],
     '/home/user/Documents': ['notes.txt', 'budget.xlsx'],
@@ -764,11 +764,19 @@ export const Terminal: React.FC<TerminalProps> = ({
           }
 
           if (fileSystem[targetPath]) {
-            const files = [...fileSystem[targetPath]];
-            if (args.includes('-a')) {
-              files.unshift('.', '..');
+            // Permission check for sensitive files
+            const sensitiveFiles = ['/etc/shadow', '/etc/sudoers', '/root'];
+            const isSensitive = sensitiveFiles.some(f => targetPath.startsWith(f));
+            
+            if (isSensitive && !isSudoAuthenticated) {
+              output = `ls: cannot open directory '${targetPath}': Permission denied`;
+            } else {
+              const files = [...fileSystem[targetPath]];
+              if (args.includes('-a')) {
+                files.unshift('.', '..');
+              }
+              output = files.join('  ');
             }
-            output = files.join('  ');
           } else {
             output = `ls: cannot access '${pathArg}': No such file or directory`;
           }
