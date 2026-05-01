@@ -4882,4 +4882,62 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'flask-api',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Flask Environment Setup',
+        instruction: 'Install Flask and create a simple RESTful endpoint.',
+        summary: 'Bootstrap a web API.',
+        whyNeeded: 'Flask is a micro-framework that allows you to build web services quickly with minimal boilerplate.',
+        pillarConnection: 'Operational Excellence — using standardized web frameworks simplifies development and maintenance.',
+        commands: [
+          { text: 'pip install flask\ncat <<EOF > app.py\nfrom flask import Flask, jsonify\napp = Flask(__name__)\n@app.route("/api/v1/status")\ndef status():\n    return jsonify({"status": "active"})\nif __name__ == "__main__":\n    app.run(port=5000)\nEOF', explanation: 'Installs Flask and writes a status API.' }
+        ],
+        checkCommand: 'pip show flask',
+        expectedOutput: 'Name: Flask'
+      }
+    ]
+  },
+  {
+    projectId: 'python-log-parser',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Log Parsing with Regex',
+        instruction: 'Create a Python script to parse an Apache log file and extract 404 errors.',
+        summary: 'Automate log auditing.',
+        whyNeeded: 'Manual log analysis is impossible at scale. Python\'s regex engine allows you to sift through millions of lines in seconds.',
+        pillarConnection: 'Security — identifying unusual patterns in logs is critical for detecting breach attempts.',
+        commands: [
+          { text: 'cat <<EOF > parser.py\nimport re\nlog_data = \'127.0.0.1 - - [01/May/2026:06:00:00] "GET /admin HTTP/1.1" 404 123\'\nerrors = re.findall(r"404", log_data)\nprint(f"Found {len(errors)} errors")\nEOF\npython3 parser.py', explanation: 'Writes and runs a simple regex-based log parser.' }
+        ],
+        checkCommand: 'python3 parser.py',
+        expectedOutput: 'Found 1 errors'
+      }
+    ]
+  },
+  {
+    projectId: 'python-network-scanner',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Scapy Network Recon',
+        instruction: 'Install Scapy and write a script to perform an ARP scan on the local subnet.',
+        summary: 'Automate network discovery.',
+        whyNeeded: 'Understanding what devices are on your network is the first step in both defensive and offensive security.',
+        pillarConnection: 'Security — visibility into network assets is a core component of asset management and threat detection.',
+        commands: [
+          { text: 'pip install scapy\ncat <<EOF > scan.py\nfrom scapy.all import ARP, Ether, srp\nrequest = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="10.0.0.0/24")\nprint("Scanning...")\nEOF', explanation: 'Installs Scapy and prepares a basic ARP scanner script.' }
+        ],
+        checkCommand: 'pip show scapy',
+        expectedOutput: 'Name: scapy'
+      }
+    ]
+  }
 ];

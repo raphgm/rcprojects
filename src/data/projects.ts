@@ -2,7 +2,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science';
+  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science' | 'Python';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   duration: string;
   tags: string[];
@@ -2499,5 +2499,115 @@ export const projects: Project[] = [
     duration: '6 hours',
     tags: ['Docker', 'Legacy', 'Migration'],
     image: 'https://picsum.photos/seed/docker-legacy/800/600'
+  },
+  {
+    id: 'web-scraper',
+    title: 'Real-time Web Scraper',
+    description: 'Build a high-performance web scraper using BeautifulSoup and Scrapy to extract and process data from multiple sources.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Python', 'BeautifulSoup', 'Scrapy', 'Web'],
+    image: 'https://picsum.photos/seed/web-scraper/800/600'
+  },
+  {
+    id: 'automation-bot',
+    title: 'Discord Automation Bot',
+    description: 'Create a feature-rich Discord bot with custom commands, automated moderation, and API integrations.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Python', 'Discord.py', 'API', 'Automation'],
+    image: 'https://picsum.photos/seed/discord-bot/800/600'
+  },
+  {
+    id: 'django-ecommerce',
+    title: 'E-commerce with Django',
+    description: 'Develop a full-scale e-commerce platform with product catalogs, shopping carts, and payment gateway integration.',
+    category: 'Python',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Django', 'Python', 'PostgreSQL', 'Payments'],
+    image: 'https://picsum.photos/seed/django-shop/800/600'
+  },
+  {
+    id: 'flask-api',
+    title: 'REST API with Flask',
+    description: 'Build and document a professional RESTful API with Flask-RESTful and Swagger.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Flask', 'API', 'Python', 'Swagger'],
+    image: 'https://picsum.photos/seed/flask-api/800/600'
+  },
+  {
+    id: 'python-data-viz',
+    title: 'Interactive Data Dashboard',
+    description: 'Create dynamic data visualizations and dashboards using Plotly Dash and Streamlit.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Python', 'Dash', 'Streamlit', 'Data Viz'],
+    image: 'https://picsum.photos/seed/py-viz/800/600'
+  },
+  {
+    id: 'python-game',
+    title: '2D Game with Pygame',
+    description: 'Learn the fundamentals of game development by building a classic 2D arcade game.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Python', 'Pygame', 'Game Dev'],
+    image: 'https://picsum.photos/seed/pygame/800/600'
+  },
+  {
+    id: 'python-ml-model',
+    title: 'Linear Regression Model',
+    description: 'Implement a linear regression model from scratch to predict house prices.',
+    category: 'Python',
+    difficulty: 'Hard',
+    duration: '10 hours',
+    tags: ['Python', 'ML', 'Math', 'Sklearn'],
+    image: 'https://picsum.photos/seed/py-ml/800/600'
+  },
+  {
+    id: 'python-gui-app',
+    title: 'Desktop App with Tkinter',
+    description: 'Build a cross-platform desktop application with a modern graphical user interface.',
+    category: 'Python',
+    difficulty: 'Easy',
+    duration: '4 hours',
+    tags: ['Python', 'Tkinter', 'GUI'],
+    image: 'https://picsum.photos/seed/py-gui/800/600'
+  },
+  {
+    id: 'python-network-scanner',
+    title: 'Custom Network Scanner',
+    description: 'Develop a security tool that scans networks for active hosts and open ports using Scapy.',
+    category: 'Python',
+    difficulty: 'Hard',
+    duration: '7 hours',
+    tags: ['Python', 'Scapy', 'Security', 'Networking'],
+    image: 'https://picsum.photos/seed/py-net/800/600'
+  },
+  {
+    id: 'python-crypto-tracker',
+    title: 'Crypto Price Tracker',
+    description: 'Build a real-time cryptocurrency tracker with price alerts and historical analysis.',
+    category: 'Python',
+    difficulty: 'Medium',
+    duration: '5 hours',
+    tags: ['Python', 'API', 'Crypto', 'Finance'],
+    image: 'https://picsum.photos/seed/py-crypto/800/600'
+  },
+  {
+    id: 'python-log-parser',
+    title: 'Cloud Log Analytics Tool',
+    description: 'Parse and analyze millions of cloud server logs to detect security threats and performance bottlenecks.',
+    category: 'Python',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Python', 'Regex', 'Cloud', 'Logs'],
+    image: 'https://picsum.photos/seed/py-logs/800/600'
   }
 ];
