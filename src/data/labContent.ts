@@ -7,26 +7,6 @@ export const labContents: LabContent[] = [
     steps: [
       {
         id: 'step-1',
-        title: 'Project Workspace Creation',
-        instruction: 'Create a dedicated directory for your CI/CD project and switch into it.',
-        summary: 'Set up the local environment for the pipeline development.',
-        whyNeeded: 'Keeping projects isolated in their own directories is a best practice to avoid file conflicts and maintain an organized workspace.',
-        pillarConnection: 'Operational Excellence — organized file systems and logical isolation simplify management and auditing.',
-        commands: [
-          {
-            text: 'mkdir -p github-actions-lab',
-            explanation: 'Creates a new directory named "github-actions-lab".'
-          },
-          {
-            text: 'cd github-actions-lab',
-            explanation: 'Changes the current working directory to the newly created lab folder.'
-          }
-        ],
-        checkCommand: 'pwd',
-        expectedOutput: 'github-actions-lab'
-      },
-      {
-        id: 'step-2',
         title: 'Git Repository Initialization',
         instruction: 'Initialize a new Git repository to begin tracking your workflow configuration.',
         summary: 'Initialize source control for the project.',
@@ -5046,6 +5026,255 @@ export const labContents: LabContent[] = [
         ],
         checkCommand: 'docker ps | grep cadvisor',
         expectedOutput: 'cadvisor'
+      }
+    ]
+  }
+  },
+  {
+    projectId: '125',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Nmap Vulnerability Scan',
+        instruction: 'Run an Nmap scan with the vuln script to identify known security weaknesses on the target host.',
+        summary: 'Perform an automated vulnerability scan.',
+        whyNeeded: 'Automated scanners help security professionals quickly identify low-hanging fruit and known CVEs before an attacker does.',
+        pillarConnection: 'Security — identifying and remediating vulnerabilities is a core tenet of proactive defense.',
+        commands: [
+          { text: 'nmap -sV --script vuln localhost', explanation: 'Uses Nmap scripting engine to detect common vulnerabilities.' }
+        ],
+        checkCommand: 'nmap --version',
+        expectedOutput: 'Nmap version'
+      }
+    ]
+  },
+  {
+    projectId: '117',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Snort IDS Configuration',
+        instruction: 'Configure a Snort rule to detect ICMP traffic (pings) and alert the administrator.',
+        summary: 'Set up an intrusion detection rule.',
+        whyNeeded: 'Intrusion Detection Systems (IDS) provide visibility into network traffic and alert on suspicious patterns.',
+        pillarConnection: 'Security — real-time monitoring and alerting allow for rapid response to potential threats.',
+        commands: [
+          { text: 'echo "alert icmp any any -> any any (msg:\"ICMP Detected\"; sid:1000001; rev:1;)" | sudo tee /etc/snort/rules/local.rules', explanation: 'Writes a custom IDS rule for ping detection.' }
+        ],
+        checkCommand: 'grep "alert icmp" /etc/snort/rules/local.rules',
+        expectedOutput: 'alert icmp'
+      }
+    ]
+  },
+  {
+    projectId: '115',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Metasploit Exploitation',
+        instruction: 'Launch the Metasploit Framework and search for a module related to the MS17-010 vulnerability.',
+        summary: 'Explore the exploitation framework.',
+        whyNeeded: 'Metasploit is the industry-standard tool for validating vulnerabilities and performing penetration tests.',
+        pillarConnection: 'Security — validating that a vulnerability is exploitable helps prioritize remediation efforts.',
+        commands: [
+          { text: 'msfconsole -q -x "search ms17-010; exit"', explanation: 'Searches for the famous EternalBlue exploit modules.' }
+        ],
+        checkCommand: 'msfconsole --version',
+        expectedOutput: 'Framework'
+      }
+    ]
+  },
+  {
+    projectId: 'redis-kv',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Redis Data Manipulation',
+        instruction: 'Use the Redis CLI to set a key-value pair and retrieve it with an expiration timer.',
+        summary: 'Interact with the key-value store.',
+        whyNeeded: 'Redis is widely used for high-speed caching and real-time data storage.',
+        pillarConnection: 'Performance Efficiency — utilizing in-memory stores drastically reduces application latency.',
+        commands: [
+          { text: 'redis-cli set user:1 "John Doe"\nredis-cli expire user:1 60\nredis-cli get user:1', explanation: 'Sets a value and applies a 60-second TTL.' }
+        ],
+        checkCommand: 'redis-cli get user:1',
+        expectedOutput: 'John Doe'
+      }
+    ]
+  },
+  {
+    projectId: 'blog-nosql',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'MongoDB Document Creation',
+        instruction: 'Insert a new blog post document into a MongoDB collection using the shell.',
+        summary: 'Work with document-oriented data.',
+        whyNeeded: 'NoSQL databases like MongoDB provide flexible schemas for unstructured data like blog posts or social media feeds.',
+        pillarConnection: 'Performance Efficiency — schema-less designs allow for faster iteration during the development phase.',
+        commands: [
+          { text: 'mongosh --eval "db.posts.insertOne({title: \'Hello Cloud\', content: \'My first post\'})"', explanation: 'Inserts a JSON-like document into the database.' }
+        ],
+        checkCommand: 'mongosh --eval "db.posts.findOne()"',
+        expectedOutput: 'Hello Cloud'
+      }
+    ]
+  },
+  {
+    projectId: 'ecommerce-db',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'PostgreSQL Schema Design',
+        instruction: 'Create a products table with primary keys and constraints in the PostgreSQL database.',
+        summary: 'Define relational data structures.',
+        whyNeeded: 'Relational databases ensure data integrity through strict schemas and foreign key relationships.',
+        pillarConnection: 'Reliability — strong consistency and ACID compliance are vital for financial and e-commerce systems.',
+        commands: [
+          { text: 'psql -c "CREATE TABLE products (id SERIAL PRIMARY KEY, name VARCHAR(100), price DECIMAL);"', explanation: 'Executes a SQL command to create a structured table.' }
+        ],
+        checkCommand: 'psql -c "\\dt"',
+        expectedOutput: 'products'
+      }
+    ]
+  },
+  {
+    projectId: 'titanic-analysis',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Pandas Data Exploration',
+        instruction: 'Use Python and Pandas to load a dataset and calculate the average age of survivors.',
+        summary: 'Perform exploratory data analysis.',
+        whyNeeded: 'Understanding the underlying patterns in data is the foundation of all machine learning and data science work.',
+        pillarConnection: 'Operational Excellence — data-driven decision making leads to more efficient business processes.',
+        commands: [
+          { text: 'python3 -c "import pandas as pd; df = pd.DataFrame({\'age\': [22, 38, 26, 35], \'survived\': [0, 1, 1, 0]}); print(df[df[\'survived\']==1][\'age\'].mean())"', explanation: 'Uses Pandas to perform a quick data aggregation.' }
+        ],
+        checkCommand: 'python3 -c "import pandas"',
+        expectedOutput: ''
+      }
+    ]
+  },
+  {
+    projectId: '113',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Network Port Recon',
+        instruction: 'Perform a stealth SYN scan to identify open ports on a target network without completing the TCP handshake.',
+        summary: 'Execute a stealth network scan.',
+        whyNeeded: 'Stealth scans are less likely to be logged by simple firewalls, providing a clearer picture of network entry points.',
+        pillarConnection: 'Security — reconnaissance is the first phase of the kill chain; understanding it is vital for defense.',
+        commands: [
+          { text: 'nmap -sS -T4 localhost', explanation: 'Performs a fast, stealthy port scan.' }
+        ],
+        checkCommand: 'nmap --version',
+        expectedOutput: 'Nmap'
+      }
+    ]
+  },
+  {
+    projectId: 'hash-cracking',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Brute-force Password Recovery',
+        instruction: 'Use John the Ripper to crack a simple password hash using a wordlist.',
+        summary: 'Recover passwords via brute-force.',
+        whyNeeded: 'Testing the strength of user passwords is a critical part of a security audit.',
+        pillarConnection: 'Security — enforcing strong password policies reduces the risk of credential-based breaches.',
+        commands: [
+          { text: 'echo "user:az0.pXn7.j93." > hash.txt\njohn hash.txt', explanation: 'Attempts to crack the provided hash using standard wordlists.' }
+        ],
+        checkCommand: 'john --version',
+        expectedOutput: 'John the Ripper'
+      }
+    ]
+  }
+  },
+  {
+    projectId: 'git-f-01',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Git Identity Configuration',
+        instruction: 'Configure your global Git username and email to ensure your contributions are correctly attributed.',
+        summary: 'Set up global Git credentials.',
+        whyNeeded: 'Git requires an identity to sign off on every commit. This is essential for collaborative environments.',
+        pillarConnection: 'Operational Excellence — clear attribution is the basis of accountability in code reviews.',
+        commands: [
+          { text: 'git config --global user.name "Cloud Student"\ngit config --global user.email "student@cloud-labs.com"', explanation: 'Sets global identity variables.' }
+        ],
+        checkCommand: 'git config --global user.name',
+        expectedOutput: 'Cloud Student'
+      }
+    ]
+  },
+  {
+    projectId: 'git-f-02',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Local Repository Initialization',
+        instruction: 'Create a new local repository to begin tracking your project files.',
+        summary: 'Initialize a new Git repository.',
+        whyNeeded: 'The "git init" command creates the hidden .git directory which stores the entire history of your project.',
+        pillarConnection: 'Reliability — versioning your code allows you to roll back to any previous state in case of failure.',
+        commands: [
+          { text: 'git init', explanation: 'Converts the current directory into a Git repository.' }
+        ],
+        checkCommand: 'ls -d .git',
+        expectedOutput: '.git'
+      }
+    ]
+  },
+  {
+    projectId: 'git-f-03',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Staging Area Mastery',
+        instruction: 'Create a file and add it to the staging area (index) to prepare it for your first commit.',
+        summary: 'Stage changes for commit.',
+        whyNeeded: 'The staging area allows you to selectively choose which changes should be included in the next snapshot.',
+        pillarConnection: 'Operational Excellence — atomic commits (staging related changes together) make history easier to read.',
+        commands: [
+          { text: 'echo "Hello Git" > README.md\ngit add README.md', explanation: 'Creates a file and adds it to the index.' }
+        ],
+        checkCommand: 'git status',
+        expectedOutput: 'Changes to be committed'
+      }
+    ]
+  },
+  {
+    projectId: 'git-f-04',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'First Commit creation',
+        instruction: 'Commit your staged changes to the repository with a descriptive message.',
+        summary: 'Create a repository snapshot.',
+        whyNeeded: 'Committing saves a permanent version of your staged changes in the local database.',
+        pillarConnection: 'Reliability — commits are the building blocks of your project\'s immutable history.',
+        commands: [
+          { text: 'git commit -m "Initial commit"', explanation: 'Records the staged changes with a message.' }
+        ],
+        checkCommand: 'git log --oneline',
+        expectedOutput: 'Initial commit'
       }
     ]
   }
