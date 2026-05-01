@@ -100,25 +100,6 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
         </div>
       )}
 
-      {/* Stats Section */}
-      <div className="mt-24 bg-zinc-900 rounded-[2.5rem] p-12 text-white overflow-hidden relative">
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          <div>
-            <div className="text-4xl font-bold mb-2">300+</div>
-            <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Guided Projects</div>
-          </div>
-          <div>
-            <div className="text-4xl font-bold mb-2">100+</div>
-            <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Azure Labs</div>
-          </div>
-          <div>
-            <div className="text-4xl font-bold mb-2">24/7</div>
-            <div className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Expert Support</div>
-          </div>
-        </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
-      </div>
     </section>
   );
 };
