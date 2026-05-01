@@ -3309,7 +3309,7 @@ export const labContents: LabContent[] = [
       { id: '4', title: 'Enable Pages', instruction: 'Repo settings -> Pages -> Source = GitHub Actions.', summary: 'Hosting.', whyNeeded: 'Required to deploy.', pillarConnection: 'Operational Excellence',
         commands: [ { text: 'echo "Repo Settings -> Pages -> Build and deployment -> Source: GitHub Actions"', explanation: 'UI step.' } ], checkCommand: 'echo enabled', expectedOutput: 'enabled' },
       { id: '5', title: 'Push and Verify', instruction: 'Push to main and watch Actions tab.', summary: 'Run pipeline.', whyNeeded: 'See green run.', pillarConnection: 'Reliability',
-        commands: [ { text: 'git add . && git commit -m "ci(actions): pages workflow" && git push', explanation: 'Trigger.' } ], checkCommand: 'echo pushed', expectedOutput: 'pushed' }
+        commands: [ { text: 'git add . && git commit -m "ci(actions): pages workflow" && git push', explanation: 'Trigger.' } ], checkCommand: 'git remote -v | grep github.com', expectedOutput: 'github.com' }
     ]
   },
   {
@@ -3343,7 +3343,7 @@ export const labContents: LabContent[] = [
       { id: '3', title: 'Forward Logs', instruction: 'Configure rsyslog on a host to send to Graylog.', summary: 'Wire source.', whyNeeded: 'Need data to stream.', pillarConnection: 'Operational Excellence',
         commands: [ { text: 'echo "*.* @127.0.0.1:1514" | sudo tee /etc/rsyslog.d/90-graylog.conf', explanation: 'Forward.' }, { text: 'sudo systemctl restart rsyslog', explanation: 'Apply.' }, { text: 'logger "graylog test"', explanation: 'Send a message.' } ], checkCommand: 'echo sent', expectedOutput: 'sent' },
       { id: '4', title: 'Create Stream', instruction: 'Stream rule: source matches host pattern.', summary: 'Routing.', whyNeeded: 'Segment data.', pillarConnection: 'Operational Excellence',
-        commands: [ { text: 'echo "UI: Streams -> Create Stream -> Rule: field source matches regex .* -> Save & Start"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' },
+        commands: [ { text: 'echo "UI: Streams -> Create Stream -> Rule: field source matches regex .* -> Save & Start"', explanation: 'UI step.' } ], checkCommand: 'curl -s -u admin:admin http://127.0.0.1:9000/api/streams | grep -o "stream_rules"', expectedOutput: 'stream_rules' },
       { id: '5', title: 'Define Alert', instruction: 'Event Definition on stream when count > N in 5m.', summary: 'Alerting.', whyNeeded: 'Detect anomalies.', pillarConnection: 'Reliability',
         commands: [ { text: 'echo "UI: Alerts -> Event Definitions -> Create -> Aggregation count() > 100 in 5m -> Notification: Email"', explanation: 'UI step.' } ], checkCommand: 'echo ok', expectedOutput: 'ok' }
     ]
@@ -3773,7 +3773,7 @@ export const labContents: LabContent[] = [
           { text: 'cilium install', explanation: 'Automates the deployment of Cilium components into the cluster.' }
         ],
         checkCommand: 'cilium status',
-        expectedOutput: 'OK'
+        expectedOutput: 'Ok'
       },
       {
         id: 'step-2',
@@ -3870,9 +3870,9 @@ export const labContents: LabContent[] = [
         whyNeeded: 'Models must be downloaded to the local storage of the Ollama pods before they can be queried.',
         pillarConnection: 'Reliability — pre-pulling models ensures that they are ready to serve requests as soon as the service is accessed.',
         commands: [
-          { text: 'kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama pull llama3', explanation: 'Commands the Ollama pod to fetch the Llama3 weights.' }
+          { text: 'kubectl exec $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama pull llama3', explanation: 'Commands the Ollama pod to fetch the Llama3 weights.' }
         ],
-        checkCommand: 'kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama list',
+        checkCommand: 'kubectl exec $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama list',
         expectedOutput: 'llama3'
       }
     ]
@@ -3954,10 +3954,10 @@ export const labContents: LabContent[] = [
         whyNeeded: 'This allows Vault to verify the identity of pods based on their ServiceAccount tokens.',
         pillarConnection: 'Security — identity-based auth is more secure than using static API keys or passwords.',
         commands: [
-          { text: 'kubectl exec -it vault-0 -- vault auth enable kubernetes', explanation: 'Enables the K8s auth engine.' },
-          { text: 'kubectl exec -it vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT"', explanation: 'Configures Vault to talk to the K8s API.' }
+          { text: 'kubectl exec vault-0 -- vault auth enable kubernetes', explanation: 'Enables the K8s auth engine.' },
+          { text: 'kubectl exec vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT"', explanation: 'Configures Vault to talk to the K8s API.' }
         ],
-        checkCommand: 'kubectl exec -it vault-0 -- vault auth list | grep kubernetes',
+        checkCommand: 'kubectl exec vault-0 -- vault auth list | grep kubernetes',
         expectedOutput: 'kubernetes'
       }
     ]
@@ -3990,7 +3990,7 @@ export const labContents: LabContent[] = [
         commands: [
           { text: 'helm install my-redis bitnami/redis --set auth.password=secretpassword --set master.persistence.enabled=true', explanation: 'Deploys Redis with a specified password and PVC support.' }
         ],
-        checkCommand: 'kubectl get pods | grep redis-master',
+        checkCommand: 'kubectl get pods -l app.kubernetes.io/name=redis-master',
         expectedOutput: 'Running'
       }
     ]
@@ -4043,8 +4043,8 @@ export const labContents: LabContent[] = [
           { text: 'helm repo add elastic https://helm.elastic.co && helm repo update', explanation: 'Adds the official Elastic repository.' },
           { text: 'helm install elasticsearch elastic/elasticsearch --set replicas=1', explanation: 'Deploys a single-node Elasticsearch instance for the lab.' }
         ],
-        checkCommand: 'kubectl get pods | grep elasticsearch',
-        expectedOutput: 'elasticsearch-master'
+        checkCommand: 'kubectl get pods -l app=elasticsearch-master',
+        expectedOutput: 'Running'
       },
       {
         id: 'step-2',
