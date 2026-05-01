@@ -3223,21 +3223,15 @@ export const labContents: LabContent[] = [
     ]
   },
   {
-    projectId: 'docker-swarm-cluster',
+    projectId: 'docker-swarm-lb',
     environment: 'linux',
     description: 'Bootstrap a 3-node Docker Swarm, deploy a stack, and roll out an update with health checks.',
     objective: 'Init swarm, join workers, deploy compose stack, perform rolling update.',
     steps: [
-      { id: '1', title: 'Init Swarm Manager', instruction: 'docker swarm init on manager.', summary: 'Cluster bootstrap.', whyNeeded: 'Establish raft.', pillarConnection: 'Operational Excellence',
-        commands: [ { text: 'docker swarm init --advertise-addr $(hostname -I | awk \'{print $1}\')', explanation: 'Init.' } ], checkCommand: 'docker info | grep Swarm', expectedOutput: 'active' },
-      { id: '2', title: 'Join Workers', instruction: 'Run join token on worker nodes.', summary: 'Expand cluster.', whyNeeded: 'Need workers.', pillarConnection: 'Reliability',
-        commands: [ { text: 'docker swarm join-token -q worker', explanation: 'Print token.' }, { text: '# on workers: docker swarm join --token <TOKEN> <MGR_IP>:2377', explanation: 'Join.' } ], checkCommand: 'docker node ls --format "{{.Hostname}} {{.Status}}"', expectedOutput: 'Ready' },
-      { id: '3', title: 'Author Stack File', instruction: 'compose v3.9 with replicas and healthcheck.', summary: 'Declarative deploy.', whyNeeded: 'Stack-as-code.', pillarConnection: 'Operational Excellence',
-        commands: [ { text: 'cat > stack.yml <<\'EOF\'\nversion: "3.9"\nservices:\n  web:\n    image: nginx:1.27\n    ports: ["80:80"]\n    deploy:\n      replicas: 3\n      update_config: { parallelism: 1, delay: 10s, order: start-first }\n      restart_policy: { condition: on-failure }\n    healthcheck:\n      test: ["CMD", "curl", "-fs", "http://localhost/"]\n      interval: 10s\n      retries: 3\nEOF', explanation: 'Stack.' } ], checkCommand: 'test -f stack.yml && echo OK', expectedOutput: 'OK' },
-      { id: '4', title: 'Deploy Stack', instruction: 'docker stack deploy.', summary: 'Apply.', whyNeeded: 'Push to swarm.', pillarConnection: 'Operational Excellence',
-        commands: [ { text: 'docker stack deploy -c stack.yml app', explanation: 'Deploy.' } ], checkCommand: 'docker service ls --filter name=app_web --format "{{.Replicas}}"', expectedOutput: '3/3' },
-      { id: '5', title: 'Rolling Update', instruction: 'Bump image and watch rollout.', summary: 'Zero-downtime upgrade.', whyNeeded: 'Production hygiene.', pillarConnection: 'Reliability',
-        commands: [ { text: 'docker service update --image nginx:1.27-alpine app_web', explanation: 'Update image.' }, { text: 'docker service ps app_web --no-trunc | head', explanation: 'Watch tasks.' } ], checkCommand: 'docker service inspect app_web --format \'{{.UpdateStatus.State}}\'', expectedOutput: 'completed' }
+      { id: '1', title: 'Init Swarm Manager', instruction: 'Initialize Docker Swarm on the manager node.', summary: 'Cluster bootstrap.', whyNeeded: 'Establish raft.', pillarConnection: 'Operational Excellence',
+        commands: [ { text: 'docker swarm init --advertise-addr $(hostname -I | awk \'{print $1}\')', explanation: 'Enables Swarm mode on the host.' } ], checkCommand: 'docker info | grep Swarm', expectedOutput: 'active' },
+      { id: '2', title: 'Deploy Load-Balanced Stack', instruction: 'Deploy a multi-replica service using a stack file.', summary: 'Declarative deployment.', whyNeeded: 'Swarm handles load balancing across replicas automatically.', pillarConnection: 'Reliability',
+        commands: [ { text: 'cat > stack.yml <<\'EOF\'\nversion: "3.9"\nservices:\n  web:\n    image: nginx:latest\n    deploy:\n      replicas: 5\nEOF\ndocker stack deploy -c stack.yml app', explanation: 'Deploys 5 replicas of Nginx across the cluster.' } ], checkCommand: 'docker service ls', expectedOutput: '5/5' }
     ]
   },
   {
@@ -4937,6 +4931,121 @@ export const labContents: LabContent[] = [
         ],
         checkCommand: 'pip show scapy',
         expectedOutput: 'Name: scapy'
+      }
+    ]
+  }
+  },
+  {
+    projectId: 'microservices-docker',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Multi-service Composition',
+        instruction: 'Define and launch a three-tier microservice architecture using Docker Compose.',
+        summary: 'Orchestrate microservices.',
+        whyNeeded: 'Real-world apps consist of multiple services (Web, API, DB). Compose allows you to manage them as a single unit.',
+        pillarConnection: 'Operational Excellence — using declarative compose files ensures consistent environments across dev, test, and prod.',
+        commands: [
+          { text: 'cat <<EOF > docker-compose.yml\nversion: "3.8"\nservices:\n  frontend:\n    image: nginx:alpine\n    ports: ["80:80"]\n  api:\n    image: node:alpine\n  db:\n    image: redis:alpine\nEOF\ndocker compose up -d', explanation: 'Defines and starts the full microservice stack in the background.' }
+        ],
+        checkCommand: 'docker compose ps',
+        expectedOutput: 'Up'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-registry-setup',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Private Registry Deployment',
+        instruction: 'Run a local Docker Registry container and push a custom image to it.',
+        summary: 'Self-host a container registry.',
+        whyNeeded: 'Enterprises often need private registries to store sensitive images behind a firewall.',
+        pillarConnection: 'Security — private registries provide total control over who can pull and push images.',
+        commands: [
+          { text: 'docker run -d -p 5000:5000 --name registry registry:2\ndocker tag alpine:latest localhost:5000/my-alpine\ndocker push localhost:5000/my-alpine', explanation: 'Starts a registry and pushes a re-tagged image to it.' }
+        ],
+        checkCommand: 'curl http://localhost:5000/v2/_catalog',
+        expectedOutput: 'my-alpine'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-networking-custom',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Custom Bridge Networking',
+        instruction: 'Create an isolated bridge network and connect two containers to it.',
+        summary: 'Isolate container traffic.',
+        whyNeeded: 'The default bridge network is not secure and lacks DNS discovery. Custom networks provide isolation and name resolution.',
+        pillarConnection: 'Security — custom networks ensure that only authorized containers can communicate with each other.',
+        commands: [
+          { text: 'docker network create --driver bridge my-secure-net\ndocker run -d --name app1 --network my-secure-net nginx:alpine\ndocker run -d --name app2 --network my-secure-net nginx:alpine', explanation: 'Creates a network and attaches two apps to it.' }
+        ],
+        checkCommand: 'docker network inspect my-secure-net',
+        expectedOutput: 'app1'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-cicd-github',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Docker Build & Push Workflow',
+        instruction: 'Create a GitHub Action to build a Docker image and push it to Docker Hub.',
+        summary: 'Automate image delivery.',
+        whyNeeded: 'Manual builds are slow and error-prone. CI/CD ensures that every code change is automatically packaged and ready for deployment.',
+        pillarConnection: 'Operational Excellence — automated delivery pipelines reduce deployment lead time and improve consistency.',
+        commands: [
+          { text: 'mkdir -p .github/workflows\ncat <<EOF > .github/workflows/docker.yml\nname: Docker-CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Build Image\n        run: docker build -t myapp:latest .\nEOF', explanation: 'Defines a basic CI workflow for building Docker images.' }
+        ],
+        checkCommand: 'ls .github/workflows/docker.yml',
+        expectedOutput: 'docker.yml'
+      }
+    ]
+  },
+  {
+    projectId: 'dockerizing-legacy-app',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Dependency Consolidation',
+        instruction: 'Containerize a legacy PHP application by bundling Apache, PHP, and its extensions into a single image.',
+        summary: 'Modernize legacy code.',
+        whyNeeded: 'Legacy apps often rely on specific OS-level libraries. Docker encapsulates these dependencies so the app can run on modern clouds.',
+        pillarConnection: 'Reliability — containerization eliminates environment-specific bugs in legacy systems.',
+        commands: [
+          { text: 'cat <<EOF > Dockerfile\nFROM php:7.4-apache\nRUN docker-php-ext-install mysqli pdo pdo_mysql\nCOPY . /var/www/html/\nEOF\ndocker build -t legacy-app .', explanation: 'Builds a custom PHP environment with required extensions.' }
+        ],
+        checkCommand: 'docker images | grep legacy-app',
+        expectedOutput: 'legacy-app'
+      }
+    ]
+  },
+  {
+    projectId: 'docker-monitoring-prom',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'cAdvisor Metric Collection',
+        instruction: 'Deploy cAdvisor to collect real-time resource usage from all running containers.',
+        summary: 'Monitor container performance.',
+        whyNeeded: 'Standard monitoring tools don\'t see inside containers. cAdvisor provides the deep visibility needed for Docker environments.',
+        pillarConnection: 'Performance Efficiency — real-time container metrics help identify and resolve resource contention.',
+        commands: [
+          { text: 'docker run -d --name cadvisor -p 8080:8080 --volume=/:/rootfs:ro --volume=/var/run:/var/run:ro --volume=/sys:/sys:ro --volume=/var/lib/docker/:/var/lib/docker:ro --privileged --device=/dev/kmsg google/cadvisor:latest', explanation: 'Starts cAdvisor with access to the host Docker socket and filesystem.' }
+        ],
+        checkCommand: 'docker ps | grep cadvisor',
+        expectedOutput: 'cadvisor'
       }
     ]
   }
