@@ -250,6 +250,11 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'exiftool':
     case 'prowler':
     case 'checkov':
+    case 'aircrack-ng':
+    case 'hashcat':
+    case 'nikto':
+    case 'burpsuite':
+      return `(${base} ${sub || ''} completed successfully)`;
       return `(${base} ${sub || ''} completed successfully)`;
       return `(${base} ${sub || ''} completed successfully)`;
     case 'trivy':

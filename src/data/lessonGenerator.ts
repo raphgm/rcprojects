@@ -43,6 +43,10 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Brute-force Attacks', cmd: 'hydra -l admin -P /usr/share/wordlists/rockyou.txt localhost ssh', focus: 'Understand the risks of weak authentication and dictionary-based attacks.' },
     { topic: 'SQL Injection Discovery', cmd: 'sqlmap --version', focus: 'Automate the detection and exploitation of SQL injection vulnerabilities.' },
     { topic: 'Web Directory Discovery', cmd: 'gobuster dir -u http://localhost -w /usr/share/wordlists/dirb/common.txt', focus: 'Identify hidden paths and sensitive files on a web server.' },
+    { topic: 'Wireless Network Auditing', cmd: 'aircrack-ng --version', focus: 'Audit wireless security and understand WPA/WPA2 handshake cracking.' },
+    { topic: 'Password Recovery (Hashcat)', cmd: 'hashcat --version', focus: 'Master the world fastest password recovery tool using GPU/CPU power.' },
+    { topic: 'Web Vulnerability Scanning', cmd: 'nikto -h http://localhost', focus: 'Perform comprehensive security scans on web servers for dangerous files and outdated software.' },
+    { topic: 'Burp Suite Integration', cmd: 'burpsuite --version', focus: 'Learn to proxy and manipulate web traffic for advanced manual exploitation.' },
   ],
   cyber_defense: [
     { topic: 'Intrusion Detection Systems', cmd: 'snort -V', focus: 'Implement signature-based detection for network threats.' },
@@ -233,12 +237,12 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
   else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s;
   else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
-  else if (lowerId.includes('hacking') || lowerTitle.includes('penetration') || lowerTitle.includes('ethical')) bank = TOPIC_BANKS.cyber_hacking;
+  else if (lowerId.includes('hacking') || lowerTitle.includes('penetration') || lowerTitle.includes('ethical') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber_hacking;
   else if (lowerId.includes('defense') || lowerTitle.includes('soc') || lowerTitle.includes('incident')) bank = TOPIC_BANKS.cyber_defense;
   else if (lowerId.includes('forensics') || lowerTitle.includes('investigation')) bank = TOPIC_BANKS.cyber_forensics;
   else if (lowerId.includes('malware') || lowerTitle.includes('reverse')) bank = TOPIC_BANKS.cyber_malware;
   else if (lowerId.includes('cloud-security') || lowerTitle.includes('cloud security')) bank = TOPIC_BANKS.cyber_cloud_sec;
-  else if (lowerId.includes('cyber') || lowerId.includes('security') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber;
+  else if (lowerId.includes('cyber') || lowerId.includes('security')) bank = TOPIC_BANKS.cyber;
   else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
   else if (lowerId.includes('kernel') || lowerTitle.includes('kernel')) bank = TOPIC_BANKS.linux_kernel;
   else if (lowerId.includes('security') || lowerTitle.includes('hardening')) bank = TOPIC_BANKS.linux_security;
