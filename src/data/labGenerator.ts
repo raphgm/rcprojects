@@ -21,6 +21,21 @@ const CATEGORY_LABS: Record<string, { title: string; instruction: string }[]> = 
     { title: 'Data Manipulation', instruction: 'Perform CRUD operations and verify index performance on large datasets.' },
     { title: 'Integrity Verification', instruction: 'Audit the data state to ensure ACID compliance and referential integrity.' },
   ],
+  azure: [
+    { title: 'Identity & Governance', instruction: 'Configure Entra ID (Azure AD) service principals and assign appropriate RBAC roles.' },
+    { title: 'Infrastructure Provisioning', instruction: 'Deploy the required Azure resources (App Service, SQL, etc.) via CLI or ARM templates.' },
+    { title: 'Resource Monitoring', instruction: 'Set up Azure Monitor and Log Analytics to verify resource health and performance.' },
+  ],
+  networking: [
+    { title: 'Topology Discovery', instruction: 'Map the network interfaces and verify local route tables for correct traffic flow.' },
+    { title: 'Protocol Audit', instruction: 'Capture and analyze packets to ensure correct port usage and encrypted communication.' },
+    { title: 'Connectivity Stress-Test', instruction: 'Verify latency and throughput across network segments to ensure SLA compliance.' },
+  ],
+  ai: [
+    { title: 'Dataset Preparation', instruction: 'Clean and tokenize raw data to prepare it for ingestion into the training pipeline.' },
+    { title: 'Model Inference Test', instruction: 'Load the pre-trained weights and execute a forward pass to verify output accuracy.' },
+    { title: 'Optimization & Scaling', instruction: 'Implement quantization or caching to reduce inference latency for production use.' },
+  ],
 };
 
 const GENERIC_LAB = [
@@ -37,6 +52,9 @@ export function generateFallbackLab(projectId: string, projectTitle: string, cat
   else if (lowerCat.includes('k8s') || lowerCat.includes('kubernetes')) steps = CATEGORY_LABS.k8s;
   else if (lowerCat.includes('cyber') || lowerCat.includes('security')) steps = CATEGORY_LABS.cyber;
   else if (lowerCat.includes('db') || lowerCat.includes('data') || lowerCat.includes('sql')) steps = CATEGORY_LABS.db;
+  else if (lowerCat.includes('azure')) steps = CATEGORY_LABS.azure;
+  else if (lowerCat.includes('net') || lowerCat.includes('network')) steps = CATEGORY_LABS.networking;
+  else if (lowerCat.includes('ai') || lowerCat.includes('intelligence') || lowerCat.includes('ml')) steps = CATEGORY_LABS.ai;
 
   return {
     projectId,

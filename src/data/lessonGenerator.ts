@@ -68,6 +68,27 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Plan & Speculative Runs', cmd: 'terraform plan', focus: 'Preview infrastructure changes before applying them.' },
     { topic: 'Resource Dependencies', cmd: 'terraform graph', focus: 'Visualize and manage implicit and explicit resource dependencies.' },
   ],
+  azure: [
+    { topic: 'Resource Groups & RBAC', cmd: 'az group list', focus: 'Organize resources and manage permissions at the subscription level.' },
+    { topic: 'Virtual Networks (VNet)', cmd: 'az network vnet list', focus: 'Design secure, isolated network topologies for cloud workloads.' },
+    { topic: 'App Service & Serverless', cmd: 'az webapp list', focus: 'Deploy web applications and functions with managed scaling.' },
+    { topic: 'Azure Kubernetes Service (AKS)', cmd: 'az aks list', focus: 'Provision and manage production-grade K8s clusters on Azure.' },
+    { topic: 'Key Vault & Governance', cmd: 'az keyvault list', focus: 'Securely manage secrets, certificates, and compliance policies.' },
+  ],
+  networking: [
+    { topic: 'OSI Model Layers', cmd: 'ping -c 3 google.com', focus: 'Understand packet travel from the Physical layer to the Application layer.' },
+    { topic: 'TCP/UDP Protocols', cmd: 'netstat -tuln', focus: 'Differentiate between connection-oriented and stateless communications.' },
+    { topic: 'DNS & Service Discovery', cmd: 'dig google.com', focus: 'Learn how hostnames are resolved to IP addresses across the web.' },
+    { topic: 'Load Balancing & Proxying', cmd: 'curl -I localhost', focus: 'Distribute traffic across multiple backend servers for high availability.' },
+    { topic: 'VPN & Tunneling', cmd: 'ip route show', focus: 'Secure remote access and site-to-site connectivity strategies.' },
+  ],
+  ai: [
+    { topic: 'Model Training Loops', cmd: 'python3 -c "import torch; print(torch.__version__)"', focus: 'Implement forward and backward passes in deep learning models.' },
+    { topic: 'Feature Engineering', cmd: 'pip show scikit-learn', focus: 'Transform raw data into meaningful signals for predictive models.' },
+    { topic: 'Inference & LLM APIs', cmd: 'curl https://api.openai.com/v1/models', focus: 'Integrate pre-trained models into application workflows.' },
+    { topic: 'Vector Embeddings', cmd: 'pip show qdrant-client', focus: 'Convert unstructured data into high-dimensional numerical vectors.' },
+    { topic: 'Model Deployment & MLOps', cmd: 'mlflow --version', focus: 'Manage the full lifecycle of machine learning models in production.' },
+  ],
 };
 
 const GENERIC: Topic[] = [
@@ -93,6 +114,9 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
   else if (lowerId.includes('linux') || lowerTitle.includes('linux')) bank = TOPIC_BANKS.linux;
   else if (lowerId.includes('terraform') || lowerTitle.includes('terraform')) bank = TOPIC_BANKS.terraform;
+  else if (lowerId.includes('azure') || lowerTitle.includes('azure')) bank = TOPIC_BANKS.azure;
+  else if (lowerId.includes('net') || lowerTitle.includes('network')) bank = TOPIC_BANKS.networking;
+  else if (lowerId.includes('ai') || lowerTitle.includes('intelligence') || lowerTitle.includes('ml')) bank = TOPIC_BANKS.ai;
 
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];
