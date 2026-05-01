@@ -239,6 +239,18 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'sestatus':
     case 'sshd':
     case 'findmnt':
+    case 'msfconsole':
+    case 'hydra':
+    case 'sqlmap':
+    case 'gobuster':
+    case 'snort':
+    case 'fail2ban-client':
+    case 'volatility':
+    case 'fls':
+    case 'exiftool':
+    case 'prowler':
+    case 'checkov':
+      return `(${base} ${sub || ''} completed successfully)`;
       return `(${base} ${sub || ''} completed successfully)`;
     case 'trivy':
       return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;

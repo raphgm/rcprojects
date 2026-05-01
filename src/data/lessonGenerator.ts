@@ -37,6 +37,38 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Password Cracking', cmd: 'john --list=formats', focus: 'Understand hashing algorithms and brute-force techniques.' },
     { topic: 'Privilege Escalation', cmd: 'find / -perm -4000 2>/dev/null', focus: 'Locate misconfigured SUID binaries to escalate local access.' },
   ],
+  cyber_hacking: [
+    { topic: 'Network Reconnaissance', cmd: 'nmap -sV -A localhost', focus: 'Identify active services, versions, and OS fingerprints on a target.' },
+    { topic: 'Exploitation Frameworks', cmd: 'msfconsole --version', focus: 'Master the use of modular exploit development and execution platforms.' },
+    { topic: 'Brute-force Attacks', cmd: 'hydra -l admin -P /usr/share/wordlists/rockyou.txt localhost ssh', focus: 'Understand the risks of weak authentication and dictionary-based attacks.' },
+    { topic: 'SQL Injection Discovery', cmd: 'sqlmap --version', focus: 'Automate the detection and exploitation of SQL injection vulnerabilities.' },
+    { topic: 'Web Directory Discovery', cmd: 'gobuster dir -u http://localhost -w /usr/share/wordlists/dirb/common.txt', focus: 'Identify hidden paths and sensitive files on a web server.' },
+  ],
+  cyber_defense: [
+    { topic: 'Intrusion Detection Systems', cmd: 'snort -V', focus: 'Implement signature-based detection for network threats.' },
+    { topic: 'Host-based Hardening', cmd: 'fail2ban-client status', focus: 'Automatically block IP addresses that show malicious signs.' },
+    { topic: 'Log Analysis & SIEM', cmd: 'grep -E "Failed password|invalid user" /var/log/auth.log', focus: 'Identify unauthorized access attempts through manual log inspection.' },
+    { topic: 'Vulnerability Scanning', cmd: 'trivy rootfs /', focus: 'Identify security weaknesses in the underlying host or container filesystem.' },
+    { topic: 'Identity & Access Audit', cmd: 'lastlog', focus: 'Review historical user access and identify potential account takeovers.' },
+  ],
+  cyber_forensics: [
+    { topic: 'Memory Forensics', cmd: 'volatility -f mem.dump imageinfo', focus: 'Extract critical evidence from volatile RAM captures.' },
+    { topic: 'File System Investigation', cmd: 'fls -r -m / image.dd', focus: 'List deleted and existing files from a disk image for evidence gathering.' },
+    { topic: 'Metadata Extraction', cmd: 'exiftool document.pdf', focus: 'Uncover hidden metadata that reveals the origin of a digital artifact.' },
+    { topic: 'Disk Imaging', cmd: 'dd if=/dev/sdb of=evidence.img status=progress', focus: 'Create bit-for-bit copies of storage media for forensic analysis.' },
+  ],
+  cyber_malware: [
+    { topic: 'Static Analysis', cmd: 'strings binary_file', focus: 'Identify embedded URLs, IPs, and command strings within a suspicious binary.' },
+    { topic: 'Dynamic Instrumentation', cmd: 'strace -e trace=network ./suspicious_app', focus: 'Monitor system calls and network activity of a binary in real-time.' },
+    { topic: 'Reverse Engineering', cmd: 'ghidra --version', focus: 'Decompile machine code to understand the underlying logic of malware.' },
+    { topic: 'Sandbox Detonation', cmd: 'curl -X POST http://sandbox:8080/analyze', focus: 'Safely execute and monitor malware behavior in an isolated environment.' },
+  ],
+  cyber_cloud_sec: [
+    { topic: 'Compliance Auditing', cmd: 'prowler aws --version', focus: 'Automate security best practices and compliance checks for cloud environments.' },
+    { topic: 'Infrastructure Security Scan', cmd: 'checkov -d .', focus: 'Identify security misconfigurations in Terraform or CloudFormation templates.' },
+    { topic: 'Cloud Asset Discovery', cmd: 'az resource list', focus: 'Identify shadow IT and unmanaged resources across your cloud subscriptions.' },
+    { topic: 'Policy as Code', cmd: 'opa test .', focus: 'Enforce security policies using the Open Policy Agent (OPA) and Rego.' },
+  ],
   python: [
     { topic: 'Data Structures', cmd: 'python3 -c "print([x for x in range(10)])"', focus: 'Master lists, dictionaries, and list comprehensions.' },
     { topic: 'Asynchronous Programming', cmd: 'python3 -c "import asyncio"', focus: 'Build high-performance concurrent applications with async/await.' },
@@ -201,6 +233,11 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
   else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s;
   else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
+  else if (lowerId.includes('hacking') || lowerTitle.includes('penetration') || lowerTitle.includes('ethical')) bank = TOPIC_BANKS.cyber_hacking;
+  else if (lowerId.includes('defense') || lowerTitle.includes('soc') || lowerTitle.includes('incident')) bank = TOPIC_BANKS.cyber_defense;
+  else if (lowerId.includes('forensics') || lowerTitle.includes('investigation')) bank = TOPIC_BANKS.cyber_forensics;
+  else if (lowerId.includes('malware') || lowerTitle.includes('reverse')) bank = TOPIC_BANKS.cyber_malware;
+  else if (lowerId.includes('cloud-security') || lowerTitle.includes('cloud security')) bank = TOPIC_BANKS.cyber_cloud_sec;
   else if (lowerId.includes('cyber') || lowerId.includes('security') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber;
   else if (lowerId.includes('db') || lowerId.includes('sql') || lowerId.includes('mongo') || lowerTitle.includes('database')) bank = TOPIC_BANKS.db;
   else if (lowerId.includes('kernel') || lowerTitle.includes('kernel')) bank = TOPIC_BANKS.linux_kernel;
