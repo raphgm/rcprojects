@@ -953,8 +953,61 @@ export const Terminal: React.FC<TerminalProps> = ({
           }
           break;
         }
+        case 'etcdctl':
+          output = 'ETCDCTL_API=3\nCONNECTED TO: 127.0.0.1:2379\nTYPE: etcd\nVERSION: 3.5.0';
+          if (args.includes('member') && args.includes('list')) {
+            output = '8e9e05f521f7e920, started, control-plane, http://127.0.0.1:2380, http://127.0.0.1:2379, false';
+          } else if (args.includes('snapshot') && args.includes('save')) {
+            output = `Snapshot saved at ${args[args.indexOf('save') + 1] || '/tmp/snapshot.db'}`;
+          }
+          break;
+        case 'helm':
+          output = 'version.BuildInfo{Version:"v3.8.0", GitCommit:"d14138609b018ee6f926b0d3cbd0d97311601a6b", GitTreeState:"clean", GoVersion:"go1.17.5"}';
+          if (args.includes('list')) {
+            output = 'NAME          \tNAMESPACE\tREVISION\tUPDATED                                \tSTATUS  \tCHART       \tAPP VERSION\nnginx-ingress \tdefault  \t1       \t2026-03-15 10:22:45.123456 -0700 MST\tdeployed\tnginx-1.1.0\t1.16.0';
+          }
+          break;
+        case 'kubeadm':
+          output = 'kubeadm version: &version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.0", GitCommit:"28c0513881efc9b8c08799981457d9189321f663", GitTreeState:"clean", BuildDate:"2021-12-07T18:31:53Z", GoVersion:"go1.17.3", Compiler:"gc", Platform:"linux/amd64"}';
+          if (args.includes('upgrade') && args.includes('plan')) {
+            output = 'Upgrade to the latest stable version: v1.23.5\nCOMPONENT   CURRENT       AVAILABLE\nKubelet     v1.23.0       v1.23.5\nAPI Server  v1.23.0       v1.23.5';
+          } else if (args.includes('certs') && args.includes('check-expiration')) {
+            output = 'CERTIFICATE                EXPIRES                     RESIDUAL TIME   CERTIFICATE AUTHORITY   EXTERNALLY MANAGED\napiserver                  Mar 15, 2027 10:22 UTC      364d            ca                      no';
+          }
+          break;
+        case 'kube-bench':
+          output = '[INFO] 1 Master Node Security Configuration\n[INFO] 1.1 Control Plane Configuration\n[PASS] 1.1.1 Ensure that the API server pod specification file permissions are set to 644\n[PASS] 1.1.2 Ensure that the API server pod specification file ownership is set to root:root\n\n== Summary ==\n45 checks PASS\n2 checks FAIL\n0 checks WARN\n0 checks INFO';
+          break;
+        case 'kubectl': {
+          const sub = args[1];
+          if (!sub || sub === '--help' || sub === 'help') {
+            output = 'kubectl controls the Kubernetes cluster manager.\n\nUsage:\n  kubectl [command] [flags]\n\nAvailable Commands:\n  get             Display one or many resources\n  describe        Show details of a specific resource or group of resources\n  create          Create a resource from a file or from stdin\n  delete          Delete resources by filenames, stdin, resources and names, or by resources and label selector\n  apply           Apply a configuration to a resource by filename or stdin\n  exec            Execute a command in a container';
+          } else if (sub === 'get') {
+            const resource = args[2];
+            if (resource === 'nodes') {
+              output = 'NAME           STATUS   ROLES                  AGE   VERSION\ncontrol-plane  Ready    control-plane,master   12d   v1.23.0\nworker-01      Ready    <none>                 12d   v1.23.0\nworker-02      Ready    <none>                 12d   v1.23.0';
+            } else if (resource === 'pods' || resource === 'pod') {
+              output = 'NAME                     READY   STATUS    RESTARTS   AGE\nnginx-6799fc88d8-7p9z2   1/1     Running   0          4h\nredis-5f4b9f9-m2k1x      1/1     Running   0          2h';
+            } else if (resource === 'deployments' || resource === 'deployment' || resource === 'deploy') {
+              output = 'NAME    READY   UP-TO-DATE   AVAILABLE   AGE\nnginx   1/1     1            1           4h\nredis   1/1     1            1           2h';
+            } else if (resource === 'svc' || resource === 'services' || resource === 'service') {
+              output = 'NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE\nkubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   12d\nnginx-svc    ClusterIP   10.96.0.45   <none>        80/TCP    4h';
+            } else if (resource === 'netpol' || resource === 'networkpolicies') {
+              output = 'NAME             POD-SELECTOR   AGE\nallow-frontend   app=frontend   4h\ndeny-all         <none>         12d';
+            } else if (resource === 'hpa') {
+              output = 'NAME        REFERENCE              TARGETS         MINPODS   MAXPODS   REPLICAS   AGE\nweb-hpa     Deployment/web-app     12%/80%         2         10        2          4h';
+            } else {
+              output = `No resources found in default namespace.`;
+            }
+          } else if (sub === 'describe') {
+            output = `Name: ${args[3] || 'resource'}\nNamespace: default\nStatus: Running\nIP: 10.244.0.123\nControlled By: ReplicaSet/nginx-6799fc88d8`;
+          } else {
+            output = `Command "kubectl ${sub}" executed successfully.`;
+          }
+          break;
+        }
         case 'help':
-          output = `Available commands: ${[...availableCommands, 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
+          output = `Available commands: ${[...availableCommands, 'kubectl', 'helm', 'etcdctl', 'kubeadm', 'kube-bench', 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
           break;
         default: {
           // Check if the user is typing a directory path or a directory definition

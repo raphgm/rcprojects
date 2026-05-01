@@ -45,6 +45,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Control Plane Health', cmd: 'kubectl get componentstatuses', focus: 'Monitor the health of the API server, scheduler, and controller manager.' },
     { topic: 'Node Taints & Tolerations', cmd: 'kubectl describe node', focus: 'Control pod placement by marking nodes as unschedulable or reserved.' },
     { topic: 'Cluster Upgrades', cmd: 'kubeadm upgrade plan', focus: 'Learn the lifecycle management of a production-grade Kubernetes cluster.' },
+    { topic: 'Static Pods Management', cmd: 'ls /etc/kubernetes/manifests', focus: 'Understand how the kubelet manages control plane components locally.' },
+    { topic: 'PKI & Certificate Rotation', cmd: 'kubeadm certs check-expiration', focus: 'Manage the security primitives and life-cycles of cluster certificates.' },
+    { topic: 'Kubelet Configuration', cmd: 'systemctl status kubelet', focus: 'Fine-tune the node-level agent responsible for container lifecycle.' },
+    { topic: 'High Availability (HA) Control Plane', cmd: 'kubectl get endpoints kubernetes', focus: 'Design and troubleshoot redundant control plane architectures.' },
+    { topic: 'DNS Troubleshooting', cmd: 'kubectl exec -it dns-tools -- nslookup kubernetes', focus: 'Resolve internal service discovery failures in complex networks.' },
   ],
   k8s_dev: [
     { topic: 'Helm Chart Management', cmd: 'helm list', focus: 'Package and version your applications using the K8s package manager.' },
@@ -52,6 +57,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Application Rollouts', cmd: 'kubectl rollout status deployment/web', focus: 'Master zero-downtime updates and automated rollback strategies.' },
     { topic: 'Port Forwarding & Debugging', cmd: 'kubectl port-forward svc/web 8080:80', focus: 'Access cluster services locally for rapid development and testing.' },
     { topic: 'Resource Limits & Quotas', cmd: 'kubectl describe quota', focus: 'Enforce resource boundaries to prevent noisy neighbor issues.' },
+    { topic: 'Horizontal Pod Autoscaling (HPA)', cmd: 'kubectl get hpa', focus: 'Automatically scale your application based on CPU/RAM metrics.' },
+    { topic: 'Init Containers', cmd: 'kubectl logs pod-name -c init-container', focus: 'Perform setup tasks before the main application container starts.' },
+    { topic: 'ConfigMap Volume Mounts', cmd: 'kubectl exec pod-name -- ls /etc/config', focus: 'Inject configuration files directly into your running containers.' },
+    { topic: 'Sidecar Container Patterns', cmd: 'kubectl get pods -o jsonpath="{.items[*].spec.containers[*].name}"', focus: 'Implement logging, proxying, or monitoring using secondary containers.' },
+    { topic: 'Jobs & Batch Processing', cmd: 'kubectl get jobs', focus: 'Run short-lived, completion-oriented tasks on the cluster.' },
   ],
   k8s_security: [
     { topic: 'Admission Controllers', cmd: 'kubectl get mutatingwebhookconfigurations', focus: 'Intercept and modify requests to the API server based on custom policies.' },
@@ -59,6 +69,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Pod Security Standards', cmd: 'kubectl label ns default pod-security.kubernetes.io/enforce=baseline', focus: 'Enforce security profiles at the namespace level.' },
     { topic: 'Container Image Scanning', cmd: 'trivy k8s cluster', focus: 'Identify vulnerabilities in running containers across the entire cluster.' },
     { topic: 'Secret Encryption at Rest', cmd: 'kubectl get secrets --all-namespaces', focus: 'Understand how Kubernetes secures sensitive data in etcd.' },
+    { topic: 'RBAC Role Bindings', cmd: 'kubectl get rolebindings -A', focus: 'Implement the principle of least privilege for users and service accounts.' },
+    { topic: 'Network Policy Isolation', cmd: 'kubectl get netpol', focus: 'Secure your microservices by restricting inter-pod communication.' },
+    { topic: 'AppArmor & Seccomp Profiles', cmd: 'kubectl describe pod security-pod', focus: 'Restrict process capabilities at the kernel level for maximum isolation.' },
+    { topic: 'Auditing API Access', cmd: 'tail -f /var/log/kubernetes/audit.log', focus: 'Trace every request made to the cluster for compliance and forensics.' },
+    { topic: 'CIS Benchmark Compliance', cmd: 'kube-bench run', focus: 'Verify your cluster configuration against industry-standard security benchmarks.' },
   ],
   k8s_networking: [
     { topic: 'Service Mesh (Istio)', cmd: 'istioctl analyze', focus: 'Implement advanced traffic routing, security, and observability at the L7 layer.' },
@@ -121,6 +136,12 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'RBAC Zero-Trust Audit', cmd: 'kubectl auth can-i --as system:serviceaccount:default:web-sa', focus: 'Killer.sh Scenario: Audit and restrict a ServiceAccount that has excessive cluster-wide permissions.' },
     { topic: 'JSONPath & Resource Sorting', cmd: 'kubectl get pods -A -o jsonpath="{.items[*].metadata.name}"', focus: 'Killer.sh Scenario: Extract specific resource names and sort them by creation timestamp using complex JSONPath.' },
     { topic: 'Pod Security Admission', cmd: 'kubectl label ns restricted pod-security.kubernetes.io/enforce=restricted', focus: 'Killer.sh Scenario: Migrate a namespace from Privileged to Restricted while identifying and fixing violating pods.' },
+    { topic: 'Sidecar Pattern Logging', cmd: 'kubectl exec pod -c sidecar -- tail -f /var/log/app.log', focus: 'Killer.sh Scenario: Implement a logging sidecar that streams application logs to a centralized collector volume.' },
+    { topic: 'InitContainer Sequential setup', cmd: 'kubectl describe pod db-app', focus: 'Killer.sh Scenario: Configure multiple InitContainers that must succeed in order before the main app container initializes.' },
+    { topic: 'Dynamic PVC Resize', cmd: 'kubectl patch pvc storage-pvc -p \'{"spec":{"resources":{"requests":{"storage":"10Gi"}}}}\'', focus: 'Killer.sh Scenario: Expand a persistent volume claim online without deleting the attached pods.' },
+    { topic: 'Custom Metrics HPA', cmd: 'kubectl get hpa.v2.autoscaling', focus: 'Killer.sh Scenario: Configure a Horizontal Pod Autoscaler based on custom application metrics from Prometheus.' },
+    { topic: 'Topology Spread Constraints', cmd: 'kubectl get pods -o wide', focus: 'Killer.sh Scenario: Ensure high availability by spreading pods evenly across multiple zones and nodes.' },
+    { topic: 'Liveness Probe with HTTP', cmd: 'kubectl explain pod.spec.containers.livenessProbe', focus: 'Killer.sh Scenario: Implement a custom health check endpoint that verifies database connectivity before declaring the pod healthy.' },
   ],
   python: [
     { topic: 'Data Structures', cmd: 'python3 -c "print([x for x in range(10)])"', focus: 'Master lists, dictionaries, and list comprehensions.' },
@@ -344,10 +365,10 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
     const phase = Math.floor(i / bank.length) + 1;
     const isRepeat = i >= bank.length;
     
-    lessons.push({
-      id: `${courseId}-lesson-${i + 1}`,
-      title: i === 0 ? `Introduction to ${courseTitle}` : (isRepeat ? `${m.topic} (Phase ${phase})` : m.topic),
-      content: `\n# ${i === 0 ? `Welcome to ${courseTitle}` : (isRepeat ? `${m.topic}: Deep Dive (Phase ${phase})` : m.topic)}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\n${
+    // Rich, domain-specific introduction for Mission 1
+    const introContent = i === 0 
+      ? `\n# Welcome to ${courseTitle}\n\nThis comprehensive learning track is designed to take you from foundational concepts to production-grade mastery. Over the next ${total} missions, you will engage in high-fidelity simulations that mirror real-world engineering challenges.\n\n## Learning Objectives\n- **Foundational Theory**: Understand the core architecture and design principles of ${courseTitle.split(' ')[0]}.\n- **Interactive Labs**: Apply your knowledge in a stateful, interactive sandbox environment.\n- **Production Best Practices**: Learn the "why" behind industry-standard configurations and security policies.\n\n## Your Journey Starts Here\nIn this first mission, we will initialize your environment and verify your access to the core toolsets. This baseline is critical for the advanced scenarios that follow.\n`
+      : `\n# ${isRepeat ? `${m.topic}: Deep Dive (Phase ${phase})` : m.topic}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\n${
         i % 3 === 0 
           ? `Mastering ${m.topic.toLowerCase()} is essential for building resilient, production-grade systems in the ${courseTitle} track.` 
           : i % 3 === 1 
@@ -357,8 +378,13 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
         isRepeat 
           ? `Refine your approach to handle ${m.topic.toLowerCase()} at scale.` 
           : `Apply these concepts to a representative ${lowerTitle} scenario.`
-      }\n      `,
-      task: `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}${isRepeat ? ` at an advanced level` : ''}.`,
+      }\n      `;
+
+    lessons.push({
+      id: `${courseId}-lesson-${i + 1}`,
+      title: i === 0 ? `Introduction to ${courseTitle}` : (isRepeat ? `${m.topic} (Phase ${phase})` : m.topic),
+      content: introContent,
+      task: i === 0 ? `Verify your environment by running \`${m.cmd}\` in the sandbox.` : `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}${isRepeat ? ` at an advanced level` : ''}.`,
       demoType: 'terminal' as const,
       demoConfig: {
         initialMessage: `${courseTitle} sandbox ready. [Mission ${i + 1}/${total}]\nType \`${m.cmd}\` to begin.`,
