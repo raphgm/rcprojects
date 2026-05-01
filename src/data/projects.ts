@@ -122,8 +122,8 @@ export const projects: Project[] = [
   },
   {
     id: '21',
-    title: 'Autoscaling Kubernetes Workloads with HPA & VPA',
-    description: 'Configure Horizontal and Vertical Pod Autoscalers to handle dynamic traffic loads efficiently.',
+    title: 'Advanced Autoscaling with HPA, VPA & KEDA',
+    description: 'Master reactive and event-driven scaling using Horizontal and Vertical Pod Autoscalers combined with KEDA.',
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '2 hours',
@@ -1049,5 +1049,85 @@ export const projects: Project[] = [
     duration: '5 hours',
     tags: ['LangChain', 'OpenAI', 'Python', 'AI'],
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2000&auto=format&fit=crop'
+  },
+  {
+    id: 'crossplane-platform',
+    title: 'Platform Engineering with Crossplane',
+    description: 'Build a custom internal developer platform (IDP) by managing cloud resources directly through Kubernetes using Crossplane.',
+    category: 'Kubernetes',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Crossplane', 'IaC', 'Platform Engineering', 'K8s'],
+    image: 'https://picsum.photos/seed/crossplane/800/600'
+  },
+  {
+    id: 'cilium-networking',
+    title: 'Advanced Networking with Cilium',
+    description: 'Implement high-performance networking, observability, and security using eBPF-powered Cilium.',
+    category: 'Kubernetes',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Cilium', 'eBPF', 'Networking', 'Security'],
+    image: 'https://picsum.photos/seed/cilium/800/600'
+  },
+  {
+    id: 'kubeflow-ml',
+    title: 'ML Pipelines with Kubeflow',
+    description: 'Build and deploy end-to-end machine learning pipelines on Kubernetes using Kubeflow.',
+    category: 'Kubernetes',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Kubeflow', 'MLOps', 'Machine Learning', 'K8s'],
+    image: 'https://picsum.photos/seed/kubeflow/800/600'
+  },
+  {
+    id: 'mlflow-tracking',
+    title: 'Experiment Tracking with MLflow',
+    description: 'Manage the machine learning lifecycle, including experimentation, reproducibility, and deployment on K8s.',
+    category: 'Kubernetes',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['MLflow', 'MLOps', 'Tracking', 'K8s'],
+    image: 'https://picsum.photos/seed/mlflow/800/600'
+  },
+  {
+    id: 'kserve-inference',
+    title: 'Model Serving with KServe',
+    description: 'Deploy and scale machine learning models in production using KServe on top of Knative.',
+    category: 'Kubernetes',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['KServe', 'Inference', 'Knative', 'K8s'],
+    image: 'https://picsum.photos/seed/kserve/800/600'
+  },
+  {
+    id: 'ollama-llm',
+    title: 'Self-hosted LLMs with Ollama',
+    description: 'Run large language models locally on your Kubernetes cluster using Ollama.',
+    category: 'Kubernetes',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Ollama', 'LLM', 'AI', 'K8s'],
+    image: 'https://picsum.photos/seed/ollama/800/600'
+  },
+  {
+    id: 'inference-gateway',
+    title: 'LLM Traffic Routing with Inference Gateway',
+    description: 'Implement a specialized gateway for routing, load balancing, and rate-limiting LLM traffic.',
+    category: 'Kubernetes',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Inference Gateway', 'AI', 'Gateway', 'Traffic Management'],
+    image: 'https://picsum.photos/seed/inference-gateway/800/600'
+  },
+  {
+    id: 'terraform-k8s',
+    title: 'Kubernetes Provisioning with Terraform',
+    description: 'Master the management of Kubernetes resources and infrastructure using Terraform providers.',
+    category: 'DevOps',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Terraform', 'IaC', 'K8s', 'Automation'],
+    image: 'https://picsum.photos/seed/terraform-k8s/800/600'
   }
 ];

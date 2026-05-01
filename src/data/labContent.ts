@@ -930,7 +930,7 @@ export const labContents: LabContent[] = [
             explanation: 'Fetches all required system images from the registry.'
           }
         ],
-        checkCommand: 'docker images | grep k8s',
+        checkCommand: 'sudo crictl images | grep k8s',
         expectedOutput: 'kube-apiserver'
       },
       {
@@ -3706,6 +3706,359 @@ export const labContents: LabContent[] = [
         commands: [ { text: 'sudo tee /usr/local/nagios/etc/objects/web.cfg >/dev/null <<\'EOF\'\ndefine host { use linux-server; host_name web1; alias web1; address 10.0.0.21 }\ndefine service { use generic-service; host_name web1; service_description HTTP; check_command check_http }\nEOF', explanation: 'Objects.' }, { text: 'echo "cfg_file=/usr/local/nagios/etc/objects/web.cfg" | sudo tee -a /usr/local/nagios/etc/nagios.cfg', explanation: 'Reference.' } ], checkCommand: 'sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg | tail -5 | grep "Things look okay"', expectedOutput: 'okay' },
       { id: '5', title: 'Restart and View UI', instruction: 'Restart daemon and Apache; log in to /nagios.', summary: 'Live monitoring.', whyNeeded: 'See state in UI.', pillarConnection: 'Reliability',
         commands: [ { text: 'sudo systemctl restart nagios apache2', explanation: 'Restart.' }, { text: 'curl -u nagiosadmin:admin -s -o /dev/null -w "%{http_code}" http://localhost/nagios/', explanation: 'UI check.' } ], checkCommand: 'systemctl is-active nagios', expectedOutput: 'active' }
+    ]
+  }
+  },
+  {
+    projectId: 'crossplane-platform',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Crossplane Control Plane Setup',
+        instruction: 'Install the Crossplane CLI and deploy the Crossplane control plane using Helm.',
+        summary: 'Bootstrap Crossplane on your cluster.',
+        whyNeeded: 'Crossplane turns your Kubernetes cluster into a universal control plane that can manage any infrastructure resource.',
+        pillarConnection: 'Operational Excellence — using K8s as the control plane for all infrastructure simplifies the management of hybrid and multi-cloud environments.',
+        commands: [
+          { text: 'curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh', explanation: 'Installs the Crossplane CLI helper.' },
+          { text: 'helm repo add crossplane-stable https://charts.crossplane.io/stable && helm repo update', explanation: 'Adds the official Crossplane chart repo.' },
+          { text: 'helm install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane', explanation: 'Deploys the Crossplane controllers.' }
+        ],
+        checkCommand: 'kubectl get pods -n crossplane-system',
+        expectedOutput: 'crossplane'
+      },
+      {
+        id: 'step-2',
+        title: 'Cloud Provider Configuration',
+        instruction: 'Install a Crossplane Provider (e.g., AWS, Azure, or GCP) and configure credentials.',
+        summary: 'Connect Crossplane to your cloud provider.',
+        whyNeeded: 'Providers allow Crossplane to interact with specific cloud APIs to provision resources like S3 buckets, SQL databases, or VPCs.',
+        pillarConnection: 'Security — Crossplane uses native K8s secrets to manage cloud credentials, ensuring they are stored and accessed securely.',
+        commands: [
+          { text: 'kubectl crossplane update configuration install crossplane/provider-aws:v0.40.0', explanation: 'Installs the AWS provider package.' },
+          { text: 'kubectl apply -f https://raw.githubusercontent.com/crossplane/crossplane/master/examples/provider/aws/provider-config.yaml', explanation: 'Applies the configuration to link the provider to your cloud account.' }
+        ],
+        checkCommand: 'kubectl get providers',
+        expectedOutput: 'provider-aws'
+      },
+      {
+        id: 'step-3',
+        title: 'Resource Composition',
+        instruction: 'Create a CompositeResourceDefinition (XRD) to define a custom infrastructure abstraction.',
+        summary: 'Define your own internal infrastructure API.',
+        whyNeeded: 'XRDs allow platform teams to hide the complexity of cloud resources from developers, providing a simplified, "opinionated" interface.',
+        pillarConnection: 'Performance Efficiency — abstracting infrastructure allows developers to provision resources faster without needing to know low-level cloud details.',
+        commands: [
+          { text: 'cat <<EOF > cluster-xrd.yaml\napiVersion: apiextensions.crossplane.io/v1\nkind: CompositeResourceDefinition\nmetadata:\n  name: xclusters.example.org\nspec:\n  group: example.org\n  names:\n    kind: XCluster\n    plural: xclusters\n  versions:\n  - name: v1alpha1\n    served: true\n    referenceable: true\n    schema:\n      openAPIV3Schema:\n        type: object\n        properties:\n          spec:\n            type: object\n            properties:\n              nodeCount:\n                type: integer\nEOF\nkubectl apply -f cluster-xrd.yaml', explanation: 'Defines a new "XCluster" resource type that developers can use.' }
+        ],
+        checkCommand: 'kubectl get xrd',
+        expectedOutput: 'xclusters.example.org'
+      }
+    ]
+  },
+  {
+    projectId: 'cilium-networking',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Cilium eBPF Installation',
+        instruction: 'Install the Cilium CLI and deploy Cilium as the CNI for your cluster.',
+        summary: 'Replace standard networking with eBPF-powered Cilium.',
+        whyNeeded: 'Cilium uses eBPF to provide high-performance networking, deep observability, and transparent security for containerized workloads.',
+        pillarConnection: 'Performance Efficiency — eBPF bypasses the traditional Linux networking stack, significantly reducing latency and overhead.',
+        commands: [
+          { text: 'curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz && sudo tar xzvf cilium-linux-amd64.tar.gz -C /usr/local/bin', explanation: 'Installs the Cilium CLI.' },
+          { text: 'cilium install', explanation: 'Automates the deployment of Cilium components into the cluster.' }
+        ],
+        checkCommand: 'cilium status',
+        expectedOutput: 'OK'
+      },
+      {
+        id: 'step-2',
+        title: 'Hubble Observability Enablement',
+        instruction: 'Enable Hubble to gain deep visibility into your network traffic.',
+        summary: 'Activate the Hubble observability engine.',
+        whyNeeded: 'Hubble allows you to visualize your service dependencies, monitor connectivity issues, and audit security policies in real-time.',
+        pillarConnection: 'Operational Excellence — deep network visibility is essential for troubleshooting complex microservice interactions.',
+        commands: [
+          { text: 'cilium hubble enable', explanation: 'Enables the Hubble component within the Cilium daemonset.' },
+          { text: 'cilium hubble ui', explanation: 'Starts the Hubble web interface for visual traffic analysis.' }
+        ],
+        checkCommand: 'cilium status | grep Hubble',
+        expectedOutput: 'Enabled'
+      }
+    ]
+  },
+  {
+    projectId: 'kubeflow-ml',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Kubeflow Deployment',
+        instruction: 'Deploy the Kubeflow manifests using Kustomize.',
+        summary: 'Bootstrap the Kubeflow ML platform.',
+        whyNeeded: 'Kubeflow provides a complete toolkit for ML workflows on Kubernetes, including notebooks, pipelines, and training controllers.',
+        pillarConnection: 'Operational Excellence — standardizing ML infrastructure on K8s ensures reproducibility and scalability across the entire ML lifecycle.',
+        commands: [
+          { text: 'git clone https://github.com/kubeflow/manifests.git && cd manifests', explanation: 'Clones the official Kubeflow manifests repo.' },
+          { text: 'while ! kustomize build example | kubectl apply -f -; do echo "Retrying..."; sleep 10; done', explanation: 'Iteratively applies the complex set of Kubeflow resources until the API server accepts all CRDs.' }
+        ],
+        checkCommand: 'kubectl get pods -n kubeflow',
+        expectedOutput: 'centraldashboard'
+      }
+    ]
+  },
+  {
+    projectId: 'kserve-inference',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'KServe Control Plane Installation',
+        instruction: 'Install the KServe operator and its dependencies (Knative and Cert-Manager).',
+        summary: 'Provision the model serving infrastructure.',
+        whyNeeded: 'KServe provides a standardized way to serve ML models across different frameworks, handling scaling, health checks, and request routing.',
+        pillarConnection: 'Performance Efficiency — KServe uses Knative to provide serverless-like scaling, ensuring you only consume compute when requests are active.',
+        commands: [
+          { text: 'kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml', explanation: 'Installs cert-manager for internal TLS.' },
+          { text: 'kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.11.0/kserve.yaml', explanation: 'Deploys the KServe controllers.' }
+        ],
+        checkCommand: 'kubectl get pods -n kserve',
+        expectedOutput: 'kserve-controller-manager'
+      },
+      {
+        id: 'step-2',
+        title: 'Deploy an InferenceService',
+        instruction: 'Define and deploy an InferenceService for a pre-trained Scikit-Learn model.',
+        summary: 'Expose a model for inference.',
+        whyNeeded: 'InferenceServices encapsulate the model location and the runtime needed to serve predictions via a standardized API.',
+        pillarConnection: 'Reliability — KServe manages the lifecycle of the inference pods, ensuring high availability and seamless updates.',
+        commands: [
+          { text: 'cat <<EOF > sklearn-isvc.yaml\napiVersion: serving.kserve.io/v1beta1\nkind: InferenceService\nmetadata:\n  name: sklearn-iris\nspec:\n  predictor:\n    model:\n      modelFormat:\n        name: sklearn\n      storageUri: gs://kfserving-examples/models/sklearn/1.0/model\nEOF\nkubectl apply -f sklearn-isvc.yaml', explanation: 'Deploys a sample Iris model from a public bucket.' }
+        ],
+        checkCommand: 'kubectl get isvc sklearn-iris',
+        expectedOutput: 'True'
+      }
+    ]
+  },
+  {
+    projectId: 'ollama-llm',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Ollama Deployment',
+        instruction: 'Deploy Ollama as a stateful service to host LLMs on your cluster.',
+        summary: 'Launch the Ollama LLM engine.',
+        whyNeeded: 'Ollama makes it easy to run open-source LLMs like Llama 3 or Mistral in a self-hosted environment.',
+        pillarConnection: 'Cost Optimization — running LLMs on your own infrastructure can be significantly cheaper than using commercial APIs for high-volume workloads.',
+        commands: [
+          { text: 'helm repo add ollama-helm https://otwld.github.io/ollama-helm/ && helm repo update', explanation: 'Adds the community Ollama chart.' },
+          { text: 'helm install ollama ollama-helm/ollama --set runtime.gpu.enabled=false', explanation: 'Installs Ollama (CPU mode for this lab).' }
+        ],
+        checkCommand: 'kubectl get pods | grep ollama',
+        expectedOutput: 'ollama'
+      },
+      {
+        id: 'step-2',
+        title: 'Model Ingestion',
+        instruction: 'Use the Ollama API to pull the Llama3 model into your cluster.',
+        summary: 'Download a model for inference.',
+        whyNeeded: 'Models must be downloaded to the local storage of the Ollama pods before they can be queried.',
+        pillarConnection: 'Reliability — pre-pulling models ensures that they are ready to serve requests as soon as the service is accessed.',
+        commands: [
+          { text: 'kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama pull llama3', explanation: 'Commands the Ollama pod to fetch the Llama3 weights.' }
+        ],
+        checkCommand: 'kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=ollama -o jsonpath="{.items[0].metadata.name}") -- ollama list',
+        expectedOutput: 'llama3'
+      }
+    ]
+  },
+  {
+    projectId: 'inference-gateway',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Inference Gateway Deployment',
+        instruction: 'Deploy an Envoy-based Inference Gateway to manage LLM traffic.',
+        summary: 'Provision the AI-aware traffic router.',
+        whyNeeded: 'Inference Gateways provide specialized features like prompt caching, token-based rate limiting, and model-based routing.',
+        pillarConnection: 'Operational Excellence — centralizing LLM traffic management provides better observability and control over AI costs and performance.',
+        commands: [
+          { text: 'helm install inference-gateway ./charts/inference-gateway', explanation: 'Deploys the gateway controllers and Envoy proxies.' }
+        ],
+        checkCommand: 'kubectl get pods -n inference-gateway',
+        expectedOutput: 'gateway'
+      }
+    ]
+  },
+  {
+    projectId: 'terraform-k8s',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Terraform Provider Configuration',
+        instruction: 'Configure the Terraform Kubernetes provider to communicate with your cluster.',
+        summary: 'Link Terraform to Kubernetes.',
+        whyNeeded: 'Terraform can manage not just the infrastructure (VMs, VPCs) but also the resources *inside* the cluster (Namespaces, Deployments).',
+        pillarConnection: 'Operational Excellence — managing both cloud and cluster resources with a single tool ensures consistent configuration state across the stack.',
+        commands: [
+          { text: 'cat <<EOF > main.tf\nprovider "kubernetes" {\n  config_path = "~/.kube/config"\n}\nresource "kubernetes_namespace" "tf-lab" {\n  metadata {\n    name = "terraform-namespace"\n  }\n}\nEOF\nterraform init', explanation: 'Initializes Terraform with the Kubernetes provider.' }
+        ],
+        checkCommand: 'terraform version',
+        expectedOutput: 'Terraform'
+      },
+      {
+        id: 'step-2',
+        title: 'Resource Provisioning',
+        instruction: 'Apply the Terraform plan to create a namespace and a deployment.',
+        summary: 'Deploy resources using IaC.',
+        whyNeeded: 'Using code to manage Kubernetes resources makes them versionable, reviewable, and easily reproducible across different environments.',
+        pillarConnection: 'Reliability — Terraform provides a dry-run (plan) phase that allows you to see exactly what will change in your cluster before applying it.',
+        commands: [
+          { text: 'terraform apply -auto-approve', explanation: 'Executes the plan and creates the defined resources in your cluster.' }
+        ],
+        checkCommand: 'kubectl get ns terraform-namespace',
+        expectedOutput: 'Active'
+      }
+    ]
+  },
+  {
+    projectId: 'vault-k8s',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Vault on K8s Installation',
+        instruction: 'Install HashiCorp Vault on Kubernetes using the official Helm chart.',
+        summary: 'Deploy Vault in your cluster.',
+        whyNeeded: 'Vault provides a centralized, secure way to manage secrets, certificates, and encryption keys for Kubernetes workloads.',
+        pillarConnection: 'Security — Vault-on-K8s integrates with native K8s auth, allowing pods to retrieve secrets without long-lived credentials.',
+        commands: [
+          { text: 'helm repo add hashicorp https://helm.releases.hashicorp.com && helm repo update', explanation: 'Adds the HashiCorp repo.' },
+          { text: 'helm install vault hashicorp/vault --set "server.dev.enabled=true"', explanation: 'Installs Vault in development mode for the lab.' }
+        ],
+        checkCommand: 'kubectl get pods | grep vault',
+        expectedOutput: 'vault-0'
+      },
+      {
+        id: 'step-2',
+        title: 'K8s Auth Method Enablement',
+        instruction: 'Configure the Kubernetes authentication method in Vault.',
+        summary: 'Link Vault auth to K8s service accounts.',
+        whyNeeded: 'This allows Vault to verify the identity of pods based on their ServiceAccount tokens.',
+        pillarConnection: 'Security — identity-based auth is more secure than using static API keys or passwords.',
+        commands: [
+          { text: 'kubectl exec -it vault-0 -- vault auth enable kubernetes', explanation: 'Enables the K8s auth engine.' },
+          { text: 'kubectl exec -it vault-0 -- vault write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT"', explanation: 'Configures Vault to talk to the K8s API.' }
+        ],
+        checkCommand: 'kubectl exec -it vault-0 -- vault auth list | grep kubernetes',
+        expectedOutput: 'kubernetes'
+      }
+    ]
+  },
+  {
+    projectId: 'helm-redis',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Helm Repository Configuration',
+        instruction: 'Add the Bitnami chart repository and search for the Redis chart.',
+        summary: 'Access the Redis package library.',
+        whyNeeded: 'Bitnami provides production-ready, hardened Helm charts for many popular open-source applications.',
+        pillarConnection: 'Operational Excellence — using curated charts reduces the time spent writing boilerplate manifests.',
+        commands: [
+          { text: 'helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update', explanation: 'Adds the Bitnami repository.' },
+          { text: 'helm search repo redis', explanation: 'Searches for available Redis chart versions.' }
+        ],
+        checkCommand: 'helm repo list',
+        expectedOutput: 'bitnami'
+      },
+      {
+        id: 'step-2',
+        title: 'Redis Deployment',
+        instruction: 'Install Redis with custom values to enable persistence and a specific password.',
+        summary: 'Deploy a persistent Redis instance.',
+        whyNeeded: 'Persistence ensures that your cache data survives pod restarts or node failures.',
+        pillarConnection: 'Reliability — configuring explicit passwords and persistent storage is a baseline requirement for production databases.',
+        commands: [
+          { text: 'helm install my-redis bitnami/redis --set auth.password=secretpassword --set master.persistence.enabled=true', explanation: 'Deploys Redis with a specified password and PVC support.' }
+        ],
+        checkCommand: 'kubectl get pods | grep redis-master',
+        expectedOutput: 'Running'
+      }
+    ]
+  }
+  },
+  {
+    projectId: '138',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'OPA Gatekeeper Installation',
+        instruction: 'Deploy the Gatekeeper admission controller to your cluster.',
+        summary: 'Provision the policy enforcement engine.',
+        whyNeeded: 'Gatekeeper allows you to enforce custom policies on Kubernetes resources, ensuring compliance and security at the API level.',
+        pillarConnection: 'Security — policy enforcement prevents insecure configurations from entering the cluster.',
+        commands: [
+          { text: 'kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/master/deploy/gatekeeper.yaml', explanation: 'Installs the Gatekeeper controller and CRDs.' }
+        ],
+        checkCommand: 'kubectl get pods -n gatekeeper-system',
+        expectedOutput: 'gatekeeper-controller-manager'
+      },
+      {
+        id: 'step-2',
+        title: 'Constraint Template Creation',
+        instruction: 'Define a ConstraintTemplate that requires specific labels on all namespaces.',
+        summary: 'Define a reusable policy template.',
+        whyNeeded: 'ConstraintTemplates allow you to define the logic (in Rego) and the schema for a policy.',
+        pillarConnection: 'Operational Excellence — reusable templates simplify the management of complex policies across multiple teams.',
+        commands: [
+          { text: 'cat <<EOF > label-template.yaml\napiVersion: templates.gatekeeper.sh/v1\nkind: ConstraintTemplate\nmetadata:\n  name: k8srequiredlabels\nspec:\n  crd:\n    spec:\n      names:\n        kind: K8sRequiredLabels\n      validation:\n        openAPIV3Schema:\n          type: object\n          properties:\n            labels:\n              type: array\n              items:\n                type: string\n  targets:\n    - target: admission.k8s.gatekeeper.sh\n      rego: |\n        package k8srequiredlabels\n        violation[{"msg": msg}] {\n          provided := {label | input.review.object.metadata.labels[label]}\n          required := {label | label := input.parameters.labels[_]}\n          missing := required - provided\n          count(missing) > 0\n          msg := sprintf("you must provide labels: %v", [missing])\n        }\nEOF\nkubectl apply -f label-template.yaml', explanation: 'Deploys the policy logic to require specific labels.' }
+        ],
+        checkCommand: 'kubectl get constrainttemplate',
+        expectedOutput: 'k8srequiredlabels'
+      }
+    ]
+  },
+  {
+    projectId: 'elk-logging',
+    environment: 'kubernetes',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Elasticsearch Cluster Deployment',
+        instruction: 'Deploy a stateful Elasticsearch cluster to store and index your logs.',
+        summary: 'Provision the logging storage backend.',
+        whyNeeded: 'Elasticsearch provides the powerful search and analytics capabilities needed to query millions of log lines in real-time.',
+        pillarConnection: 'Operational Excellence — centralized logging is the foundation of modern observability and incident response.',
+        commands: [
+          { text: 'helm repo add elastic https://helm.elastic.co && helm repo update', explanation: 'Adds the official Elastic repository.' },
+          { text: 'helm install elasticsearch elastic/elasticsearch --set replicas=1', explanation: 'Deploys a single-node Elasticsearch instance for the lab.' }
+        ],
+        checkCommand: 'kubectl get pods | grep elasticsearch',
+        expectedOutput: 'elasticsearch-master'
+      },
+      {
+        id: 'step-2',
+        title: 'Fluentd Log Collection',
+        instruction: 'Deploy Fluentd as a DaemonSet to collect logs from every node in the cluster.',
+        summary: 'Configure the log shipper.',
+        whyNeeded: 'Fluentd automatically scrapes logs from all containers and routes them to Elasticsearch with the correct metadata (pod name, namespace, etc.).',
+        pillarConnection: 'Reliability — automated log collection ensures that logs are preserved even if pods are deleted or nodes fail.',
+        commands: [
+          { text: 'kubectl apply -f https://raw.githubusercontent.com/fluent/fluentd-kubernetes-daemonset/master/fluentd-daemonset-elasticsearch.yaml', explanation: 'Deploys the Fluentd agents to the cluster.' }
+        ],
+        checkCommand: 'kubectl get ds -n kube-system | grep fluentd',
+        expectedOutput: 'fluentd'
+      }
     ]
   }
 ];
