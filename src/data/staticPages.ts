@@ -86,7 +86,7 @@ export const staticPages: Record<StaticPageId, StaticPageContent> = {
   community: {
     id: 'community',
     eyebrow: 'Community',
-    title: 'Join 10,000 engineers learning out loud.',
+    title: 'Join 10,000+ engineers learning out loud.',
     intro:
       'A welcoming home for cloud, DevOps and security learners — share what you build, get unstuck, and help others level up.',
     sections: [

@@ -304,10 +304,12 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
 
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];
+    const isK8s = lowerId.includes('k8s') || lowerId.includes('cka') || lowerId.includes('ckad') || lowerTitle.includes('kubernetes');
+    
     lessons.push({
       id: `${courseId}-lesson-${i + 1}`,
-      title: i === 0 ? `Introduction to ${courseTitle}` : `${courseTitle}: ${m.topic}`,
-      content: `\n# ${i === 0 ? `Welcome to ${courseTitle}` : m.topic}\n${m.focus}\n\n## Why It Matters\nUnderstanding ${m.topic.toLowerCase()} is a building block for mastering ${courseTitle}.\n\n## What You'll Practice\n- Run a real command in the interactive sandbox\n- Read the output and reason about it\n- Apply the idea to a representative scenario\n      `,
+      title: i === 0 ? `Introduction to ${courseTitle}` : m.topic,
+      content: `\n# ${i === 0 ? `Welcome to ${courseTitle}` : m.topic}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\nUnderstanding ${m.topic.toLowerCase()} is a building block for mastering ${courseTitle}.\n\n## What You'll Practice\n- Run a real command in the interactive sandbox\n- Read the output and reason about it\n- Apply the idea to a representative scenario\n      `,
       task: `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}.`,
       demoType: 'terminal' as const,
       demoConfig: {

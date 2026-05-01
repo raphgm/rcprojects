@@ -986,7 +986,7 @@ export const Terminal: React.FC<TerminalProps> = ({
                         {idx < currentStepIndex ? '✓' : idx + 1}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className={`text-[11px] font-black truncate transition-colors uppercase tracking-wider ${
+                        <span className={`text-[11px] font-black leading-tight transition-colors uppercase tracking-wider ${
                           idx === currentStepIndex ? 'text-brand-blue' : idx < currentStepIndex ? 'text-emerald-500/80' : 'text-zinc-500'
                         }`}>
                           {step.title}
@@ -1137,8 +1137,8 @@ export const Terminal: React.FC<TerminalProps> = ({
           </div>
           <div className="flex items-center gap-2 ml-4 text-zinc-400">
             <TerminalIcon className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-widest">
-              {isBooting ? `Booting System... ${Math.round(bootProgress)}%` : 'Interactive Terminal'}
+            <span className="text-xs font-bold uppercase tracking-widest truncate max-w-[300px]">
+              {isBooting ? `Booting System... ${Math.round(bootProgress)}%` : currentStep.title}
             </span>
           </div>
         </div>

@@ -174,7 +174,7 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
                 ))}
               </div>
               <div className="text-sm text-zinc-500">
-                <span className="font-bold text-zinc-900">10,000</span> engineers already learning
+                <span className="font-bold text-zinc-900">10,000+</span> engineers already learning
                 <div className="flex gap-0.5 mt-0.5">
                   {[1,2,3,4,5].map(i => (
                     <svg key={i} className="w-3.5 h-3.5 text-amber-400 fill-current" viewBox="0 0 20 20">
