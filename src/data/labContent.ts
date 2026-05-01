@@ -4682,4 +4682,75 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'titanic-analysis',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Exploratory Data Analysis (EDA)',
+        instruction: 'Load the Titanic dataset using Pandas and visualize the survival distribution.',
+        summary: 'Understand the data structure.',
+        whyNeeded: 'EDA is the most critical first step to identify patterns, outliers, and missing values before modeling.',
+        pillarConnection: 'Operational Excellence — clean, well-understood data is the foundation of any reliable AI system.',
+        commands: [
+          { text: 'pip install pandas matplotlib seaborn\npython3 -c "import pandas as pd; df = pd.read_csv(\'titanic.csv\'); print(df.describe())"', explanation: 'Installs data science libraries and performs initial analysis.' }
+        ],
+        checkCommand: 'python3 -c "import pandas as pd; print(\'Pandas OK\')"',
+        expectedOutput: 'Pandas OK'
+      },
+      {
+        id: 'step-2',
+        title: 'Model Training (Random Forest)',
+        instruction: 'Train a Random Forest classifier to predict survival based on age, gender, and class.',
+        summary: 'Build the predictive model.',
+        whyNeeded: 'Random Forests are robust against overfitting and provide excellent performance on tabular data.',
+        pillarConnection: 'Performance Efficiency — ensemble methods provide high accuracy while maintaining manageable training times.',
+        commands: [
+          { text: 'python3 -c "from sklearn.ensemble import RandomForestClassifier; import pandas as pd; df = pd.read_csv(\'titanic.csv\'); rf = RandomForestClassifier(); rf.fit(df[[\'Pclass\', \'Age\', \'SibSp\']], df[\'Survived\']); print(\'Model Trained\')"', explanation: 'Trains the classification model using Scikit-learn.' }
+        ],
+        checkCommand: 'echo "Model Trained"',
+        expectedOutput: 'Model Trained'
+      }
+    ]
+  },
+  {
+    projectId: 'sentiment-analysis',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Text Preprocessing with NLTK',
+        instruction: 'Download the NLTK stopword list and tokenize a sample tweet.',
+        summary: 'Prepare text for analysis.',
+        whyNeeded: 'Raw text contains noise. Tokenization and stopword removal focus the model on meaningful words.',
+        pillarConnection: 'Security — NLP pipelines must handle untrusted user input safely to avoid injection attacks.',
+        commands: [
+          { text: 'pip install nltk\npython3 -c "import nltk; nltk.download(\'punkt\'); nltk.download(\'stopwords\'); print(\'NLTK Ready\')"', explanation: 'Prepares the NLP environment.' }
+        ],
+        checkCommand: 'python3 -c "import nltk; print(\'Ready\')"',
+        expectedOutput: 'Ready'
+      }
+    ]
+  },
+  {
+    projectId: 'mnist-digit-recognition',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Neural Network Architecture',
+        instruction: 'Define a simple Feedforward Neural Network using TensorFlow Keras.',
+        summary: 'Design the brain.',
+        whyNeeded: 'Handwritten digit recognition is the "Hello World" of deep learning, teaching the basics of backpropagation.',
+        pillarConnection: 'Reliability — well-defined architectures ensure consistent learning across different training sessions.',
+        commands: [
+          { text: 'pip install tensorflow\npython3 -c \"import tensorflow as tf; model = tf.keras.models.Sequential([tf.keras.layers.Flatten(), tf.keras.layers.Dense(128, activation=\'relu\'), tf.keras.layers.Dense(10)]); print(\'Architecture OK\')\"', explanation: 'Creates a sequential neural network model.' }
+        ],
+        checkCommand: 'python3 -c "import tensorflow as tf; print(tf.__version__)"',
+        expectedOutput: '2'
+      }
+    ]
+  }
 ];

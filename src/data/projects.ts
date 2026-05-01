@@ -2,7 +2,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security';
+  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   duration: string;
   tags: string[];
@@ -1619,5 +1619,815 @@ export const projects: Project[] = [
     duration: '3 hours',
     tags: ['PlanetScale', 'Vitess', 'Serverless', 'MySQL'],
     image: 'https://picsum.photos/seed/planetscale-security/800/600'
+  },
+  {
+    id: 'titanic-analysis',
+    title: 'Titanic Survivor Prediction',
+    description: 'Build a classification model to predict passenger survival on the Titanic using the classic Kaggle dataset.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '5 hours',
+    tags: ['Python', 'Pandas', 'Scikit-learn', 'Classification'],
+    image: 'https://picsum.photos/seed/titanic-ds/800/600'
+  },
+  {
+    id: 'stock-prediction',
+    title: 'Stock Market Trend Analysis',
+    description: 'Analyze historical stock data and build time-series forecasting models using LSTM networks.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['LSTM', 'Time Series', 'Finance', 'Keras'],
+    image: 'https://picsum.photos/seed/stock-ds/800/600'
+  },
+  {
+    id: 'customer-segmentation',
+    title: 'Customer Segmentation Analysis',
+    description: 'Use unsupervised learning (K-Means) to segment customers based on their purchasing behavior.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['K-Means', 'Clustering', 'Marketing', 'Sklearn'],
+    image: 'https://picsum.photos/seed/segmentation-ds/800/600'
+  },
+  {
+    id: 'sentiment-analysis',
+    title: 'Twitter Sentiment Analysis',
+    description: 'Build a natural language processing pipeline to classify the sentiment of tweets in real-time.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '7 hours',
+    tags: ['NLP', 'NLTK', 'Sentiment', 'Python'],
+    image: 'https://picsum.photos/seed/sentiment-ds/800/600'
+  },
+  {
+    id: 'house-price-pred',
+    title: 'Real Estate Price Prediction',
+    description: 'Predict housing prices using regression techniques and feature engineering on a large-scale dataset.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Regression', 'XGBoost', 'Housing', 'EDA'],
+    image: 'https://picsum.photos/seed/housing-ds/800/600'
+  },
+  {
+    id: 'fraud-detection',
+    title: 'Credit Card Fraud Detection',
+    description: 'Build a highly accurate fraud detection system using anomaly detection and class-balancing techniques.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Anomaly Detection', 'SMOTE', 'Finance', 'Security'],
+    image: 'https://picsum.photos/seed/fraud-ds/800/600'
+  },
+  {
+    id: 'image-classification-ds',
+    title: 'Image Classification with CNNs',
+    description: 'Train a convolutional neural network to classify images from the CIFAR-10 dataset.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Deep Learning', 'CNN', 'PyTorch', 'CV'],
+    image: 'https://picsum.photos/seed/images-ds/800/600'
+  },
+  {
+    id: 'recommender-system-ds',
+    title: 'Product Recommendation Engine',
+    description: 'Implement collaborative filtering and content-based recommendation systems for an e-commerce platform.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '10 hours',
+    tags: ['Recommendation', 'Surprise', 'E-commerce', 'Python'],
+    image: 'https://picsum.photos/seed/recommender-ds/800/600'
+  },
+  {
+    id: 'movie-genre-classifier',
+    title: 'Movie Genre Classifier',
+    description: 'Predict movie genres based on plot summaries using multi-label classification and NLP.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['NLP', 'Multi-label', 'Classification', 'TF-IDF'],
+    image: 'https://picsum.photos/seed/movies-ds/800/600'
+  },
+  {
+    id: 'air-quality-forecast',
+    title: 'Air Quality Forecasting',
+    description: 'Analyze and predict air pollution levels using sensor data and time-series modeling.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Time Series', 'Environment', 'ARIMA', 'Prophet'],
+    image: 'https://picsum.photos/seed/air-ds/800/600'
+  },
+  {
+    id: 'spam-detector',
+    title: 'Email Spam Detection',
+    description: 'Build a robust spam classifier using Naive Bayes and text vectorization techniques.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Naive Bayes', 'NLP', 'Text Classification'],
+    image: 'https://picsum.photos/seed/spam-ds/800/600'
+  },
+  {
+    id: 'credit-scoring',
+    title: 'Credit Scoring Model',
+    description: 'Develop a credit risk assessment model to predict the likelihood of default for loan applicants.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Logistic Regression', 'Finance', 'Credit Risk'],
+    image: 'https://picsum.photos/seed/credit-ds/800/600'
+  },
+  {
+    id: 'fake-news-detector',
+    title: 'Fake News Detector',
+    description: 'Use machine learning to identify and flag deceptive news articles and misinformation.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['NLP', 'Social Media', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/news-ds/800/600'
+  },
+  {
+    id: 'customer-churn',
+    title: 'Customer Churn Prediction',
+    description: 'Predict which customers are likely to cancel their subscriptions using ensemble methods.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Random Forest', 'Churn', 'Retention', 'Python'],
+    image: 'https://picsum.photos/seed/churn-ds/800/600'
+  },
+  {
+    id: 'diabetes-prediction',
+    title: 'Diabetes Prediction Model',
+    description: 'Analyze medical data to predict the onset of diabetes in patients using health indicators.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Healthcare', 'SVM', 'Binary Classification'],
+    image: 'https://picsum.photos/seed/diabetes-ds/800/600'
+  },
+  {
+    id: 'object-detection-ds',
+    title: 'Object Detection with YOLO',
+    description: 'Implement real-time object detection in videos using the YOLO (You Only Look Once) architecture.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['YOLO', 'Computer Vision', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/yolo-ds/800/600'
+  },
+  {
+    id: 'music-recommendation',
+    title: 'Music Recommendation System',
+    description: 'Build a personalized music discovery engine based on listening history and audio features.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Recommendation', 'Spotify API', 'Clustering'],
+    image: 'https://picsum.photos/seed/music-ds/800/600'
+  },
+  {
+    id: 'traffic-sign-recognition',
+    title: 'Traffic Sign Recognition',
+    description: 'Train a deep learning model to accurately classify traffic signs for autonomous vehicle applications.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['CNN', 'Autonomous Driving', 'CV', 'TensorFlow'],
+    image: 'https://picsum.photos/seed/traffic-ds/800/600'
+  },
+  {
+    id: 'loan-approval-pred',
+    title: 'Loan Approval Prediction',
+    description: 'Automate the loan approval process using historical data and predictive modeling.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Decision Tree', 'Finance', 'Automation'],
+    image: 'https://picsum.photos/seed/loan-ds/800/600'
+  },
+  {
+    id: 'face-mask-detection',
+    title: 'Face Mask Detection',
+    description: 'Build a real-time face mask detection system using OpenCV and deep learning.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['OpenCV', 'Deep Learning', 'Public Safety'],
+    image: 'https://picsum.photos/seed/mask-ds/800/600'
+  },
+  {
+    id: 'wine-quality-ds',
+    title: 'Wine Quality Analysis',
+    description: 'Predict the quality of wine based on physicochemical tests using regression and decision trees.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Regression', 'Decision Tree', 'Food Science'],
+    image: 'https://picsum.photos/seed/wine-ds/800/600'
+  },
+  {
+    id: 'mnist-digit-recognition',
+    title: 'Handwritten Digit Recognition',
+    description: 'Build a neural network to recognize handwritten digits from the MNIST dataset with high accuracy.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Neural Networks', 'MNIST', 'TensorFlow'],
+    image: 'https://picsum.photos/seed/mnist-ds/800/600'
+  },
+  {
+    id: 'customer-lifetime-value',
+    title: 'Customer Lifetime Value Prediction',
+    description: 'Estimate the future value of customers using probabilistic models and historical transaction data.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Marketing', 'CLV', 'Regression'],
+    image: 'https://picsum.photos/seed/clv-ds/800/600'
+  },
+  {
+    id: 'dog-breed-classifier',
+    title: 'Dog Breed Classifier',
+    description: 'Use transfer learning with ResNet or Inception to classify different dog breeds from images.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Transfer Learning', 'CNN', 'PyTorch'],
+    image: 'https://picsum.photos/seed/dogs-ds/800/600'
+  },
+  {
+    id: 'sales-forecasting',
+    title: 'Retail Sales Forecasting',
+    description: 'Predict future sales for multiple retail stores using time-series analysis and exogenous variables.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Time Series', 'Retail', 'XGBoost'],
+    image: 'https://picsum.photos/seed/sales-ds/800/600'
+  },
+  {
+    id: 'chatbot-nlp',
+    title: 'NLP-based Chatbot',
+    description: 'Develop an intelligent chatbot using seq2seq models or Transformers for natural language understanding.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['NLP', 'Transformers', 'Chatbot', 'Keras'],
+    image: 'https://picsum.photos/seed/chatbot-ds/800/600'
+  },
+  {
+    id: 'credit-card-segmentation',
+    title: 'Credit Card User Segmentation',
+    description: 'Apply clustering algorithms to segment credit card users based on their usage patterns and credit limits.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Clustering', 'PCA', 'Finance'],
+    image: 'https://picsum.photos/seed/cc-segmentation-ds/800/600'
+  },
+  {
+    id: 'anomaly-detection-it',
+    title: 'IT Infrastructure Anomaly Detection',
+    description: 'Identify unusual patterns in server logs and metrics to detect potential hardware failures or security breaches.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Anomaly Detection', 'Isolation Forest', 'AIOps'],
+    image: 'https://picsum.photos/seed/it-anomaly-ds/800/600'
+  },
+  {
+    id: 'weather-prediction',
+    title: 'Daily Weather Prediction',
+    description: 'Build a model to predict daily weather conditions based on historical atmospheric data.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Regression', 'Meteorology', 'Ensemble Learning'],
+    image: 'https://picsum.photos/seed/weather-ds/800/600'
+  },
+  {
+    id: 'movie-recommendation-als',
+    title: 'Movie Recommendations with ALS',
+    description: 'Implement a scalable recommendation system using Alternating Least Squares (ALS) in Apache Spark.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Spark', 'Recommendation', 'Big Data'],
+    image: 'https://picsum.photos/seed/spark-recommender-ds/800/600'
+  },
+  {
+    id: 'heart-disease-pred',
+    title: 'Heart Disease Prediction',
+    description: 'Analyze patient health records to predict the presence of heart disease using classification models.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Healthcare', 'Logistic Regression', 'EDA'],
+    image: 'https://picsum.photos/seed/heart-ds/800/600'
+  },
+  {
+    id: 'nlp-resume-parser',
+    title: 'NLP Resume Parser',
+    description: 'Build a system to automatically extract key information from resumes using Named Entity Recognition (NER).',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['NLP', 'spaCy', 'NER', 'Automation'],
+    image: 'https://picsum.photos/seed/resume-parser-ds/800/600'
+  },
+  {
+    id: 'taxi-fare-prediction',
+    title: 'Taxi Fare Prediction',
+    description: 'Predict taxi fares based on pickup/dropoff locations and time of day using regression.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Regression', 'Geospatial', 'Feature Engineering'],
+    image: 'https://picsum.photos/seed/taxi-ds/800/600'
+  },
+  {
+    id: 'language-translator',
+    title: 'Machine Language Translator',
+    description: 'Build a neural machine translation system to translate text between languages using RNNs.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['NLP', 'NMT', 'RNN', 'Sequence Modeling'],
+    image: 'https://picsum.photos/seed/translator-ds/800/600'
+  },
+  {
+    id: 'air-passenger-forecast',
+    title: 'Airline Passenger Forecasting',
+    description: 'Analyze and forecast monthly airline passenger counts using classical time-series methods.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Time Series', 'Forecasting', 'Seasonality'],
+    image: 'https://picsum.photos/seed/airline-ds/800/600'
+  },
+  {
+    id: 'breast-cancer-classifier',
+    title: 'Breast Cancer Classifier',
+    description: 'Classify tumors as malignant or benign based on cell feature measurements.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Healthcare', 'SVM', 'Binary Classification'],
+    image: 'https://picsum.photos/seed/cancer-ds/800/600'
+  },
+  {
+    id: 'toxic-comment-classifier',
+    title: 'Toxic Comment Classifier',
+    description: 'Identify and categorize toxic behavior in online comments using multi-label NLP models.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['NLP', 'Multi-label', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/toxic-ds/800/600'
+  },
+  {
+    id: 'energy-consumption-pred',
+    title: 'Energy Consumption Prediction',
+    description: 'Forecast building energy consumption based on historical usage and weather patterns.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Regression', 'Time Series', 'Sustainability'],
+    image: 'https://picsum.photos/seed/energy-ds/800/600'
+  },
+  {
+    id: 'bird-species-classifier',
+    title: 'Bird Species Classifier',
+    description: 'Train a deep learning model to identify bird species from audio recordings of their songs.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Audio Analysis', 'Deep Learning', 'CNN'],
+    image: 'https://picsum.photos/seed/birds-ds/800/600'
+  },
+  {
+    id: 'market-basket-analysis',
+    title: 'Market Basket Analysis',
+    description: 'Discover association rules between products purchased together using the Apriori algorithm.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Association Rules', 'Mining', 'Retail'],
+    image: 'https://picsum.photos/seed/basket-ds/800/600'
+  },
+  {
+    id: 'predictive-maintenance-ds',
+    title: 'Industrial Predictive Maintenance',
+    description: 'Predict equipment failure before it happens using sensor data and survival analysis models.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['IoT', 'Predictive Maintenance', 'XGBoost'],
+    image: 'https://picsum.photos/seed/maintenance-ds/800/600'
+  },
+  {
+    id: 'supply-chain-opt',
+    title: 'Supply Chain Optimization',
+    description: 'Optimize inventory levels and distribution routes using linear programming and simulation.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Optimization', 'Operations Research', 'Python'],
+    image: 'https://picsum.photos/seed/supply-chain-ds/800/600'
+  },
+  {
+    id: 'facial-expression-recognition',
+    title: 'Facial Expression Recognition',
+    description: 'Classify human emotions from facial images using deep learning and real-time video processing.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['CNN', 'Deep Learning', 'Computer Vision'],
+    image: 'https://picsum.photos/seed/emotions-ds/800/600'
+  },
+  {
+    id: 'customer-segmentation-rfm',
+    title: 'RFM Customer Segmentation',
+    description: 'Perform Recency, Frequency, and Monetary (RFM) analysis to identify high-value customer segments.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['Marketing', 'RFM', 'Analytics'],
+    image: 'https://picsum.photos/seed/rfm-ds/800/600'
+  },
+  {
+    id: 'cryptocurrency-price-pred',
+    title: 'Cryptocurrency Price Prediction',
+    description: 'Analyze crypto market trends and build short-term price prediction models using GRU networks.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Crypto', 'GRU', 'Deep Learning', 'Finance'],
+    image: 'https://picsum.photos/seed/crypto-ds/800/600'
+  },
+  {
+    id: 'hand-gesture-recognition',
+    title: 'Hand Gesture Recognition',
+    description: 'Build a system to recognize hand gestures for human-computer interaction using MediaPipe and CNNs.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['OpenCV', 'Deep Learning', 'HCI'],
+    image: 'https://picsum.photos/seed/gesture-ds/800/600'
+  },
+  {
+    id: 'fake-profile-detection',
+    title: 'Fake Social Profile Detection',
+    description: 'Identify fraudulent social media accounts using network analysis and behavioral features.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Social Media', 'Graph Theory', 'Classification'],
+    image: 'https://picsum.photos/seed/fake-profile-ds/800/600'
+  },
+  {
+    id: 'wildfire-prediction',
+    title: 'Wildfire Risk Prediction',
+    description: 'Assess and predict wildfire risk using satellite imagery and historical climate data.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Remote Sensing', 'Environmental Science', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/wildfire-ds/800/600'
+  },
+  {
+    id: 'resume-screening-automation',
+    title: 'Automated Resume Screening',
+    description: 'Build an end-to-end pipeline to rank job applicants based on resume content and job descriptions.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['NLP', 'Cosine Similarity', 'HR Tech'],
+    image: 'https://picsum.photos/seed/resume-screen-ds/800/600'
+  },
+  {
+    id: 'molecular-modeling',
+    title: 'Molecular Property Prediction',
+    description: 'Predict molecular properties for drug discovery using Graph Neural Networks (GNNs).',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Drug Discovery', 'GNN', 'Bioinformatics'],
+    image: 'https://picsum.photos/seed/molecules-ds/800/600'
+  },
+  {
+    id: 'smart-grid-stability',
+    title: 'Smart Grid Stability Prediction',
+    description: 'Analyze and predict the stability of a decentralized smart grid system.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Energy', 'Classification', 'Grid Tech'],
+    image: 'https://picsum.photos/seed/smartgrid-ds/800/600'
+  },
+  {
+    id: 'amazon-review-analysis',
+    title: 'Amazon Product Review Sentiment',
+    description: 'Perform large-scale sentiment analysis on millions of Amazon product reviews using Spark NLP.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Big Data', 'Spark NLP', 'Sentiment'],
+    image: 'https://picsum.photos/seed/amazon-reviews-ds/800/600'
+  },
+  {
+    id: 'credit-default-prediction',
+    title: 'Credit Card Default Prediction',
+    description: 'Build a deep learning model to predict the probability of default for credit card customers.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Deep Learning', 'Finance', 'Classification'],
+    image: 'https://picsum.photos/seed/default-ds/800/600'
+  },
+  {
+    id: 'object-tracking-video',
+    title: 'Real-time Object Tracking',
+    description: 'Implement multi-object tracking in video streams using DeepSORT and YOLO.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['DeepSORT', 'Computer Vision', 'Video Analytics'],
+    image: 'https://picsum.photos/seed/tracking-ds/800/600'
+  },
+  {
+    id: 'retail-store-optimization',
+    title: 'Retail Store Layout Optimization',
+    description: 'Analyze customer movement patterns to optimize store layout and product placement.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Spatial Analysis', 'Retail', 'Optimization'],
+    image: 'https://picsum.photos/seed/store-ds/800/600'
+  },
+  {
+    id: 'gan-image-generation',
+    title: 'Generative Image Synthesis',
+    description: 'Build and train a Generative Adversarial Network (GAN) to generate realistic images.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '20 hours',
+    tags: ['GAN', 'Generative AI', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/gan-ds/800/600'
+  },
+  {
+    id: 'reinforcement-learning-game',
+    title: 'RL Agent for Classic Games',
+    description: 'Train a reinforcement learning agent to master Atari games or chess using Q-Learning.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '18 hours',
+    tags: ['Reinforcement Learning', 'OpenAI Gym', 'AI'],
+    image: 'https://picsum.photos/seed/rl-ds/800/600'
+  },
+  {
+    id: 'disease-outbreak-prediction',
+    title: 'Disease Outbreak Prediction',
+    description: 'Model the spread of infectious diseases and predict potential outbreaks using epidemiological data.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Epidemiology', 'SIR Models', 'Public Health'],
+    image: 'https://picsum.photos/seed/outbreak-ds/800/600'
+  },
+  {
+    id: 'geospatial-intelligence',
+    title: 'Geospatial Intelligence Analysis',
+    description: 'Leverage GIS data and satellite imagery to gain insights into urban development and land use.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['GIS', 'Geospatial', 'Remote Sensing'],
+    image: 'https://picsum.photos/seed/gis-ds/800/600'
+  },
+  {
+    id: 'customer-churn-telco',
+    title: 'Telecom Churn Prediction',
+    description: 'Build a high-performance churn prediction model for the telecommunications industry.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['Telecom', 'Churn', 'Gradient Boosting'],
+    image: 'https://picsum.photos/seed/telco-ds/800/600'
+  },
+  {
+    id: 'movie-recommender-als',
+    title: 'Scalable Movie Recommendations',
+    description: 'Use Apache Spark and the ALS algorithm to build a recommendation engine that scales to millions of users.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Big Data', 'Spark', 'Recommendation'],
+    image: 'https://picsum.photos/seed/movie-als-ds/800/600'
+  },
+  {
+    id: 'credit-default-risk',
+    title: 'Credit Default Risk Assessment',
+    description: 'Predict the probability of a client defaulting on a loan using a large-scale financial dataset.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Finance', 'Credit Risk', 'XGBoost'],
+    image: 'https://picsum.photos/seed/risk-ds/800/600'
+  },
+  {
+    id: 'image-segmentation-medical',
+    title: 'Medical Image Segmentation',
+    description: 'Use U-Net architectures to segment tumors and anomalies in MRI and CT scan images.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '20 hours',
+    tags: ['Healthcare', 'Deep Learning', 'Computer Vision'],
+    image: 'https://picsum.photos/seed/medical-ds/800/600'
+  },
+  {
+    id: 'stock-sentiment-analysis',
+    title: 'Financial News Sentiment',
+    description: 'Correlate financial news sentiment with stock price movements using NLP and time-series analysis.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['NLP', 'Finance', 'Sentiment'],
+    image: 'https://picsum.photos/seed/stock-sentiment-ds/800/600'
+  },
+  {
+    id: 'house-price-prediction-advanced',
+    title: 'Advanced Housing Price Models',
+    description: 'Implement stacked ensemble models and advanced feature engineering to win housing price prediction challenges.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Ensemble', 'Regression', 'Feature Engineering'],
+    image: 'https://picsum.photos/seed/advanced-housing-ds/800/600'
+  },
+  {
+    id: 'churn-prediction-subscription',
+    title: 'SaaS Subscription Churn',
+    description: 'Analyze user activity logs to predict churn in a subscription-based SaaS application.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['SaaS', 'Churn', 'Survival Analysis'],
+    image: 'https://picsum.photos/seed/saas-churn-ds/800/600'
+  },
+  {
+    id: 'real-time-fraud-detection',
+    title: 'Real-time Fraud Monitoring',
+    description: 'Build a streaming fraud detection system using Kafka and online learning models.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Streaming', 'Kafka', 'Fraud'],
+    image: 'https://picsum.photos/seed/live-fraud-ds/800/600'
+  },
+  {
+    id: 'product-categorization-ecommerce',
+    title: 'E-commerce Product Classifier',
+    description: 'Automatically categorize products into hierarchical taxonomies based on their descriptions and images.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Multi-modal', 'NLP', 'Computer Vision'],
+    image: 'https://picsum.photos/seed/product-ds/800/600'
+  },
+  {
+    id: 'anomaly-detection-cyber',
+    title: 'Cybersecurity Threat Detection',
+    description: 'Use unsupervised learning to identify network intrusions and malicious activity in traffic logs.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Security', 'Anomaly Detection', 'Network Analysis'],
+    image: 'https://picsum.photos/seed/cyber-ds-ds/800/600'
+  },
+  {
+    id: 'natural-disaster-response',
+    title: 'Disaster Response NLP',
+    description: 'Classify disaster-related messages to help emergency responders prioritize relief efforts.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '7 hours',
+    tags: ['NLP', 'Social Good', 'Emergency'],
+    image: 'https://picsum.photos/seed/disaster-ds/800/600'
+  },
+  {
+    id: 'market-segmentation-unsupervised',
+    title: 'Unsupervised Market Discovery',
+    description: 'Discover hidden patterns in customer data to identify new market segments using manifold learning (t-SNE).',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['t-SNE', 'Clustering', 'Strategy'],
+    image: 'https://picsum.photos/seed/market-ds/800/600'
+  },
+  {
+    id: 'language-identification-nlp',
+    title: 'Multi-lingual ID System',
+    description: 'Build a system that can identify the language of a given text sample for over 100 languages.',
+    category: 'Data Science',
+    difficulty: 'Beginner',
+    duration: '4 hours',
+    tags: ['NLP', 'Naive Bayes', 'Global'],
+    image: 'https://picsum.photos/seed/language-id-ds/800/600'
+  },
+  {
+    id: 'inventory-demand-forecasting',
+    title: 'Demand Forecasting for Logistics',
+    description: 'Predict future product demand to optimize supply chain and inventory management.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['Supply Chain', 'Forecasting', 'Regression'],
+    image: 'https://picsum.photos/seed/logistics-ds/800/600'
+  },
+  {
+    id: 'audio-sentiment-analysis',
+    title: 'Voice Emotion Recognition',
+    description: 'Detect emotions in spoken language using spectral features and neural networks.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Audio', 'Deep Learning', 'HCI'],
+    image: 'https://picsum.photos/seed/voice-ds/800/600'
+  },
+  {
+    id: 'facial-recognition-security',
+    title: 'Facial Recognition Attendance',
+    description: 'Implement a secure facial recognition system for automated attendance tracking.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '10 hours',
+    tags: ['FaceNet', 'Security', 'Computer Vision'],
+    image: 'https://picsum.photos/seed/attendance-ds/800/600'
+  },
+  {
+    id: 'medical-diagnosis-ai',
+    title: 'AI-assisted Diagnosis',
+    description: 'Build a diagnostic tool for respiratory diseases using clinical data and sound analysis.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Healthcare', 'Deep Learning', 'Diagnosis'],
+    image: 'https://picsum.photos/seed/med-ai-ds/800/600'
+  },
+  {
+    id: 'weather-forecasting-lstm',
+    title: 'Advanced Weather Forecasting',
+    description: 'Use LSTM and Transformer architectures to predict complex weather patterns.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Weather', 'Deep Learning', 'Time Series'],
+    image: 'https://picsum.photos/seed/weather-pro-ds/800/600'
+  },
+  {
+    id: 'customer-journey-mapping',
+    title: 'Customer Journey Analytics',
+    description: 'Analyze path-to-purchase data to understand and optimize the customer journey.',
+    category: 'Data Science',
+    difficulty: 'Intermediate',
+    duration: '8 hours',
+    tags: ['Analytics', 'Marketing', 'Sequence Data'],
+    image: 'https://picsum.photos/seed/journey-ds/800/600'
+  },
+  {
+    id: 'ai-stock-trader',
+    title: 'Automated AI Stock Trader',
+    description: 'Build a reinforcement learning agent that learns to trade stocks in a simulated market.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '20 hours',
+    tags: ['Finance', 'RL', 'Trading'],
+    image: 'https://picsum.photos/seed/trader-ds/800/600'
+  },
+  {
+    id: 'social-network-influence',
+    title: 'Influence Maximization Analysis',
+    description: 'Identify key influencers in a social network using centrality measures and information diffusion models.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Graph Theory', 'Social Media', 'Network Science'],
+    image: 'https://picsum.photos/seed/influence-ds/800/600'
+  },
+  {
+    id: 'malware-detection-ds',
+    title: 'ML-based Malware Detection',
+    description: 'Detect malware in binary files using static analysis and machine learning features.',
+    category: 'Data Science',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Security', 'Binary Analysis', 'Deep Learning'],
+    image: 'https://picsum.photos/seed/malware-ml-ds/800/600'
   }
 ];
