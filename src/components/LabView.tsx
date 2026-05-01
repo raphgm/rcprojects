@@ -9,6 +9,8 @@ import {
 import { LabContent, LabStep } from '../types/content';
 import { Terminal } from './Terminal';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
+import { projects } from '../data/projects';
+import { conceptDictionary } from '../data/conceptDictionary';
 
 interface LabViewProps {
   lab: LabContent;
@@ -142,9 +144,11 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     }, 400);
   };
 
-  const currentStep = lab.steps[currentStepIndex];
+  const currentStep = lab?.steps?.[currentStepIndex];
+  if (!currentStep) return null; // Defensive bail-out if data is malformed
+
   const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === lab.steps.length - 1;
+  const isLastStep = currentStepIndex === (lab?.steps?.length || 0) - 1;
 
   const nextStep = () => {
     if (!completedSteps.includes(currentStep.id)) {
@@ -215,7 +219,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                Mission {lab.missionNumber || 1} of {lab.totalMissions || lab.steps.length}
+                Mission {lab.missionNumber || 1} of {lab.totalMissions || lab.steps?.length || 0}
               </span>
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-32 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
@@ -266,7 +270,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   Description
                 </h4>
                 <p className="text-zinc-500 text-sm leading-relaxed">
-                  {lab.description || lab.steps[0].instruction}
+                  {lab.description || lab.steps?.[0]?.instruction || ''}
                 </p>
               </div>
               <div>
@@ -275,10 +279,53 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   Objective
                 </h4>
                 <p className="text-zinc-500 text-sm leading-relaxed">
-                  {lab.objective || `Complete all ${lab.steps.length} missions to master the core concepts of ${projectTitle} and validate your practical skills in a live-cloud sandbox environment.`}
+                  {lab.objective || `Complete all ${lab.steps?.length || 0} missions to master the core concepts of ${projectTitle} and validate your practical skills in a live-cloud sandbox environment.`}
                 </p>
               </div>
             </div>
+
+            {/* Important Concepts Section */}
+            {(() => {
+              if (!lab || !lab.projectId) return null;
+              const project = projects.find(p => p.id === String(lab.projectId));
+              const tags = project?.tags || [];
+              
+              const concepts = tags
+                .map(tag => conceptDictionary[tag])
+                .filter((c): c is { title: string; description: string } => 
+                  Boolean(c && typeof c === 'object' && 'title' in c && 'description' in c)
+                );
+
+              // Deduplicate concepts by title to be extra safe
+              const uniqueConcepts = Array.from(
+                new Map(concepts.map(c => [c.title, c])).values()
+              );
+
+              if (uniqueConcepts.length > 0) {
+                return (
+                  <div className="mb-8 pb-8 border-b border-zinc-200">
+                    <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                      <Lightbulb className="w-3 h-3 text-amber-500" />
+                      Important Concepts
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {uniqueConcepts.map((concept, idx) => (
+                        <div key={idx} className="bg-white border border-zinc-100 rounded-2xl p-5 shadow-sm">
+                          <h5 className="text-sm font-bold text-zinc-900 mb-2 flex items-center gap-2">
+                            <Sparkle className="w-4 h-4 text-brand-blue" />
+                            {concept.title}
+                          </h5>
+                          <p className="text-zinc-500 text-xs leading-relaxed">
+                            {concept.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           <div className="h-[650px] flex flex-col relative">
@@ -530,7 +577,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
       {/* Footer (Simplified as navigation is mostly in terminal now) */}
       <footer className="bg-white border-t border-zinc-100 px-8 py-4 shrink-0">
         <div className="max-w-6xl mx-auto flex items-center justify-between text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
-          <div>{lab.environment.toUpperCase()} ENVIRONMENT READY</div>
+          <div>{(lab?.environment || 'LINUX').toUpperCase()} ENVIRONMENT READY</div>
           <div className="flex items-center gap-4">
             <span className={isStarted ? "text-emerald-500" : "text-zinc-300"}>
               {isStarted ? "● LIVE SESSION ACTIVE" : "○ SESSION IDLE"}

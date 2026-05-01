@@ -1355,7 +1355,7 @@ export const projects: Project[] = [
     title: 'Social Engineering Toolkit (SET) Mastery',
     description: 'Master the Social-Engineer Toolkit (SET) to perform advanced phishing and credential harvesting simulations.',
     category: 'Security',
-    difficulty: 'Medium',
+    difficulty: 'Intermediate',
     duration: '4 hours',
     tags: ['SET', 'Social Engineering', 'Security', 'Kali'],
     image: 'https://picsum.photos/seed/social-engineering-toolkit/800/600'
@@ -2565,7 +2565,7 @@ export const projects: Project[] = [
     title: 'Linear Regression Model',
     description: 'Implement a linear regression model from scratch to predict house prices.',
     category: 'Python',
-    difficulty: 'Hard',
+    difficulty: 'Advanced',
     duration: '10 hours',
     tags: ['Python', 'ML', 'Math', 'Sklearn'],
     image: 'https://picsum.photos/seed/py-ml/800/600'
@@ -2575,7 +2575,7 @@ export const projects: Project[] = [
     title: 'Desktop App with Tkinter',
     description: 'Build a cross-platform desktop application with a modern graphical user interface.',
     category: 'Python',
-    difficulty: 'Easy',
+    difficulty: 'Beginner',
     duration: '4 hours',
     tags: ['Python', 'Tkinter', 'GUI'],
     image: 'https://picsum.photos/seed/py-gui/800/600'
@@ -2585,7 +2585,7 @@ export const projects: Project[] = [
     title: 'Custom Network Scanner',
     description: 'Develop a security tool that scans networks for active hosts and open ports using Scapy.',
     category: 'Python',
-    difficulty: 'Hard',
+    difficulty: 'Advanced',
     duration: '7 hours',
     tags: ['Python', 'Scapy', 'Security', 'Networking'],
     image: 'https://picsum.photos/seed/py-net/800/600'
@@ -2595,7 +2595,7 @@ export const projects: Project[] = [
     title: 'Crypto Price Tracker',
     description: 'Build a real-time cryptocurrency tracker with price alerts and historical analysis.',
     category: 'Python',
-    difficulty: 'Medium',
+    difficulty: 'Intermediate',
     duration: '5 hours',
     tags: ['Python', 'API', 'Crypto', 'Finance'],
     image: 'https://picsum.photos/seed/py-crypto/800/600'

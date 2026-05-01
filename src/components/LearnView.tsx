@@ -199,8 +199,8 @@ const PathDetail: React.FC<{
                       <div className="flex justify-between items-start mb-3">
                         <h4 className="font-bold text-zinc-900 group-hover:text-zinc-900 transition-colors">{project.title}</h4>
                         <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
-                          project.difficulty === 'Easy' ? 'bg-brand-blue/10 text-brand-blue' :
-                          project.difficulty === 'Medium' ? 'bg-brand-blue/20 text-brand-blue' :
+                          project.difficulty === 'Beginner' ? 'bg-brand-blue/10 text-brand-blue' :
+                          project.difficulty === 'Intermediate' ? 'bg-brand-blue/20 text-brand-blue' :
                           'bg-rose-50 text-rose-600'
                         }`}>
                           {project.difficulty}

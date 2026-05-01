@@ -53,7 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) =
               <p className="text-zinc-500 text-sm mb-8">
                 {mode === 'login' 
                   ? 'Sign in to continue your cloud engineering journey.' 
-                  : 'Join 50,000+ engineers mastering the cloud today.'}
+                  : 'Join 10,000 engineers mastering the cloud today.'}
               </p>
 
               <div className="space-y-4">

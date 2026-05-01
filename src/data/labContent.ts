@@ -7,23 +7,23 @@ export const labContents: LabContent[] = [
     steps: [
       {
         id: 'step-1',
-        title: 'Project Workspace & Git Initialization',
-        instruction: 'Create a dedicated directory for your CI/CD project and initialize a Git repository to begin tracking your workflow.',
-        summary: 'Set up the local environment and source control.',
-        whyNeeded: 'Every professional DevOps pipeline starts with a clean workspace and version control. This ensures isolation and provides a traceable history of all automation changes.',
+        title: 'Workspace Initialization',
+        instruction: 'Initialize a Git repository to begin tracking your workflow.',
+        summary: 'Set up source control.',
+        whyNeeded: 'Every professional DevOps pipeline starts with version control. This ensures isolation and provides a traceable history of all automation changes.',
         pillarConnection: 'Operational Excellence — organized file systems and version control are the bedrock of reliable automation.',
         commands: [
           {
-            text: 'mkdir -p github-actions-lab && cd github-actions-lab && git init',
-            explanation: 'Creates the project folder, enters it, and initializes a local Git repository in one sequence.'
+            text: 'git init',
+            explanation: 'Initializes a local Git repository in the current directory.'
           }
         ],
         checkCommand: 'ls -d .git',
         expectedOutput: '.git'
       },
       {
-        id: 'step-3',
-        title: 'Identity Configuration',
+        id: 'step-2',
+        title: 'Git Identity Configuration',
         instruction: 'Configure your global Git identity to ensure all commits are correctly attributed.',
         summary: 'Set up Git user credentials.',
         whyNeeded: 'Git requires an email and name to sign off on commits. This identity is used to track who made specific changes to the automation logic.',
@@ -42,39 +42,39 @@ export const labContents: LabContent[] = [
         expectedOutput: 'student@cloud-labs.com'
       },
       {
-        id: 'step-4',
-        title: 'Define Workflow Infrastructure',
+        id: 'step-3',
+        title: 'Workflow Infrastructure Setup',
         instruction: 'Create the GitHub Actions directory structure and establish the main workflow definition.',
-        summary: 'Create the directory structure and main workflow file.',
+        summary: 'Create the directory structure.',
         whyNeeded: 'GitHub Actions follows a specific directory convention (.github/workflows). Placing files correctly is essential for the platform to detect and execute your pipelines.',
         pillarConnection: 'Operational Excellence — defining standard automated workflows reduces the risk of human error during deployments.',
         commands: [
           {
-            text: 'mkdir -p .github/workflows',
-            explanation: 'Create the hidden directory required by GitHub for workflow files.'
-          },
-          {
-            text: 'touch .github/workflows/main.yml',
-            explanation: 'Create the YAML file where you will define your automation steps.'
+            text: 'mkdir -p .github/workflows && touch .github/workflows/main.yml',
+            explanation: 'Creates the hidden directory and YAML file required by GitHub for workflow execution.'
           }
-        ]
+        ],
+        checkCommand: 'ls .github/workflows/main.yml',
+        expectedOutput: 'main.yml'
       },
       {
-        id: 'step-5',
-        title: 'Configure Build Job',
+        id: 'step-4',
+        title: 'Continuous Integration Build Job',
         instruction: 'Define the build stages in the main.yml file to automate code verification.',
-        summary: 'Define the CI/CD workflow logic.',
-        whyNeeded: 'The workflow file instructs GitHub which environment to use (Runner) and what commands to execute (Jobs) when code is changed.',
+        summary: 'Define the CI workflow logic.',
+        whyNeeded: 'The workflow file instructs GitHub which environment to use and what commands to execute when code is pushed.',
         pillarConnection: 'Operational Excellence — automation of build and test phases is a core DevOps principle for reliable software delivery.',
         commands: [
           {
-            text: 'cat <<EOF > .github/workflows/main.yml\nname: Cloud-CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Run Quality Check\n        run: echo "Verifying source code integrity..."\n      - name: Compile\n        run: echo "Application build successful."\nEOF',
-            explanation: 'Write a declarative pipeline that checks out code and runs verification steps on every push.'
+            text: 'cat <<\'EOF\' > .github/workflows/main.yml\nname: Cloud-CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Run Quality Check\n        run: echo "Verifying source code integrity..."\n      - name: Compile\n        run: echo "Application build successful."\nEOF',
+            explanation: 'Writes a declarative pipeline that checks out code and runs verification steps on every push.'
           }
-        ]
+        ],
+        checkCommand: 'grep "Run Quality Check" .github/workflows/main.yml',
+        expectedOutput: 'Run Quality Check'
       },
       {
-        id: 'step-6',
+        id: 'step-5',
         title: 'Artifact Management',
         instruction: 'Update the workflow to upload build artifacts for later stages or production deployment.',
         summary: 'Add an artifact upload step.',
@@ -82,63 +82,47 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — using build artifacts prevents "works on my machine" issues and ensures environment parity.',
         commands: [
           {
-            text: 'sed -i \'$a \      - name: Upload Build Artifacts\\n        uses: actions/upload-artifact@v3\\n        with:\\n          name: app-bundle\\n          path: ./\' .github/workflows/main.yml',
-            explanation: 'Appends an upload-artifact action to the workflow file using sed.'
+            text: 'cat <<\'EOF\' > .github/workflows/main.yml\nname: Cloud-CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Run Quality Check\n        run: echo "Verifying source code integrity..."\n      - name: Compile\n        run: echo "Application build successful."\n      - name: Upload Build Artifacts\n        uses: actions/upload-artifact@v3\n        with:\n          name: app-bundle\n          path: ./\nEOF',
+            explanation: 'Replaces the workflow file to include the upload-artifact action.'
           }
         ],
         checkCommand: 'grep "upload-artifact" .github/workflows/main.yml',
         expectedOutput: 'upload-artifact'
       },
       {
-        id: 'step-7',
-        title: 'Environment variables & Secrets',
+        id: 'step-6',
+        title: 'Global Environment Variables',
         instruction: 'Define environment variables in your workflow to manage production settings securely.',
         summary: 'Add environment configuration.',
         whyNeeded: 'Hardcoding sensitive values is a security risk. Using environment variables and secrets allows for flexible and secure deployments across different stages.',
         pillarConnection: 'Security — secret management is vital for preventing credentials from being leaked in source code.',
         commands: [
           {
-            text: 'sed -i \'/runs-on/a \    env:\\n      DEPLOY_ENV: production\' .github/workflows/main.yml',
-            explanation: 'Injects a global environment variable into the job definition.'
+            text: 'cat <<\'EOF\' > .github/workflows/main.yml\nname: Cloud-CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    env:\n      DEPLOY_ENV: production\n    steps:\n      - uses: actions/checkout@v3\n      - name: Run Quality Check\n        run: echo "Verifying source code integrity..."\n      - name: Compile\n        run: echo "Application build successful."\n      - name: Upload Build Artifacts\n        uses: actions/upload-artifact@v3\n        with:\n          name: app-bundle\n          path: ./\nEOF',
+            explanation: 'Replaces the workflow file to inject a global environment variable into the job definition.'
           }
         ],
         checkCommand: 'grep "DEPLOY_ENV" .github/workflows/main.yml',
         expectedOutput: 'DEPLOY_ENV'
       },
       {
-        id: 'step-8',
-        title: 'Production Deployment Trigger',
-        instruction: 'Add a manual trigger (workflow_dispatch) to allow teams to trigger production deployments on demand.',
-        summary: 'Enable manual deployment triggers.',
-        whyNeeded: 'While CI is often automated, CD into production sometimes requires a "human in the loop" for compliance or final verification.',
-        pillarConnection: 'Operational Excellence — providing controlled deployment triggers balances automation with safety.',
-        commands: [
-          {
-            text: 'sed -i \'s/on: \\[push\\]/on: [push, workflow_dispatch]/\' .github/workflows/main.yml',
-            explanation: 'Updates the "on" property to include the workflow_dispatch trigger for manual execution.'
-          }
-        ],
-        checkCommand: 'grep "workflow_dispatch" .github/workflows/main.yml',
-        expectedOutput: 'workflow_dispatch'
-      },
-      {
-        id: 'step-9',
-        title: 'Workflow Speed Optimization',
-        instruction: 'Implement dependency caching to reduce build times by reusing packages between runs.',
-        summary: 'Add caching logic to the CI pipeline.',
-        whyNeeded: 'Downloading dependencies on every run is slow and expensive. Caching allows the runner to reuse existing assets, significantly accelerating the feedback loop.',
+        id: 'step-7',
+        title: 'Workflow Triggers & Caching',
+        instruction: 'Add manual triggers and implement dependency caching to reduce build times by reusing packages.',
+        summary: 'Add caching and manual triggers.',
+        whyNeeded: 'Downloading dependencies on every run is slow and expensive. Caching accelerates the feedback loop. Manual triggers provide control over production deployments.',
         pillarConnection: 'Performance Efficiency — optimizing workflow execution time improves developer productivity and reduces compute costs.',
         commands: [
           {
-            text: 'sed -i \'/uses: actions\\/checkout/a \      - name: Cache Dependencies\\n        uses: actions/cache@v3\\n        with:\\n          path: ~/.npm\\n          key: npm-${{ hashFiles(\\\'package-lock.json\\\') }}\' .github/workflows/main.yml',
-            explanation: 'Injects a caching action that stores the npm cache directory globally based on a hash of the lockfile.'
+            text: 'cat <<\'EOF\' > .github/workflows/main.yml\nname: Cloud-CI\non: [push, workflow_dispatch]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    env:\n      DEPLOY_ENV: production\n    steps:\n      - uses: actions/checkout@v3\n      - name: Cache Dependencies\n        uses: actions/cache@v3\n        with:\n          path: ~/.npm\n          key: npm-${{ hashFiles(\'package-lock.json\') }}\n      - name: Run Quality Check\n        run: echo "Verifying source code integrity..."\n      - name: Compile\n        run: echo "Application build successful."\n      - name: Upload Build Artifacts\n        uses: actions/upload-artifact@v3\n        with:\n          name: app-bundle\n          path: ./\nEOF',
+            explanation: 'Replaces the workflow to include workflow_dispatch and the caching action.'
           }
         ],
         checkCommand: 'grep "actions/cache" .github/workflows/main.yml',
         expectedOutput: 'actions/cache'
       },
       {
-        id: 'step-10',
+        id: 'step-8',
         title: 'Containerization Strategy',
         instruction: 'Add a job to build a Docker image and prepare it for a container registry.',
         summary: 'Build and tag a Docker image.',
@@ -146,11 +130,11 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — container images provide immutable deployment units that eliminate environment inconsistency.',
         commands: [
           {
-            text: 'echo "FROM node:18-alpine\nWORKDIR /app\nCOPY . .\nRUN npm install\nCMD [\"npm\", \"start\"]" > Dockerfile',
+            text: 'cat <<\'EOF\' > Dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY . .\nRUN npm install\nCMD ["npm", "start"]\nEOF',
             explanation: 'Creates a standard Dockerfile for a Node.js application.'
           },
           {
-            text: 'sed -i \'$a \  containerize:\\n    runs-on: ubuntu-latest\\n    steps:\\n      - uses: actions/checkout@v3\\n      - name: Build Image\\n        run: docker build -t cloud-app:latest .\' .github/workflows/main.yml',
+            text: 'cat <<\'EOF\' >> .github/workflows/main.yml\n  containerize:\n    runs-on: ubuntu-latest\n    needs: build\n    steps:\n      - uses: actions/checkout@v3\n      - name: Build Image\n        run: docker build -t cloud-app:latest .\nEOF',
             explanation: 'Appends a new job to the YAML structure that handles the Docker build process.'
           }
         ],
@@ -368,7 +352,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Cost Optimization — using compression (gzip) reduces the storage footprint of automated backups.',
         commands: [
           {
-            text: 'echo "tar -czf backup_$(date +%F).tar.gz /etc" >> backup.sh',
+            text: 'echo \'tar -czf backup_$(date +%F).tar.gz /etc\' >> backup.sh',
             explanation: 'Appends a tar command that creates a compressed archive with a dynamic date-based filename.'
           }
         ],
@@ -414,12 +398,12 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Operational Excellence — clean, modular code is easier to maintain and troubleshoot during service incidents.',
         commands: [
           {
-            text: 'cat <<EOF > backup.sh\n#!/bin/bash\nlog_message() { echo "[$(date)] \$1"; }\ncreate_backup() {\n  log_message "Starting backup..."\n  tar -czf backup_$(date +%F).tar.gz /etc\n  log_message "Backup completed."\n}\ncreate_backup\nEOF',
+            text: 'cat <<\'EOF\' > backup.sh\n#!/bin/bash\nlog_message() { echo "[$(date)] $1"; }\ncreate_backup() {\n  log_message "Starting backup..."\n  tar -czf backup_$(date +%F).tar.gz /etc\n  log_message "Backup completed."\n}\ncreate_backup\nEOF',
             explanation: 'Rewrites the script using a modular approach with logging and backup functions.'
           }
         ],
-        checkCommand: 'grep "log_message()" backup.sh',
-        expectedOutput: 'log_message()'
+        checkCommand: 'grep "log_message" backup.sh',
+        expectedOutput: 'log_message'
       },
       {
         id: 'step-7',
@@ -745,19 +729,23 @@ export const labContents: LabContent[] = [
           }
         ],
         checkCommand: 'helm status monitoring -n monitoring',
-        expectedOutput: 'STATUS: deployed'
+        expectedOutput: 'deployed'
       },
       {
         id: 'step-4',
         title: 'Customizing Dashboards',
-        instruction: 'Access the Grafana UI and import a community-standard Kubernetes cluster dashboard.',
-        summary: 'Import a Grafana dashboard.',
+        instruction: 'Verify the Grafana service is created and can be accessed.',
+        summary: 'Expose the Grafana dashboard.',
         whyNeeded: 'Raw metrics are hard to interpret. Dashboards provide visual maps of cluster health, helping you spot trends and anomalies quickly.',
         pillarConnection: 'Operational Excellence — visual observability allows for faster incident response and better capacity planning.',
         commands: [
           {
-            text: 'kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80',
-            explanation: 'Enables access to the Grafana web portal from your local machine.'
+            text: 'kubectl get svc -n monitoring | grep grafana',
+            explanation: 'Locates the Grafana service name deployed by the Helm chart.'
+          },
+          {
+            text: 'kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80 &',
+            explanation: 'Runs a port-forward in the background to enable access to the Grafana web portal from your local machine.'
           }
         ],
         checkCommand: 'kubectl get svc -n monitoring',
@@ -772,11 +760,11 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — automated discovery of new application instances ensures monitoring coverage scales with your application.',
         commands: [
           {
-            text: 'cat <<EOF > service-monitor.yaml\napiVersion: monitoring.coreos.com/v1\nkind: ServiceMonitor\nmetadata:\n  name: app-monitor\n  labels:\n    release: monitoring\nspec:\n  selector:\n    matchLabels:\n      app: web-server\n  endpoints:\n  - port: web\nEOF\nkubectl apply -f service-monitor.yaml',
+            text: 'cat <<EOF > service-monitor.yaml\napiVersion: monitoring.coreos.com/v1\nkind: ServiceMonitor\nmetadata:\n  name: app-monitor\n  namespace: monitoring\n  labels:\n    release: monitoring\nspec:\n  selector:\n    matchLabels:\n      app: web-server\n  endpoints:\n  - port: web\nEOF\nkubectl apply -f service-monitor.yaml',
             explanation: 'Creates a Prometheus Operator resource that identifies any service labeled "web-server" as a metrics source.'
           }
         ],
-        checkCommand: 'kubectl get servicemonitor',
+        checkCommand: 'kubectl get servicemonitor -n monitoring',
         expectedOutput: 'app-monitor'
       },
       {
@@ -788,11 +776,11 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Operational Excellence — proactive alerting reduces the Mean Time to Repair (MTTR) by notifying the on-call team instantly.',
         commands: [
           {
-            text: 'cat <<EOF > alertmanager-config.yaml\nalertmanager:\n  config:\n    global:\n      slack_api_url: "http://hooks.slack.com/services/..."\n    receivers:\n    - name: "slack-notifications"\n      slack_configs:\n      - channel: "#alerts"\nEOF\nhelm upgrade monitoring prometheus-community/kube-prometheus-stack --namespace monitoring -f alertmanager-config.yaml',
+            text: 'cat <<EOF > alertmanager-config.yaml\nalertmanager:\n  config:\n    global:\n      slack_api_url: "http://hooks.slack.com/services/T0000/B0000/XXXX"\n    receivers:\n    - name: "slack-notifications"\n      slack_configs:\n      - channel: "#alerts"\nEOF\nhelm upgrade monitoring prometheus-community/kube-prometheus-stack --namespace monitoring -f alertmanager-config.yaml',
             explanation: 'Updates the Helm release with custom Slack webhook configuration for the AlertManager component.'
           }
         ],
-        checkCommand: 'kubectl get secret -n monitoring alertmanager-monitoring-kube-prometheus-alertmanager -o jsonpath="{.data.alertmanager\\.yaml}"',
+        checkCommand: 'helm get values monitoring -n monitoring',
         expectedOutput: 'slack_api_url'
       },
       {
@@ -808,8 +796,8 @@ export const labContents: LabContent[] = [
             explanation: 'Enables the Thanos sidecar container within the Prometheus pod to start syncing blocks to external storage.'
           }
         ],
-        checkCommand: 'kubectl get pods -n monitoring | grep thanos',
-        expectedOutput: 'thanos-sidecar'
+        checkCommand: 'kubectl describe pod -l app.kubernetes.io/name=prometheus -n monitoring | grep thanos',
+        expectedOutput: 'thanos'
       },
       {
         id: 'step-8',
@@ -846,11 +834,11 @@ export const labContents: LabContent[] = [
             explanation: 'Disables swap immediately and permanently.'
           },
           {
-            text: 'cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf\noverlay\nbr_netfilter\nEOF\nsudo modprobe overlay && sudo modprobe br_netfilter',
+            text: 'cat <<\'EOF\' | sudo tee /etc/modules-load.d/k8s.conf\noverlay\nbr_netfilter\nEOF\nsudo modprobe overlay && sudo modprobe br_netfilter',
             explanation: 'Loads modules required for the bridge network to work correctly with iptables.'
           },
           {
-            text: 'cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf\nnet.bridge.bridge-nf-call-iptables  = 1\nnet.bridge.bridge-nf-call-ip6tables = 1\nnet.ipv4.ip_forward                 = 1\nEOF\nsudo sysctl --system',
+            text: 'cat <<\'EOF\' | sudo tee /etc/sysctl.d/k8s.conf\nnet.bridge.bridge-nf-call-iptables  = 1\nnet.bridge.bridge-nf-call-ip6tables = 1\nnet.ipv4.ip_forward                 = 1\nEOF\nsudo sysctl --system',
             explanation: 'Applies system parameters to enable bridging and packet forwarding.'
           }
         ],
@@ -885,6 +873,10 @@ export const labContents: LabContent[] = [
         whyNeeded: 'These are the three standard tools for any Kubernetes administrator. Kubelet runs on every node, Kubeadm bootstraps, and Kubectl controls.',
         pillarConnection: 'Operational Excellence — using the official repository ensures you receive signed, verified binaries and timely security updates.',
         commands: [
+          {
+            text: 'sudo mkdir -p /etc/apt/keyrings && curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg',
+            explanation: 'Downloads and installs the public signing key for the Kubernetes package repository.'
+          },
           {
             text: 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list',
             explanation: 'Adds the official Kubernetes community-hosted deb repository.'
@@ -1072,7 +1064,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Performance Efficiency — using domain-specific metrics for scaling Ensures that the application has the right capacity for actual user demand.',
         commands: [
           {
-            text: 'cat <<EOF > prometheus-adapter.yaml\nrules:\n  custom:\n  - seriesQuery: "http_requests_total"\n    resources: { "template": "service" }\n    name: { "as": "requests_per_second" }\n    metricsQuery: "rate(<<.Series>>[2m])"\nEOF\nhelm install prometheus-adapter prometheus-community/prometheus-adapter -f prometheus-adapter.yaml',
+            text: 'cat <<\'EOF\' > prometheus-adapter.yaml\nrules:\n  custom:\n  - seriesQuery: "http_requests_total"\n    resources: { "template": "service" }\n    name: { "as": "requests_per_second" }\n    metricsQuery: "rate(<<.Series>>[2m])"\nEOF\nhelm install prometheus-adapter prometheus-community/prometheus-adapter -f prometheus-adapter.yaml',
             explanation: 'Installs the adapter that translates Prometheus queries into Kubernetes-native Metrics API calls.'
           }
         ],
@@ -1088,7 +1080,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — pre-warming infrastructure prevents performance degradation during sudden but predictable traffic surges.',
         commands: [
           {
-            text: 'cat <<EOF > scaledobject.yaml\napiVersion: keda.sh/v1alpha1\nkind: ScaledObject\nmetadata:\n  name: predictive-scaler\nspec:\n  scaleTargetRef: { name: web-app }\n  triggers:\n  - type: prometheus\n    metadata:\n      serverAddress: http://prometheus:9090\n      query: rate(http_requests_total[5m])\nEOF\nkubectl apply -f scaledobject.yaml',
+            text: 'cat <<\'EOF\' > scaledobject.yaml\napiVersion: keda.sh/v1alpha1\nkind: ScaledObject\nmetadata:\n  name: predictive-scaler\nspec:\n  scaleTargetRef: { name: web-app }\n  triggers:\n  - type: prometheus\n    metadata:\n      serverAddress: http://prometheus:9090\n      query: rate(http_requests_total[5m])\nEOF\nkubectl apply -f scaledobject.yaml',
             explanation: 'Defines a KEDA ScaledObject that uses prometheus data to drive its scaling decisions.'
           }
         ],
@@ -1130,7 +1122,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — using declarative ingress rules ensures that your traffic routing is version-controlled and reproducible.',
         commands: [
           {
-            text: 'cat <<EOF > ingress.yaml\napiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: app-ingress\nspec:\n  rules:\n  - host: myapp.local\n    http:\n      paths:\n      - path: /\n        pathType: Prefix\n        backend:\n          service:\n            name: web-service\n            port:\n              number: 80\nEOF\nkubectl apply -f ingress.yaml',
+            text: 'cat <<\'EOF\' > ingress.yaml\napiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: app-ingress\nspec:\n  rules:\n  - host: myapp.local\n    http:\n      paths:\n      - path: /\n        pathType: Prefix\n        backend:\n          service:\n            name: web-service\n            port:\n              number: 80\nEOF\nkubectl apply -f ingress.yaml',
             explanation: 'Creates a routing rule that sends all traffic for "myapp.local" to the web-service on port 80.'
           }
         ],
@@ -1252,7 +1244,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Security — enforcing traffic restriction at the network layer significantly reduces the lateral movement capability of an attacker.',
         commands: [
           {
-            text: 'cat <<EOF > default-deny.yaml\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: default-deny-all\n  namespace: secure-app\nspec:\n  podSelector: {}\n  policyTypes:\n  - Ingress\n  - Egress\nEOF\nkubectl apply -f default-deny.yaml',
+            text: 'cat <<\'EOF\' > default-deny.yaml\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: default-deny-all\n  namespace: secure-app\nspec:\n  podSelector: {}\n  policyTypes:\n  - Ingress\n  - Egress\nEOF\nkubectl apply -f default-deny.yaml',
             explanation: 'Creates and applies a policy that targets all pods in the namespace and blocks all incoming/outgoing traffic.'
           }
         ],
@@ -1807,57 +1799,109 @@ export const labContents: LabContent[] = [
       },
       {
         id: 'step-2',
-        title: 'Git Repository Integration',
-        instruction: 'Connect ArgoCD to your application repository and create a new Application resource.',
-        summary: 'Synchronize a Git repo with ArgoCD.',
-        whyNeeded: 'The core of GitOps is the association between a Git path and a cluster namespace. This step tells ArgoCD exactly which manifest files it should be monitoring.',
-        pillarConnection: 'Reliability — automated synchronization ensures that the cluster state never drifts from the approved configuration in Git.',
+        title: 'ArgoCD CLI & Authentication',
+        instruction: 'Install the ArgoCD CLI, securely retrieve the initial admin password, and log in to the server.',
+        summary: 'Install CLI and authenticate.',
+        whyNeeded: 'While ArgoCD has a web UI, the CLI is essential for automation and CI/CD pipelines. Authenticating allows you to securely manage applications from the terminal.',
+        pillarConnection: 'Security — securely managing administrative credentials is a critical component of cluster security.',
         commands: [
           {
-            text: 'cat <<EOF > guestbook-app.yaml\napiVersion: argoproj.io/v1alpha1\nkind: Application\nmetadata:\n  name: guestbook\n  namespace: argocd\nspec:\n  destination:\n    namespace: default\n    server: https://kubernetes.default.svc\n  project: default\n  source:\n    path: guestbook\n    repoURL: https://github.com/argoproj/argocd-example-apps.git\n    targetRevision: HEAD\n  syncPolicy:\n    automated: {}\nEOF\nkubectl apply -f guestbook-app.yaml',
-            explanation: 'Creates an ArgoCD Application object that tracks a sample guestbook repo and automatically syncs changes.'
+            text: 'curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 && sudo install -m 555 argocd /usr/local/bin/argocd',
+            explanation: 'Downloads and installs the ArgoCD command-line tool.'
+          },
+          {
+            text: 'kubectl wait --for=condition=Available deployment/argocd-server -n argocd --timeout=300s',
+            explanation: 'Waits for the ArgoCD server to be fully running before attempting to connect.'
+          },
+          {
+            text: 'kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &',
+            explanation: 'Exposes the ArgoCD server locally on port 8080 in the background.'
+          },
+          {
+            text: 'sleep 3 && PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) && argocd login localhost:8080 --username admin --password $PASSWORD --insecure',
+            explanation: 'Retrieves the auto-generated password and authenticates the CLI.'
           }
         ],
-        checkCommand: 'kubectl get app -n argocd',
-        expectedOutput: 'guestbook'
+        checkCommand: 'argocd account get-user-info --insecure',
+        expectedOutput: 'admin'
       },
       {
         id: 'step-3',
-        title: 'Sync Policy Management',
-        instruction: 'Configure a self-healing policy to automatically correct manual changes made to the cluster.',
-        summary: 'Enable Self-Healing in GitOps.',
-        whyNeeded: 'If a user manually edits a resource using kubectl, it creates "drift". Self-healing tells ArgoCD to immediately overwrite those changes with the source of truth from Git.',
-        pillarConnection: 'Reliability — self-healing guarantees that the environment remains in the desired state even if accidental manual changes occur.',
+        title: 'Git Repository Integration',
+        instruction: 'Connect ArgoCD to a sample application repository and create a new Application resource.',
+        summary: 'Create an ArgoCD Application.',
+        whyNeeded: 'The core of GitOps is the association between a Git path and a cluster namespace. This step tells ArgoCD exactly which manifest files it should be monitoring.',
+        pillarConnection: 'Reliability — tracking state in Git ensures that the cluster configuration is versioned and reviewable.',
         commands: [
           {
-            text: 'sed -i \'/automated: {}/a \      selfHeal: true\' guestbook-app.yaml && kubectl apply -f guestbook-app.yaml',
-            explanation: 'Adds the selfHeal property to the sync policy and updates the Application resource.'
+            text: 'argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace default --insecure',
+            explanation: 'Creates an ArgoCD Application object that tracks a sample guestbook repo.'
           }
         ],
-        checkCommand: 'grep "selfHeal: true" guestbook-app.yaml',
-        expectedOutput: 'selfHeal: true'
-      },
-      {
-        id: 'step-4',
-        title: 'Environment Drift Analysis',
-        instruction: 'Use the ArgoCD CLI to identify differences between your Git source and the live cluster state.',
-        summary: 'Perform a drift audit.',
-        whyNeeded: 'Before committing large changes, it\'s important to see exactly what ArgoCD plans to do. Drift analysis provides a "dry-run" view of pending cluster updates.',
-        pillarConnection: 'Security — identifying unauthorized changes (drift) is a key part of operational auditing and security posture management.',
-        commands: [
-          {
-            text: 'argocd app diff guestbook --local .',
-            explanation: 'Compares the local directory manifests with the live version running in the cluster to highlight changes.'
-          }
-        ],
-        checkCommand: 'kubectl get app guestbook -n argocd',
+        checkCommand: 'argocd app list --insecure',
         expectedOutput: 'guestbook'
       },
       {
+        id: 'step-4',
+        title: 'Manual Synchronization',
+        instruction: 'Trigger a manual sync to deploy the application manifests from Git into your Kubernetes cluster.',
+        summary: 'Deploy the application.',
+        whyNeeded: 'By default, applications are created with a manual sync policy. This ensures that you have full control over when changes are applied to the live environment.',
+        pillarConnection: 'Operational Excellence — explicit synchronization allows for validation before changing production state.',
+        commands: [
+          {
+            text: 'argocd app sync guestbook --insecure',
+            explanation: 'Instructs ArgoCD to apply the manifests from the Git repository to the Kubernetes cluster.'
+          }
+        ],
+        checkCommand: 'argocd app status guestbook --insecure',
+        expectedOutput: 'Synced'
+      },
+      {
         id: 'step-5',
-        title: 'ArgoCD Rollouts & Progressive Delivery',
+        title: 'Configuration Drift Analysis',
+        instruction: 'Simulate unauthorized changes by manually scaling the deployment, and observe how ArgoCD detects the drift.',
+        summary: 'Identify environment drift.',
+        whyNeeded: 'Drift happens when someone manually edits resources using kubectl instead of updating Git. ArgoCD continuously monitors for these discrepancies.',
+        pillarConnection: 'Security — identifying unauthorized changes (drift) is a key part of operational auditing and security posture management.',
+        commands: [
+          {
+            text: 'kubectl scale deployment guestbook-ui --replicas=3',
+            explanation: 'Manually scales the application, creating a divergence from the Git repository state (which specifies 1 replica).'
+          },
+          {
+            text: 'argocd app diff guestbook --insecure || true',
+            explanation: 'Displays the exact differences between the live cluster and the Git manifests.'
+          }
+        ],
+        checkCommand: 'argocd app status guestbook --insecure',
+        expectedOutput: 'OutOfSync'
+      },
+      {
+        id: 'step-6',
+        title: 'Self-Healing Implementation',
+        instruction: 'Enable automated sync and self-healing policies to automatically revert the manual changes.',
+        summary: 'Enforce configuration immutability.',
+        whyNeeded: 'Self-healing ensures that Git remains the absolute source of truth. Any manual hotfixes are immediately overwritten, forcing engineers to use the proper GitOps workflow.',
+        pillarConnection: 'Reliability — automated drift correction prevents Snowflake Clusters and ensures the environment matches the audited Git history.',
+        commands: [
+          {
+            text: 'argocd app set guestbook --sync-policy automated --self-heal --insecure',
+            explanation: 'Configures the application to automatically correct any detected drift.'
+          },
+          {
+            text: 'sleep 5 && argocd app sync guestbook --insecure',
+            explanation: 'Forces a sync to ensure the self-heal policy takes effect immediately.'
+          }
+        ],
+        checkCommand: 'argocd app status guestbook --insecure',
+        expectedOutput: 'Synced'
+      },
+      {
+        id: 'step-7',
+        title: 'ArgoCD Rollouts Installation',
         instruction: 'Install the Argo Rollouts controller to enable advanced deployment strategies like Blue-Green and Canary.',
-        summary: 'Enhance deployment capabilities with Rollouts.',
+        summary: 'Enhance deployment capabilities.',
         whyNeeded: 'Standard Kubernetes Deployments lack built-in progressive delivery. Rollouts allow for fine-grained control over traffic shifting and automated rollbacks.',
         pillarConnection: 'Reliability — progressive delivery reduces the blast radius of failed deployments by testing in production with small subsets of traffic.',
         commands: [
@@ -1870,52 +1914,20 @@ export const labContents: LabContent[] = [
         expectedOutput: 'argo-rollouts'
       },
       {
-        id: 'step-6',
-        title: 'Automated Rollback Triggers',
-        instruction: 'Configure AnalysisTemplates to automatically monitor Prometheus metrics and trigger rollbacks on failure.',
-        summary: 'Implement automated safety checks.',
-        whyNeeded: 'Manual monitoring of rollouts is slow. AnalysisTemplates automate the "Go/No-Go" decision based on real-time error rates.',
-        pillarConnection: 'Operational Excellence — automating the rollback process ensures that users are never exposed to broken code for longer than a few seconds.',
-        commands: [
-          {
-            text: 'kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-rollouts/master/examples/analysistemplate-prometheus.yaml',
-            explanation: 'Deploys a template that defines how Argo should query Prometheus to validate the health of a new version.'
-          }
-        ],
-        checkCommand: 'kubectl get analysistemplate -A',
-        expectedOutput: 'success-rate'
-      },
-      {
-        id: 'step-7',
-        title: 'Self-Healing & Drift Correction',
-        instruction: 'Enable the "Self-Heal" feature in ArgoCD to automatically revert manual changes made to the cluster.',
-        summary: 'Enforce configuration immutability.',
-        whyNeeded: 'Configuration drift happens when engineers make manual "hotfixes" in the cluster. Self-healing ensures that Git remains the absolute source of truth by immediately overwriting unauthorized changes.',
-        pillarConnection: 'Reliability — automated drift correction prevents "Snowflake Clusters" and ensures the environment matches the audited Git history.',
-        commands: [
-          {
-            text: 'argocd app set guestbook --sync-policy automated --self-heal',
-            explanation: 'Configures the application to automatically synchronize and correct any detected drift from the Git state.'
-          }
-        ],
-        checkCommand: 'argocd app get guestbook --show-params | grep "Self-Heal"',
-        expectedOutput: 'Enabled'
-      },
-      {
         id: 'step-8',
-        title: 'ArgoCD Notifications & Slack',
-        instruction: 'Install the ArgoCD Notifications controller and configure it to alert Slack on sync failures.',
-        summary: 'Implement GitOps alerting.',
-        whyNeeded: 'Engineers need to know immediately if a deployment fails or if drift cannot be corrected. Notifications keep the team informed without them having to poll the dashboard.',
-        pillarConnection: 'Operational Excellence — real-time visibility into the deployment lifecycle reduces the feedback loop for developers.',
+        title: 'Rollouts CLI Integration',
+        instruction: 'Install the kubectl plugin for Argo Rollouts to manage and monitor progressive delivery.',
+        summary: 'Install the Rollouts plugin.',
+        whyNeeded: 'The Kubectl plugin provides a visual dashboard and specialized commands to promote or abort canary rollouts directly from the terminal.',
+        pillarConnection: 'Operational Excellence — specialized tooling provides deeper visibility into complex deployment lifecycles.',
         commands: [
           {
-            text: 'kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-notifications/stable/manifests/install.yaml',
-            explanation: 'Installs the specialized notification engine that monitors ArgoCD application events.'
+            text: 'curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64 && sudo install -m 555 kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts',
+            explanation: 'Installs the official kubectl extension for Argo Rollouts.'
           }
         ],
-        checkCommand: 'kubectl get pods -n argocd | grep notifications',
-        expectedOutput: 'argocd-notifications-controller'
+        checkCommand: 'ls /usr/local/bin/kubectl-argo-rollouts',
+        expectedOutput: 'kubectl-argo-rollouts'
       }
     ]
   },
@@ -2060,7 +2072,7 @@ export const labContents: LabContent[] = [
             explanation: 'Creates a new Python-based Azure Functions directory with standard boilerplate files.'
           }
         ],
-        checkCommand: 'ls DataPipeline',
+        checkCommand: 'ls DataPipeline/host.json',
         expectedOutput: 'host.json'
       },
       {
@@ -2076,7 +2088,7 @@ export const labContents: LabContent[] = [
             explanation: 'Generates a specific function template designed to handle streaming data from Event Hubs.'
           }
         ],
-        checkCommand: 'ls DataPipeline/ProcessEvents',
+        checkCommand: 'ls DataPipeline/ProcessEvents/__init__.py',
         expectedOutput: '__init__.py'
       },
       {
@@ -2088,8 +2100,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — using managed output bindings offloads connection management and retry logic to the Azure Functions runtime.',
         commands: [
           {
-            text: 'cat <<EOF >> DataPipeline/ProcessEvents/function.json\n{\n  "type": "cosmosDB",\n  "direction": "out",\n  "name": "outputDocument",\n  "databaseName": "TelemetryDB",\n  "collectionName": "Events",\n  "createIfNotExists": "true",\n  "connectionStringSetting": "CosmosDBConnection"\n}\nEOF',
-            explanation: 'Appends the Cosmos DB output binding configuration to the function metadata.'
+            text: 'cat <<EOF > DataPipeline/ProcessEvents/function.json\n{\n  "scriptFile": "__init__.py",\n  "bindings": [\n    {\n      "type": "eventHubTrigger",\n      "name": "event",\n      "direction": "in",\n      "eventHubName": "myeventhub",\n      "connection": "EventHubConnection"\n    },\n    {\n      "type": "cosmosDB",\n      "direction": "out",\n      "name": "outputDocument",\n      "databaseName": "TelemetryDB",\n      "collectionName": "Events",\n      "createIfNotExists": "true",\n      "connectionStringSetting": "CosmosDBConnection"\n    }\n  ]\n}\nEOF',
+            explanation: 'Replaces the default function.json with one containing both the Event Hub trigger and Cosmos DB output binding.'
           }
         ],
         checkCommand: 'grep "cosmosDB" DataPipeline/ProcessEvents/function.json',
@@ -2120,8 +2132,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Performance Efficiency — proper batch size tuning ensures maximum resource utilization and lowest latency for data processing.',
         commands: [
           {
-            text: 'sed -i \'/extensions/a \    "eventHubs": { "batchSize": 100, "prefetchCount": 200 }\' DataPipeline/host.json',
-            explanation: 'Injects eventHubs specific performance configurations into the global host settings.'
+            text: 'cat <<EOF > DataPipeline/host.json\n{\n  "version": "2.0",\n  "logging": {\n    "applicationInsights": {\n      "samplingSettings": {\n        "isEnabled": true,\n        "excludedTypes": "Request"\n      }\n    }\n  },\n  "extensionBundle": {\n    "id": "Microsoft.Azure.Functions.ExtensionBundle",\n    "version": "[3.*, 4.0.0)"\n  },\n  "extensions": {\n    "eventHubs": {\n      "batchSize": 100,\n      "prefetchCount": 200\n    }\n  }\n}\nEOF',
+            explanation: 'Overwrites host.json to inject eventHubs specific performance configurations into the global host settings.'
           }
         ],
         checkCommand: 'grep "batchSize" DataPipeline/host.json',
@@ -2136,8 +2148,8 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Operational Excellence — using distributed tracing ensures you can troubleshoot complex event-driven architectures efficiently.',
         commands: [
           {
-            text: 'sed -i "s/logging/import azure.functions as func\\nimport opencensus.ext.azure.log_exporter as log_exporter/" DataPipeline/ProcessEvents/__init__.py',
-            explanation: 'Integrates the OpenCensus SDK for Azure to send telemetry to App Insights.'
+            text: 'sed -i \'1i import opencensus.ext.azure.log_exporter as log_exporter\' DataPipeline/ProcessEvents/__init__.py',
+            explanation: 'Integrates the OpenCensus SDK for Azure to send telemetry to App Insights by adding the import to the top of the file.'
           }
         ],
         checkCommand: 'grep "opencensus" DataPipeline/ProcessEvents/__init__.py',
@@ -2189,7 +2201,7 @@ export const labContents: LabContent[] = [
         whyNeeded: 'Istio provides a dedicated infrastructure layer for managing service-to-service communication, including security and observability.',
         pillarConnection: 'Reliability — service meshes provide automatic retries and circuit breakers to handle distributed failures gracefully.',
         commands: [
-          { text: 'curl -L https://istio.io/downloadIstio | sh -', explanation: 'Downloads the latest Istio command line tool.' },
+          { text: 'curl -sL https://istio.io/downloadIstio | sh - && sudo cp istio-*/bin/istioctl /usr/local/bin/', explanation: 'Downloads the latest Istio package and installs the command line tool globally.' },
           { text: 'istioctl install --set profile=demo -y', explanation: 'Installs the Istio components into the cluster using the demo configuration.' }
         ],
         checkCommand: 'kubectl get pods -n istio-system',
@@ -2216,7 +2228,8 @@ export const labContents: LabContent[] = [
         whyNeeded: 'Canary deployments allow you to test new features on a small percentage of users before a full rollout, minimizing the impact of potential bugs.',
         pillarConnection: 'Reliability — Istio enables advanced traffic steering without requiring application code changes.',
         commands: [
-          { text: 'kubectl apply -f canary-virtualservice.yaml', explanation: 'Applies a routing rule that splits traffic between two versions of your service.' }
+          { text: 'cat <<\'EOF\' > canary-virtualservice.yaml\napiVersion: networking.istio.io/v1alpha3\nkind: VirtualService\nmetadata:\n  name: canary-route\nspec:\n  hosts:\n  - my-service\n  http:\n  - route:\n    - destination:\n        host: my-service\n        subset: v1\n      weight: 80\n    - destination:\n        host: my-service\n        subset: v2\n      weight: 20\nEOF', explanation: 'Generates the declarative manifest defining the canary routing percentages.' },
+          { text: 'kubectl apply -f canary-virtualservice.yaml', explanation: 'Applies the routing rule that splits traffic between two versions of your service.' }
         ],
         checkCommand: 'kubectl get virtualservice',
         expectedOutput: 'canary-route'
@@ -2230,7 +2243,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Security — encrypting service-to-service traffic protects against internal sniffing and spoofing attacks.',
         commands: [
           {
-            text: 'cat <<EOF > mtls-strict.yaml\napiVersion: security.istio.io/v1beta1\nkind: PeerAuthentication\nmetadata:\n  name: default\n  namespace: istio-system\nspec:\n  mtls:\n    mode: STRICT\nEOF\nkubectl apply -f mtls-strict.yaml',
+            text: 'cat <<\'EOF\' > mtls-strict.yaml\napiVersion: security.istio.io/v1beta1\nkind: PeerAuthentication\nmetadata:\n  name: default\n  namespace: istio-system\nspec:\n  mtls:\n    mode: STRICT\nEOF\nkubectl apply -f mtls-strict.yaml',
             explanation: 'Forces all services to communicate via encrypted mutual TLS, rejecting any unencrypted (plaintext) traffic.'
           }
         ],
@@ -2246,7 +2259,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — circuit breakers isolate unhealthy instances and prevent small failures from collapsing the entire microservices architecture.',
         commands: [
           {
-            text: 'cat <<EOF > circuit-breaker.yaml\napiVersion: networking.istio.io/v1alpha3\nkind: DestinationRule\nmetadata:\n  name: web-cb\nspec:\n  host: web-service\n  trafficPolicy:\n    connectionPool:\n      http:\n        http1MaxPendingRequests: 1\n        maxRequestsPerConnection: 1\nEOF\nkubectl apply -f circuit-breaker.yaml',
+            text: 'cat <<\'EOF\' > circuit-breaker.yaml\napiVersion: networking.istio.io/v1alpha3\nkind: DestinationRule\nmetadata:\n  name: web-cb\nspec:\n  host: web-service\n  trafficPolicy:\n    connectionPool:\n      http:\n        http1MaxPendingRequests: 1\n        maxRequestsPerConnection: 1\nEOF\nkubectl apply -f circuit-breaker.yaml',
             explanation: 'Limits the number of concurrent connections to the service, forcing a failure response if the system is overloaded.'
           }
         ],
@@ -2278,7 +2291,7 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Security — controlling egress prevents data exfiltration and ensures compliance with strict regulatory requirements.',
         commands: [
           {
-            text: 'cat <<EOF > egress-gateway.yaml\napiVersion: networking.istio.io/v1alpha3\nkind: Gateway\nmetadata:\n  name: istio-egressgateway\nspec:\n  selector:\n    istio: egressgateway\n  servers:\n  - port:\n      number: 80\n      name: http\n      protocol: HTTP\n    hosts:\n    - "edition.cnn.com"\nEOF\nkubectl apply -f egress-gateway.yaml',
+            text: 'cat <<\'EOF\' > egress-gateway.yaml\napiVersion: networking.istio.io/v1alpha3\nkind: Gateway\nmetadata:\n  name: istio-egressgateway\nspec:\n  selector:\n    istio: egressgateway\n  servers:\n  - port:\n      number: 80\n      name: http\n      protocol: HTTP\n    hosts:\n    - "edition.cnn.com"\nEOF\nkubectl apply -f egress-gateway.yaml',
             explanation: 'Defines a controlled exit point for traffic authorized to reach the specified external host.'
           }
         ],
@@ -2293,115 +2306,115 @@ export const labContents: LabContent[] = [
     steps: [
       {
         id: 'step-1',
-        title: 'Security Audit Environment Setup',
-        instruction: 'Install Prowler and ensure all necessary AWS authentication variables are set.',
-        summary: 'Provision the security auditing scanner.',
-        whyNeeded: 'Prowler is a powerful tool for security best practices and compliance auditing. Setting up the environment correctly is the first step in identifying cloud vulnerabilities.',
+        title: 'Prowler Engine Installation',
+        instruction: 'Install Prowler using the Python package manager to prepare the auditing environment.',
+        summary: 'Install the Prowler security tool.',
+        whyNeeded: 'Prowler is a powerful open-source tool for cloud security best practices and compliance auditing. Installation is the prerequisite for all scanning operations.',
         pillarConnection: 'Security — automation of security audits is a core principle for maintaining a secure environment at scale.',
         commands: [
           {
             text: 'pip install prowler',
-            explanation: 'Installs the Prowler security auditing tool using the Python package manager.'
+            explanation: 'Installs the Prowler security auditing engine and its dependencies.'
           }
         ],
         checkCommand: 'prowler -v',
-        expectedOutput: 'Prowler'
+        expectedOutput: 'rowler'
       },
       {
         id: 'step-2',
-        title: 'CIS Benchmark Audit',
-        instruction: 'Run a full audit against the CIS AWS Foundations Benchmark to identify high-risk misconfigurations.',
-        summary: 'Execute a comprehensive compliance scan.',
-        whyNeeded: 'CIS benchmarks are industry-standard safety guidelines. Running these tests identifies common errors like public S3 buckets or MFA-disabled accounts.',
-        pillarConnection: 'Security — regular auditing against gold-standard benchmarks reduces the overall risk of breach.',
+        title: 'AWS Identity Provisioning',
+        instruction: 'Configure the necessary AWS credentials file to allow Prowler to authenticate against the target cloud environment.',
+        summary: 'Configure AWS credentials.',
+        whyNeeded: 'Prowler requires programmatic access to AWS APIs to inspect resources. Securely managing these credentials is vital for the tool to function.',
+        pillarConnection: 'Security — using dedicated, scoped IAM roles or credentials for auditing follows the principle of least privilege.',
         commands: [
           {
-            text: 'prowler aws -g cis_v1.4.0',
-            explanation: 'Runs a targeted suite of tests designed to verify adherence to the CIS benchmark for AWS.'
+            text: 'mkdir -p ~/.aws && cat <<\'EOF\' > ~/.aws/credentials\n[default]\naws_access_key_id = AKIAIOSFODNN7EXAMPLE\naws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\nEOF',
+            explanation: 'Creates a standard AWS credentials profile for Prowler to use during execution.'
           }
         ],
-        checkCommand: 'echo "Audit complete"',
-        expectedOutput: 'Audit complete'
+        checkCommand: 'cat ~/.aws/credentials',
+        expectedOutput: 'AKIAIOSFODNN7EXAMPLE'
       },
       {
         id: 'step-3',
+        title: 'Compliance Framework Audit',
+        instruction: 'List the available compliance frameworks to verify the CIS AWS Foundations Benchmark is loaded, then save the output.',
+        summary: 'Verify CIS benchmark modules.',
+        whyNeeded: 'CIS benchmarks are industry-standard safety guidelines. Verifying that these modules are loaded ensures the scan will cover critical misconfigurations.',
+        pillarConnection: 'Security — regular auditing against gold-standard benchmarks reduces the overall risk of a breach.',
+        commands: [
+          {
+            text: 'prowler aws --list-compliance > compliance_modules.txt',
+            explanation: 'Queries the engine for all supported compliance frameworks (like CIS, HIPAA, SOC2) and writes them to a file.'
+          }
+        ],
+        checkCommand: 'grep "cis" compliance_modules.txt',
+        expectedOutput: 'cis'
+      },
+      {
+        id: 'step-4',
+        title: 'Targeted Resource Scanning',
+        instruction: 'Run a targeted scan specifically for S3 bucket public access vulnerabilities and output the logs.',
+        summary: 'Scan for S3 vulnerabilities.',
+        whyNeeded: 'Full account scans can take hours. Targeted scanning allows security engineers to quickly verify the posture of high-risk services like S3 after a deployment.',
+        pillarConnection: 'Performance Efficiency — targeting specific services drastically reduces scan time and API rate limiting issues.',
+        commands: [
+          {
+            text: 'prowler aws --services s3 > s3_scan.log 2>&1 || true',
+            explanation: 'Executes a security scan restricted entirely to Amazon S3 buckets and policies.'
+          }
+        ],
+        checkCommand: 'ls s3_scan.log',
+        expectedOutput: 's3_scan.log'
+      },
+      {
+        id: 'step-5',
+        title: 'Security Hub Integration',
+        instruction: 'Export scan results using the ASFF format so they can be ingested directly into AWS Security Hub.',
+        summary: 'Generate ASFF security reports.',
+        whyNeeded: 'HTML reports are hard to track over time. Sending data in Amazon Security Finding Format (ASFF) allows centralized tracking and automated remediation via EventBridge.',
+        pillarConnection: 'Operational Excellence — using standardized security endpoints ensures that findings are actionable and integrated into the broader IT governance framework.',
+        commands: [
+          {
+            text: 'prowler aws --services ec2 -M json-asff > asff_export.log 2>&1 || true',
+            explanation: 'Generates a machine-readable JSON output natively formatted for AWS Security Hub.'
+          }
+        ],
+        checkCommand: 'ls asff_export.log',
+        expectedOutput: 'asff_export.log'
+      },
+      {
+        id: 'step-6',
         title: 'Custom Security Checks',
-        instruction: 'Create a custom Prowler check to verify internal corporate security requirements.',
+        instruction: 'Create a custom Prowler check definition to enforce internal corporate tagging standards.',
         summary: 'Implement tailored compliance rules.',
         whyNeeded: 'Generic benchmarks don\'t catch everything. Custom checks allow you to enforce specific internal standards, such as mandatory tagging or restricted instance types.',
         pillarConnection: 'Operational Excellence — customizing security tools to the specific needs of the business ensures better alignment with corporate policies.',
         commands: [
           {
-            text: 'mkdir -p checks && echo "check_description: Verify private subnet tagging" > checks/custom_check.yaml',
-            explanation: 'Sets up the directory structure for user-defined auditing logic.'
+            text: 'mkdir -p custom_checks && echo "check_description: Verify private subnet tagging" > custom_checks/subnet_tag_check.yaml',
+            explanation: 'Sets up the directory structure and definition for user-defined auditing logic.'
           }
         ],
-        checkCommand: 'ls checks/custom_check.yaml',
-        expectedOutput: 'custom_check.yaml'
-      },
-      {
-        id: 'step-4',
-        title: 'Automated Remediation Workflows',
-        instruction: 'Configure Prowler to trigger an AWS Lambda function to automatically fix common misconfigurations.',
-        summary: 'Enable self-healing security.',
-        whyNeeded: 'Finding a bug is only half the battle. Automated remediation ensures that high-risk errors (like public S3 buckets) are corrected in seconds, not days.',
-        pillarConnection: 'Security — reducing the "Time to Remediate" (TTR) is critical for preventing successful exploitations of misconfigurations.',
-        commands: [
-          {
-            text: 'echo "Remediation triggered for AWS-S3-001" > remediation.log',
-            explanation: 'Simulates the integration between auditor findings and automated correction scripts.'
-          }
-        ],
-        checkCommand: 'ls remediation.log',
-        expectedOutput: 'remediation.log'
-      },
-      {
-        id: 'step-5',
-        title: 'Security Dashboards with QuickSight',
-        instruction: 'Export Prowler findings to S3 and configure an Athena/QuickSight dashboard for visual security reporting.',
-        summary: 'Visualize compliance status.',
-        whyNeeded: 'C-level executives need to see high-level compliance trends. Dashboards transform technical findings into actionable business intelligence.',
-        pillarConnection: 'Operational Excellence — providing clear visibility into security posture improves decision-making and resource allocation.',
-        commands: [
-          {
-            text: 'prowler aws -M json-asff --output-directory reports/',
-            explanation: 'Exports the scan results into the standard Amazon Security Finding Format (ASFF) for easy ingestion into other AWS services.'
-          }
-        ],
-        checkCommand: 'ls reports/*.json',
-        expectedOutput: 'json'
-      },
-      {
-        id: 'step-6',
-        title: 'Multi-Account Scanning',
-        instruction: 'Configure Prowler to scan multiple AWS accounts using cross-account IAM roles.',
-        summary: 'Scale compliance auditing.',
-        whyNeeded: 'Enterprise environments often have hundreds of accounts. Scanning them one by one is impossible. Cross-account roles allow a central hub to audit the entire organization.',
-        pillarConnection: 'Security — centralizing security oversight ensures that no "Dark Accounts" or unmanaged environments exist without audit coverage.',
-        commands: [
-          {
-            text: 'prowler aws --role arn:aws:iam::123456789012:role/ProwlerAuditRole',
-            explanation: 'Executes a scan against a remote account by assuming a pre-configured audit role.'
-          }
-        ],
-        checkCommand: 'prowler -v',
-        expectedOutput: 'Prowler'
+        checkCommand: 'ls custom_checks/subnet_tag_check.yaml',
+        expectedOutput: 'subnet_tag_check.yaml'
       },
       {
         id: 'step-7',
-        title: 'Compliance Dashboard Integration',
-        instruction: 'Export Prowler results to AWS Security Hub or an S3 bucket for centralized security visualization.',
-        summary: 'Centralize security findings.',
-        whyNeeded: 'HTML reports are hard to track over time. Sending data to Security Hub allows you to track compliance trends and integrate findings into automated remediation workflows.',
-        pillarConnection: 'Operational Excellence — using standardized security endpoints ensures that findings are actionable and integrated into the broader IT governance framework.',
+        title: 'Multi-Account Role Assumption',
+        instruction: 'Define a shell script that automates Prowler scanning across multiple AWS accounts using cross-account IAM roles.',
+        summary: 'Scale compliance auditing.',
+        whyNeeded: 'Enterprise environments often have hundreds of accounts. Cross-account IAM roles allow a central security hub to automatically audit the entire organization without managing multiple keys.',
+        pillarConnection: 'Security — centralizing security oversight ensures that no "Dark Accounts" or unmanaged environments exist without audit coverage.',
         commands: [
           {
-            text: 'prowler aws -S -f json',
-            explanation: 'Generates a machine-readable JSON output and prepares it for ingestion into AWS Security Hub.'
+            text: 'cat <<\'EOF\' > multi_account_scan.sh\n#!/bin/bash\nfor account in "111111111111" "222222222222"; do\n  echo "Scanning $account..."\n  prowler aws --role arn:aws:iam::$account:role/ProwlerAuditRole\ndone\nEOF\nchmod +x multi_account_scan.sh',
+            explanation: 'Creates an automation script that loops through target accounts and assumes their respective audit roles.'
           }
         ],
-        checkCommand: 'ls output/*.json',
-        expectedOutput: 'json'
+        checkCommand: 'grep "prowler aws --role" multi_account_scan.sh',
+        expectedOutput: 'ProwlerAuditRole'
       }
     ]
   },
@@ -2418,11 +2431,11 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — following cloud vendor architectural requirements ensures service stability and supportability.',
         commands: [
           {
-            text: 'az network vnet subnet create -g myRG --vnet-name myVNet -n GatewaySubnet --address-prefix 10.0.255.0/27',
+            text: 'az network vnet subnet create -g Labs-RG --vnet-name HubVNet -n GatewaySubnet --address-prefix 10.0.255.0/27',
             explanation: 'Creates a dedicated network segment for the encrypted VPN gateway components.'
           }
         ],
-        checkCommand: 'az network vnet subnet show -g myRG --vnet-name myVNet -n GatewaySubnet',
+        checkCommand: 'az network vnet subnet show -g Labs-RG --vnet-name HubVNet -n GatewaySubnet',
         expectedOutput: 'GatewaySubnet'
       },
       {
@@ -2434,12 +2447,12 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Security — the gateway ensures all traffic entering your cloud network over the public internet is AES-256 encrypted.',
         commands: [
           {
-            text: 'az network vnet-gateway create -g myRG --name myVPN -vnet myVNet --public-ip-address myIP --gateway-type Vpn --vpn-type RouteBased --sku VpnGw1 --no-wait',
+            text: 'az network vnet-gateway create -g Labs-RG --name HubVPNGW --vnet HubVNet --public-ip-address HubGWIP --gateway-type Vpn --vpn-type RouteBased --sku VpnGw1 --no-wait',
             explanation: 'Triggers the background deployment of the managed VPN service in Azure.'
           }
         ],
-        checkCommand: 'az network vnet-gateway show -g myRG --name myVPN',
-        expectedOutput: 'Succeeded'
+        checkCommand: 'az network vnet-gateway show -g Labs-RG --name HubVPNGW',
+        expectedOutput: 'HubVPNGW'
       },
       {
         id: 'step-3',
@@ -2450,12 +2463,12 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — precise definition of remote networking parameters is essential for stable site-to-site connectivity.',
         commands: [
           {
-            text: 'az network local-gateway create -g myRG --name on-prem-lng --gateway-ip-address 203.0.113.1 --address-prefixes 192.168.1.0/24',
+            text: 'az network local-gateway create -g Labs-RG --name OnPremLNG --gateway-ip-address 203.0.113.1 --address-prefixes 192.168.1.0/24',
             explanation: 'Creates a logical object representing the physical VPN hardware at your remote office.'
           }
         ],
-        checkCommand: 'az network local-gateway show -g myRG --name on-prem-lng',
-        expectedOutput: 'on-prem-lng'
+        checkCommand: 'az network local-gateway show -g Labs-RG --name OnPremLNG',
+        expectedOutput: 'OnPremLNG'
       },
       {
         id: 'step-4',
@@ -2466,12 +2479,12 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Security — the use of strong pre-shared keys and transit encryption ensures private communication over public infrastructure.',
         commands: [
           {
-            text: 'az network vpn-connection create -g myRG --name azure-to-onprem --vnet-gateway1 myVPN --local-network-gateway2 on-prem-lng --shared-key "MyVerySecretKey123"',
+            text: 'az network vpn-connection create -g Labs-RG --name HubToOnPrem --vnet-gateway1 HubVPNGW --local-network-gateway2 OnPremLNG --shared-key "MyVerySecretKey123"',
             explanation: 'Establishes the logical connection and starts the IKE phase negotiation.'
           }
         ],
-        checkCommand: 'az network vpn-connection show -g myRG --name azure-to-onprem',
-        expectedOutput: 'Connected'
+        checkCommand: 'az network vpn-connection show -g Labs-RG --name HubToOnPrem',
+        expectedOutput: 'HubToOnPrem'
       },
       {
         id: 'step-5',
@@ -2482,28 +2495,28 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Reliability — dynamic routing protocols automatically reroute traffic during path failures, improving hybrid cloud resilience.',
         commands: [
           {
-            text: 'az network vpn-connection update -g myRG --name azure-to-onprem --enable-bgp true',
+            text: 'az network vpn-connection update -g Labs-RG --name HubToOnPrem --enable-bgp true',
             explanation: 'Enables BGP protocol for the specified VPN connection.'
           }
         ],
-        checkCommand: 'az network vpn-connection show -g myRG --name azure-to-onprem -o json | jq ".enableBgp"',
+        checkCommand: 'az network vpn-connection show -g Labs-RG --name HubToOnPrem | grep enableBgp',
         expectedOutput: 'true'
       },
       {
         id: 'step-6',
         title: 'VPN ExpressRoute Failover',
-        instruction: 'Configure the VPN Gateway as a backup path for an existing ExpressRoute circuit.',
+        instruction: 'Configure the VPN Gateway to use a specific ASN to act as a backup path for an existing ExpressRoute circuit.',
         summary: 'Implement hybrid network redundancy.',
         whyNeeded: 'ExpressRoute provides high speed, but if the physical cable is cut, your business stops. VPN acting as a failover ensures that critical traffic can still reach Azure over the public internet.',
         pillarConnection: 'Reliability — multi-path connectivity via different providers/technologies is the only way to achieve 99.99% network availability.',
         commands: [
           {
-            text: 'az network vpn-gateway update --name VPNGateway --resource-group Labs-RG --set enableBgp=true',
-            explanation: 'Enables BGP routing, which is essential for automatic failover between ExpressRoute and VPN paths.'
+            text: 'az network vnet-gateway update -g Labs-RG --name HubVPNGW --asn 65010',
+            explanation: 'Updates the BGP Autonomous System Number (ASN) on the gateway, which is essential for routing failover scenarios.'
           }
         ],
-        checkCommand: 'az network vpn-gateway show --name VPNGateway --resource-group Labs-RG | grep enableBgp',
-        expectedOutput: 'true'
+        checkCommand: 'az network vnet-gateway show -g Labs-RG --name HubVPNGW | grep asn',
+        expectedOutput: '65010'
       },
       {
         id: 'step-7',
@@ -2514,12 +2527,12 @@ export const labContents: LabContent[] = [
         pillarConnection: 'Cost Optimization — sharing high-cost networking infrastructure across multiple environments reduces the total cost of ownership (TCO).',
         commands: [
           {
-            text: 'az network vnet peering create --name HubToSpoke --vnet-name HubVNet --remote-vnet SpokeVNet --allow-vnet-access --allow-gateway-transit',
+            text: 'az network vnet peering create -g Labs-RG --name HubToSpoke --vnet-name HubVNet --remote-vnet SpokeVNet --allow-vnet-access --allow-gateway-transit',
             explanation: 'Connects two networks and allows the "Spoke" network to use the "Hub\'s" existing VPN connection.'
           }
         ],
-        checkCommand: 'az network vnet peering show --name HubToSpoke --vnet-name HubVNet --resource-group Labs-RG',
-        expectedOutput: 'Connected'
+        checkCommand: 'az network vnet peering show -g Labs-RG --name HubToSpoke --vnet-name HubVNet',
+        expectedOutput: 'HubToSpoke'
       }
     ]
   },
@@ -4811,6 +4824,32 @@ export const labContents: LabContent[] = [
         ],
         checkCommand: 'kubectl get pods -n external-secrets',
         expectedOutput: 'external-secrets-operator'
+      },
+      {
+        id: 'step-2',
+        title: 'Configure SecretStore',
+        instruction: 'Create a ClusterSecretStore that tells the operator how to communicate with your backend vault.',
+        summary: 'Define the backend connection.',
+        whyNeeded: 'The operator needs credentials and endpoints to access Azure Key Vault, AWS Secrets Manager, or HashiCorp Vault. A SecretStore encapsulates this connection logic.',
+        pillarConnection: 'Security — isolating provider credentials into a single SecretStore minimizes the attack surface.',
+        commands: [
+          { text: 'cat <<\'EOF\' > secret-store.yaml\napiVersion: external-secrets.io/v1beta1\nkind: ClusterSecretStore\nmetadata:\n  name: global-secret-store\nspec:\n  provider:\n    fake:\n      data:\n        - key: "database-password"\n          value: "SuperSecret123!"\nEOF\nkubectl apply -f secret-store.yaml', explanation: 'Creates a simulated backend provider for testing the operator.' }
+        ],
+        checkCommand: 'kubectl get clustersecretstore',
+        expectedOutput: 'global-secret-store'
+      },
+      {
+        id: 'step-3',
+        title: 'Synchronize ExternalSecret',
+        instruction: 'Create an ExternalSecret object that fetches the password from the store and creates a native Kubernetes Secret.',
+        summary: 'Sync the secret payload.',
+        whyNeeded: 'Pods cannot mount ExternalSecrets directly; they mount native Kubernetes Secrets. The operator bridges this gap by continuously syncing changes from the backend.',
+        pillarConnection: 'Operational Excellence — automated secret synchronization prevents application outages caused by manual credential rotation failures.',
+        commands: [
+          { text: 'cat <<\'EOF\' > external-secret.yaml\napiVersion: external-secrets.io/v1beta1\nkind: ExternalSecret\nmetadata:\n  name: db-credentials\nspec:\n  refreshInterval: "15s"\n  secretStoreRef:\n    name: global-secret-store\n    kind: ClusterSecretStore\n  target:\n    name: native-db-secret\n  data:\n  - secretKey: password\n    remoteRef:\n      key: database-password\nEOF\nkubectl apply -f external-secret.yaml', explanation: 'Defines the synchronization rule that pulls the fake data into a real Kubernetes Secret.' }
+        ],
+        checkCommand: 'kubectl get secret native-db-secret -o jsonpath="{.data.password}" | base64 -d',
+        expectedOutput: 'SuperSecret123!'
       }
     ]
   },

@@ -13,7 +13,7 @@ const CATEGORY_LABS: Record<string, { title: string; instruction: string }[]> = 
   ],
   cyber: [
     { title: 'Surface Reconnaissance', instruction: 'Perform network discovery to identify active services and potential entry points.' },
-    { topic: 'Vulnerability Analysis', instruction: 'Scan targets for known CVEs and misconfigurations using automated tools.' },
+    { title: 'Vulnerability Analysis', instruction: 'Scan targets for known CVEs and misconfigurations using automated tools.' },
     { title: 'Security Validation', instruction: 'Execute safe exploitation techniques to verify the impact of discovered flaws.' },
   ],
   db: [
