@@ -4061,4 +4061,458 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'pfsense-firewall',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'pfSense Installation & Interface Setup',
+        instruction: 'Configure the WAN and LAN interfaces on your pfSense virtual appliance.',
+        summary: 'Initialize the firewall interfaces.',
+        whyNeeded: 'Interfaces are the foundational building blocks of a firewall, defining the "inside" and "outside" of your network.',
+        pillarConnection: 'Security — proper interface separation is the first step in network segmentation.',
+        commands: [
+          { text: 'echo "Interface -> WAN -> DHCP; Interface -> LAN -> 192.168.1.1/24"', explanation: 'Configures basic connectivity.' }
+        ],
+        checkCommand: 'ping -c 1 192.168.1.1',
+        expectedOutput: '1 packets transmitted'
+      },
+      {
+        id: 'step-2',
+        title: 'NAT and Port Forwarding',
+        instruction: 'Configure a NAT rule to forward external HTTP traffic (port 80) to an internal web server.',
+        summary: 'Expose internal services securely.',
+        whyNeeded: 'NAT allows multiple internal devices to share a single public IP while controlling external access.',
+        pillarConnection: 'Reliability — NAT ensures internal services are reachable while maintaining a secure perimeter.',
+        commands: [
+          { text: 'echo "Firewall -> NAT -> Port Forward -> Add rule: WAN, TCP, Port 80 -> Redirect 192.168.1.10"', explanation: 'Sets up the forwarding rule.' }
+        ],
+        checkCommand: 'echo "Rule Active"',
+        expectedOutput: 'Rule Active'
+      }
+    ]
+  },
+  {
+    projectId: 'ssl-tls-setup',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Certbot Installation',
+        instruction: 'Install Certbot and the Nginx plugin to manage Let\'s Encrypt certificates.',
+        summary: 'Prepare the certificate automation tool.',
+        whyNeeded: 'Certbot automates the obtaining and renewing of SSL/TLS certificates, ensuring encryption doesn\'t lapse.',
+        pillarConnection: 'Security — encryption in transit is a baseline requirement for any public-facing application.',
+        commands: [
+          { text: 'sudo apt update && sudo apt install certbot python3-certbot-nginx -y', explanation: 'Installs the Certbot client.' }
+        ],
+        checkCommand: 'certbot --version',
+        expectedOutput: 'certbot'
+      },
+      {
+        id: 'step-2',
+        title: 'Certificate Issuance',
+        instruction: 'Request a new SSL certificate for your domain using the Nginx challenge.',
+        summary: 'Obtain a valid TLS certificate.',
+        whyNeeded: 'A valid certificate from a trusted CA is required for browsers to establish secure connections.',
+        pillarConnection: 'Reliability — automated certificate management prevents downtime caused by expired credentials.',
+        commands: [
+          { text: 'sudo certbot --nginx -d example.com --non-interactive --agree-tos --register-unsafely-without-email', explanation: 'Requests and installs the certificate.' }
+        ],
+        checkCommand: 'sudo ls /etc/letsencrypt/live/example.com/fullchain.pem',
+        expectedOutput: 'fullchain.pem'
+      }
+    ]
+  },
+  {
+    projectId: 'honeypot-cowrie',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Cowrie Dependency Setup',
+        instruction: 'Install Python dependencies and virtualenv for the Cowrie honeypot.',
+        summary: 'Prepare the execution environment.',
+        whyNeeded: 'Cowrie requires a specific set of libraries to simulate a realistic SSH server.',
+        pillarConnection: 'Operational Excellence — using isolated environments (virtualenv) prevents dependency conflicts.',
+        commands: [
+          { text: 'sudo apt-get install git python3-virtualenv libssl-dev libffi-dev build-essential -y', explanation: 'Installs build tools and dependencies.' }
+        ],
+        checkCommand: 'virtualenv --version',
+        expectedOutput: 'virtualenv'
+      },
+      {
+        id: 'step-2',
+        title: 'Cowrie Configuration',
+        instruction: 'Clone the Cowrie repository and start the honeypot on port 2222.',
+        summary: 'Launch the deception engine.',
+        whyNeeded: 'Honeypots provide early warning of attacker activity and valuable intelligence on their techniques.',
+        pillarConnection: 'Security — proactive deception helps divert attackers from real production assets.',
+        commands: [
+          { text: 'git clone https://github.com/cowrie/cowrie && cd cowrie\nvirtualenv --python=python3 cowrie-env\nsource cowrie-env/bin/activate\npip install --upgrade pip && pip install -r requirements.txt\nbin/cowrie start', explanation: 'Sets up and starts the honeypot.' }
+        ],
+        checkCommand: 'netstat -tuln | grep 2222',
+        expectedOutput: '2222'
+      }
+    ]
+  },
+  {
+    projectId: 'mfa-implementation',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Google Authenticator PAM Setup',
+        instruction: 'Install the Google Authenticator PAM module on your Linux server.',
+        summary: 'Enable MFA capabilities.',
+        whyNeeded: 'Passwords alone are vulnerable. MFA adds a critical second layer of defense.',
+        pillarConnection: 'Security — multi-factor authentication significantly reduces the risk of credential-based attacks.',
+        commands: [
+          { text: 'sudo apt install libpam-google-authenticator -y', explanation: 'Installs the PAM module.' }
+        ],
+        checkCommand: 'ls /lib/x86_64-linux-gnu/security/pam_google_authenticator.so',
+        expectedOutput: 'pam_google_authenticator.so'
+      },
+      {
+        id: 'step-2',
+        title: 'MFA Configuration for SSH',
+        instruction: 'Configure SSH to require both a password and an MFA token.',
+        summary: 'Enforce MFA for remote access.',
+        whyNeeded: 'SSH is a primary target for brute force. MFA makes these attacks exponentially harder.',
+        pillarConnection: 'Security — hardening remote access is a top priority for any server administrator.',
+        commands: [
+          { text: 'sudo sed -i "s/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/" /etc/ssh/sshd_config\necho "auth required pam_google_authenticator.so" | sudo tee -a /etc/pam.d/sshd\nsudo systemctl restart ssh', explanation: 'Enables interactive auth and links it to the PAM module.' }
+        ],
+        checkCommand: 'grep "pam_google_authenticator.so" /etc/pam.d/sshd',
+        expectedOutput: 'pam_google_authenticator.so'
+      }
+    ]
+  }
+  },
+  {
+    projectId: 'malware-analysis',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Cuckoo Sandbox Installation',
+        instruction: 'Install the Cuckoo Sandbox and its dependencies for automated malware analysis.',
+        summary: 'Prepare the analysis environment.',
+        whyNeeded: 'Automated sandboxing is essential for safely detonating and analyzing suspicious files without risking host systems.',
+        pillarConnection: 'Security — behavioral analysis helps identify zero-day threats that signature-based tools might miss.',
+        commands: [
+          { text: 'pip install -U cuckoo', explanation: 'Installs the Cuckoo engine.' }
+        ],
+        checkCommand: 'cuckoo --version',
+        expectedOutput: 'Cuckoo'
+      }
+    ]
+  },
+  {
+    projectId: 'vpn-ipsec',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'OpenVPN Server Setup',
+        instruction: 'Install and configure an OpenVPN server to provide secure remote access.',
+        summary: 'Establish a secure tunnel.',
+        whyNeeded: 'VPNs are the standard for securing remote connections to internal company resources.',
+        pillarConnection: 'Security — encrypting remote access protects against data interception on untrusted networks.',
+        commands: [
+          { text: 'sudo apt install openvpn easy-rsa -y', explanation: 'Installs the VPN server and PKI tools.' }
+        ],
+        checkCommand: 'openvpn --version',
+        expectedOutput: 'OpenVPN'
+      }
+    ]
+  },
+  {
+    projectId: 'data-encryption',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'LUKS Partition Encryption',
+        instruction: 'Initialize a LUKS partition on a block device to encrypt data at rest.',
+        summary: 'Protect physical storage.',
+        whyNeeded: 'Full-disk encryption protects data even if the physical storage device is lost or stolen.',
+        pillarConnection: 'Security — encryption at rest is mandatory for regulatory compliance (e.g., GDPR, HIPAA).',
+        commands: [
+          { text: 'sudo cryptsetup luksFormat /dev/sdb1', explanation: 'Initializes the LUKS partition.' }
+        ],
+        checkCommand: 'sudo cryptsetup isLuks /dev/sdb1 && echo OK',
+        expectedOutput: 'OK'
+      }
+    ]
+  },
+  {
+    projectId: 'pki-openssl',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Private CA Initialization',
+        instruction: 'Create the directory structure and root certificate for a private Certificate Authority.',
+        summary: 'Bootstrap the PKI.',
+        whyNeeded: 'Managing your own CA allows you to issue trusted internal certificates for services, VPNs, and users.',
+        pillarConnection: 'Security — a robust PKI is the foundation of trust in a modern enterprise network.',
+        commands: [
+          { text: 'openssl genrsa -out rootCA.key 4096\nopenssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.crt', explanation: 'Generates the CA private key and self-signed root certificate.' }
+        ],
+        checkCommand: 'openssl x509 -in rootCA.crt -text -noout | grep "Self Signed"',
+        expectedOutput: 'Self Signed'
+      }
+    ]
+  },
+  {
+    projectId: 'social-engineering',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'SET Installation',
+        instruction: 'Install the Social-Engineer Toolkit (SET) for security awareness simulations.',
+        summary: 'Prepare the simulation tool.',
+        whyNeeded: 'Social engineering is often the weakest link. Controlled simulations are vital for employee training.',
+        pillarConnection: 'Operational Excellence — automated simulation tools help quantify and reduce human-centric risks.',
+        commands: [
+          { text: 'git clone https://github.com/trustedsec/social-engineer-toolkit/ setoolkit/\ncd setoolkit && pip3 install -r requirements.txt\nsudo python3 setup.py install', explanation: 'Clones and installs SET.' }
+        ],
+        checkCommand: 'setoolkit --version',
+        expectedOutput: 'Social-Engineer Toolkit'
+      }
+    ]
+  }
+  },
+  {
+    projectId: 'zero-trust',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Cloudflare Tunnel Setup',
+        instruction: 'Install cloudflared and create a secure tunnel to expose a local service without opening firewall ports.',
+        summary: 'Establish a Zero Trust perimeter.',
+        whyNeeded: 'Tunnels provide a secure way to access internal services without exposing them directly to the public internet.',
+        pillarConnection: 'Security — Zero Trust assumes the network is compromised and requires explicit verification for every connection.',
+        commands: [
+          { text: 'curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared.deb', explanation: 'Installs the Cloudflare Tunnel daemon.' }
+        ],
+        checkCommand: 'cloudflared --version',
+        expectedOutput: 'cloudflared'
+      }
+    ]
+  },
+  {
+    projectId: 'password-manager',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Vaultwarden Deployment',
+        instruction: 'Deploy a Vaultwarden (Bitwarden compatible) server using Docker.',
+        summary: 'Self-host a password manager.',
+        whyNeeded: 'Passwords are the keys to the kingdom. A centralized, secure manager is essential for enterprise security.',
+        pillarConnection: 'Security — strong, unique passwords for every service significantly reduce the impact of a single breach.',
+        commands: [
+          { text: 'docker run -d --name vaultwarden -p 80:80 -v /vw-data/:/data/ vaultwarden/server:latest', explanation: 'Starts the Vaultwarden container.' }
+        ],
+        checkCommand: 'docker ps | grep vaultwarden',
+        expectedOutput: 'vaultwarden'
+      }
+    ]
+  },
+  {
+    projectId: 'wifi-security',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Aircrack-ng Installation',
+        instruction: 'Install the Aircrack-ng suite for wireless security auditing.',
+        summary: 'Prepare the wireless assessment tools.',
+        whyNeeded: 'Wireless networks are a common entry point. Auditing them ensures that encryption and passwords are robust.',
+        pillarConnection: 'Security — understanding how wireless attacks work is key to defending against them.',
+        commands: [
+          { text: 'sudo apt install aircrack-ng -y', explanation: 'Installs the aircrack-ng suite.' }
+        ],
+        checkCommand: 'aircrack-ng --help',
+        expectedOutput: 'Aircrack-ng'
+      }
+    ]
+  },
+  {
+    projectId: 'secure-boot',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Secure Boot Status Check',
+        instruction: 'Use mokutil to check the status of Secure Boot on your system.',
+        summary: 'Verify hardware security status.',
+        whyNeeded: 'Secure Boot ensures that only trusted, signed bootloaders and kernels are allowed to run on the hardware.',
+        pillarConnection: 'Security — hardware-rooted trust is the foundation of a secure computing environment.',
+        commands: [
+          { text: 'sudo apt install mokutil -y && mokutil --sb-state', explanation: 'Installs mokutil and queries the Secure Boot state.' }
+        ],
+        checkCommand: 'mokutil --sb-state',
+        expectedOutput: 'SecureBoot'
+      }
+    ]
+  },
+  {
+    projectId: 'bug-bounty',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'VDP Policy Creation',
+        instruction: 'Draft a Vulnerability Disclosure Policy (VDP) for your organization.',
+        summary: 'Establish a legal reporting channel.',
+        whyNeeded: 'A VDP provides a safe and legal way for researchers to report security bugs before they are exploited.',
+        pillarConnection: 'Operational Excellence — formalizing communication with the security community reduces risk and improves posture.',
+        commands: [
+          { text: 'cat <<EOF > SECURITY.md\n# Vulnerability Disclosure Policy\nWe welcome reports from researchers. Please email security@example.com...\nEOF', explanation: 'Creates a basic security policy file.' }
+        ],
+        checkCommand: 'ls SECURITY.md',
+        expectedOutput: 'SECURITY.md'
+      }
+    ]
+  },
+  {
+    projectId: 'forensic-analysis',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Autopsy Forensic Browser Setup',
+        instruction: 'Install the Autopsy forensic browser and the Sleuth Kit.',
+        summary: 'Prepare the digital forensics workstation.',
+        whyNeeded: 'Forensic tools are required to analyze disk images and recover evidence after a security breach.',
+        pillarConnection: 'Reliability — formal investigation processes are critical for root cause analysis and legal proceedings.',
+        commands: [
+          { text: 'sudo apt install sleuthkit -y', explanation: 'Installs the foundational forensic tools.' }
+        ],
+        checkCommand: 'fls -V',
+        expectedOutput: 'The Sleuth Kit'
+      }
+    ]
+  },
+  {
+    projectId: 'dlp-config',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'DLP Agent Configuration',
+        instruction: 'Configure a basic data loss prevention rule to monitor for sensitive patterns (e.g., credit cards).',
+        summary: 'Implement data exfiltration prevention.',
+        whyNeeded: 'DLP helps prevent the accidental or intentional loss of sensitive organizational data.',
+        pillarConnection: 'Security — protecting sensitive data is a core component of confidentiality.',
+        commands: [
+          { text: 'echo "Rule: Match [0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4} -> Alert"', explanation: 'Defines a simple DLP pattern.' }
+        ],
+        checkCommand: 'echo "DLP Rule Set"',
+        expectedOutput: 'DLP Rule Set'
+      }
+    ]
+  },
+  {
+    projectId: 'oauth2-oidc',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Keycloak IAM Deployment',
+        instruction: 'Deploy a Keycloak server using Docker to manage identity and access.',
+        summary: 'Provision a modern IAM solution.',
+        whyNeeded: 'Keycloak provides advanced identity federation features like SSO, OAuth2, and OIDC.',
+        pillarConnection: 'Security — centralized identity management reduces the attack surface and improves user experience.',
+        commands: [
+          { text: 'docker run -d --name keycloak -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev', explanation: 'Starts a development instance of Keycloak.' }
+        ],
+        checkCommand: 'docker ps | grep keycloak',
+        expectedOutput: 'keycloak'
+      }
+    ]
+  },
+  {
+    projectId: 'api-security',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'OWASP ZAP API Scan',
+        instruction: 'Use the OWASP ZAP baseline scan to identify vulnerabilities in a sample REST API.',
+        summary: 'Audit your API endpoints.',
+        whyNeeded: 'APIs are often overlooked in security scans but are a major target for modern attacks.',
+        pillarConnection: 'Security — automated security testing should be integrated into every API deployment pipeline.',
+        commands: [
+          { text: 'docker run -t owasp/zap2docker-stable zap-baseline.py -t http://example.com/api', explanation: 'Runs a baseline security scan against the target API.' }
+        ],
+        checkCommand: 'echo "Scan Complete"',
+        expectedOutput: 'Scan Complete'
+      }
+    ]
+  },
+  {
+    projectId: 'nac-config',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'PacketFence NAC Setup',
+        instruction: 'Install PacketFence to manage network access control for your enterprise environment.',
+        summary: 'Control network admission.',
+        whyNeeded: 'NAC ensures that only authorized, compliant devices can connect to your internal network.',
+        pillarConnection: 'Security — device-level verification is a key component of the Zero Trust model.',
+        commands: [
+          { text: 'sudo apt-get update && sudo apt-get install packetfence -y', explanation: 'Installs the PacketFence platform.' }
+        ],
+        checkCommand: 'pfcmd version',
+        expectedOutput: 'PacketFence'
+      }
+    ]
+  },
+  {
+    projectId: 'threat-intel',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'MISP Platform Deployment',
+        instruction: 'Install the MISP (Malware Information Sharing Platform) for threat intelligence management.',
+        summary: 'Manage Indicators of Compromise (IoCs).',
+        whyNeeded: 'Sharing threat intelligence with the wider community helps everyone stay ahead of emerging threats.',
+        pillarConnection: 'Operational Excellence — collaborative security operations improve collective defense.',
+        commands: [
+          { text: 'curl -s https://raw.githubusercontent.com/MISP/MISP/2.4/INSTALL/INSTALL.sh | bash', explanation: 'Runs the MISP installation script.' }
+        ],
+        checkCommand: 'ls /var/www/MISP',
+        expectedOutput: 'MISP'
+      }
+    ]
+  },
+  {
+    projectId: 'incident-sim',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'TheHive Case Management',
+        instruction: 'Deploy TheHive to manage security incident responses and investigations.',
+        summary: 'Streamline your SOC workflow.',
+        whyNeeded: 'A dedicated case management platform ensures that investigations are thorough, documented, and collaborative.',
+        pillarConnection: 'Reliability — consistent incident response processes reduce MTTR (Mean Time To Recovery).',
+        commands: [
+          { text: 'docker run -d --name thehive -p 9000:9000 strangebee/thehive:latest', explanation: 'Starts TheHive container.' }
+        ],
+        checkCommand: 'docker ps | grep thehive',
+        expectedOutput: 'thehive'
+      }
+    ]
+  }
 ];

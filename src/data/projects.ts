@@ -1129,5 +1129,215 @@ export const projects: Project[] = [
     duration: '4 hours',
     tags: ['Terraform', 'IaC', 'K8s', 'Automation'],
     image: 'https://picsum.photos/seed/terraform-k8s/800/600'
+  },
+  {
+    id: 'pfsense-firewall',
+    title: 'Enterprise Firewall Configuration',
+    description: 'Configure and manage an enterprise-grade firewall with pfSense, implementing VLANs, NAT, and stateful inspection.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['pfSense', 'Firewall', 'Networking', 'Security'],
+    image: 'https://picsum.photos/seed/pfsense-firewall/800/600'
+  },
+  {
+    id: 'ssl-tls-setup',
+    title: 'Implementing SSL/TLS',
+    description: 'Master the deployment of SSL/TLS certificates using Certbot and OpenSSL to secure web traffic.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['SSL', 'TLS', 'Certbot', 'OpenSSL'],
+    image: 'https://picsum.photos/seed/ssl-tls-security/800/600'
+  },
+  {
+    id: 'honeypot-cowrie',
+    title: 'Deploying a Cowrie Honeypot',
+    description: 'Deploy a Cowrie SSH/Telnet honeypot to attract and analyze attacker behavior in a controlled environment.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Honeypot', 'Cowrie', 'Deception', 'Security'],
+    image: 'https://picsum.photos/seed/cowrie-honeypot/800/600'
+  },
+  {
+    id: 'mfa-implementation',
+    title: 'Implementing Multi-Factor Auth',
+    description: 'Configure multi-factor authentication (MFA) for Linux systems and applications using Google Authenticator.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['MFA', 'Authentication', 'Security', '2FA'],
+    image: 'https://picsum.photos/seed/mfa-security/800/600'
+  },
+  {
+    id: 'malware-analysis',
+    title: 'Malware Analysis in Sandbox',
+    description: 'Perform behavioral analysis of malware samples in a safe, isolated Cuckoo Sandbox environment.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Malware Analysis', 'Reverse Engineering', 'Sandbox', 'Cuckoo'],
+    image: 'https://picsum.photos/seed/malware-analysis/800/600'
+  },
+  {
+    id: 'vpn-ipsec',
+    title: 'IPsec VPN for Remote Access',
+    description: 'Set up a secure IPsec VPN for remote workers using OpenSwan or Libreswan on Linux.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['VPN', 'IPsec', 'Remote Access', 'Security'],
+    image: 'https://picsum.photos/seed/vpn-security/800/600'
+  },
+  {
+    id: 'data-encryption',
+    title: 'Data Encryption at Rest',
+    description: 'Implement full-disk and file-level encryption using LUKS and VeraCrypt to protect sensitive data.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Encryption', 'LUKS', 'VeraCrypt', 'Privacy'],
+    image: 'https://picsum.photos/seed/data-encryption/800/600'
+  },
+  {
+    id: 'pki-openssl',
+    title: 'PKI Setup with OpenSSL',
+    description: 'Build a private Certificate Authority (CA) and manage the full certificate lifecycle with OpenSSL.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['PKI', 'CA', 'OpenSSL', 'Certificates'],
+    image: 'https://picsum.photos/seed/pki-security/800/600'
+  },
+  {
+    id: 'social-engineering',
+    title: 'Social Engineering Simulation',
+    description: 'Use the Social-Engineer Toolkit (SET) to perform controlled phishing and spear-phishing simulations.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Phishing', 'SET', 'Social Engineering', 'Security'],
+    image: 'https://picsum.photos/seed/social-engineering/800/600'
+  },
+  {
+    id: 'zero-trust',
+    title: 'Zero Trust Architecture Design',
+    description: 'Design and implement a Zero Trust network using Cloudflare Tunnels and Tailscale for secure access.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '12 hours',
+    tags: ['Zero Trust', 'Cloudflare', 'Tailscale', 'Security'],
+    image: 'https://picsum.photos/seed/zero-trust-architecture/800/600'
+  },
+  {
+    id: 'password-manager',
+    title: 'Enterprise Password Management',
+    description: 'Self-host and manage an enterprise-grade password manager using Vaultwarden (Bitwarden).',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Password Management', 'Vaultwarden', 'Privacy', 'Security'],
+    image: 'https://picsum.photos/seed/password-security/800/600'
+  },
+  {
+    id: 'wifi-security',
+    title: 'Wireless Security Auditing',
+    description: 'Perform security assessments of wireless networks using the Aircrack-ng suite.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Wireless', 'Aircrack-ng', 'Auditing', 'Pentesting'],
+    image: 'https://picsum.photos/seed/wifi-security/800/600'
+  },
+  {
+    id: 'secure-boot',
+    title: 'Implementing Secure Boot & TPM',
+    description: 'Configure hardware-based security using UEFI Secure Boot and Trusted Platform Modules (TPM).',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Secure Boot', 'TPM', 'Hardware Security', 'UEFI'],
+    image: 'https://picsum.photos/seed/secure-boot-tpm/800/600'
+  },
+  {
+    id: 'bug-bounty',
+    title: 'Setting up a Bug Bounty Program',
+    description: 'Learn the operational and technical steps to launch and manage a corporate bug bounty program.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Bug Bounty', 'Vulnerability Disclosure', 'AppSec'],
+    image: 'https://picsum.photos/seed/bug-bounty-program/800/600'
+  },
+  {
+    id: 'forensic-analysis',
+    title: 'Forensic Analysis of Disk Image',
+    description: 'Perform deep-dive digital forensics on disk images using Autopsy and the Sleuth Kit.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '15 hours',
+    tags: ['Forensics', 'Autopsy', 'Incident Response', 'Sleuth Kit'],
+    image: 'https://picsum.photos/seed/digital-forensics/800/600'
+  },
+  {
+    id: 'dlp-config',
+    title: 'Data Loss Prevention Setup',
+    description: 'Configure and monitor data loss prevention (DLP) rules to prevent unauthorized data exfiltration.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['DLP', 'Data Privacy', 'Compliance', 'Security'],
+    image: 'https://picsum.photos/seed/dlp-security/800/600'
+  },
+  {
+    id: 'oauth2-oidc',
+    title: 'Implementing OAuth2 & OIDC',
+    description: 'Implement modern identity federation using OAuth2 and OpenID Connect with Keycloak.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['OAuth2', 'OIDC', 'Keycloak', 'Identity'],
+    image: 'https://picsum.photos/seed/identity-federation/800/600'
+  },
+  {
+    id: 'api-security',
+    title: 'API Security Testing',
+    description: 'Scan and test REST and GraphQL APIs for vulnerabilities using OWASP ZAP and Postman.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['API Security', 'OWASP ZAP', 'AppSec', 'Testing'],
+    image: 'https://picsum.photos/seed/api-security-testing/800/600'
+  },
+  {
+    id: 'nac-config',
+    title: 'Network Access Control Config',
+    description: 'Implement Network Access Control (NAC) using PacketFence to secure enterprise environments.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '5 hours',
+    tags: ['NAC', 'PacketFence', 'Network Security', 'IEEE 802.1X'],
+    image: 'https://picsum.photos/seed/nac-security/800/600'
+  },
+  {
+    id: 'threat-intel',
+    title: 'Threat Intelligence Platform',
+    description: 'Set up and manage a Threat Intelligence Platform (TIP) using MISP for sharing indicators of compromise.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '8 hours',
+    tags: ['Threat Intel', 'MISP', 'IoC', 'Security Sharing'],
+    image: 'https://picsum.photos/seed/threat-intelligence/800/600'
+  },
+  {
+    id: 'incident-sim',
+    title: 'Incident Response Simulation',
+    description: 'Simulate a real-world security incident and manage the response using TheHive and Cortex.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '10 hours',
+    tags: ['Incident Response', 'TheHive', 'Cortex', 'Security Ops'],
+    image: 'https://picsum.photos/seed/incident-response-sim/800/600'
   }
 ];
