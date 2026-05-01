@@ -100,6 +100,17 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Cloud Asset Discovery', cmd: 'az resource list', focus: 'Identify shadow IT and unmanaged resources across your cloud subscriptions.' },
     { topic: 'Policy as Code', cmd: 'opa test .', focus: 'Enforce security policies using the Open Policy Agent (OPA) and Rego.' },
   ],
+  killer_sh: [
+    { topic: 'Complex Scheduling & Taints', cmd: 'kubectl get nodes --show-labels', focus: 'Killer.sh Scenario: Deploy a pod with specific node affinity and tolerations to bypass a NoSchedule taint.' },
+    { topic: 'Multi-part Network Policy', cmd: 'kubectl get netpol -A', focus: 'Killer.sh Scenario: Restrict ingress to Namespace A from Namespace B while allowing DNS egress to kube-system.' },
+    { topic: 'Control Plane Troubleshooting', cmd: 'systemctl status kubelet', focus: 'Killer.sh Scenario: Fix a control plane where the API server pod is crashing due to a misconfigured CA certificate path.' },
+    { topic: 'Etcd Snapshot & Restore', cmd: 'etcdctl snapshot save /tmp/backup.db', focus: 'Killer.sh Scenario: Perform a live backup of etcd and restore it into a new data directory under pressure.' },
+    { topic: 'Persistent Storage Migration', cmd: 'kubectl get pv,pvc', focus: 'Killer.sh Scenario: Migrate data from an existing HostPath volume to a new dynamic Provisioned block storage.' },
+    { topic: 'Ingress & TLS Hardening', cmd: 'kubectl get ingress', focus: 'Killer.sh Scenario: Configure an Nginx Ingress with a TLS secret and custom annotations for rate-limiting.' },
+    { topic: 'RBAC Zero-Trust Audit', cmd: 'kubectl auth can-i --as system:serviceaccount:default:web-sa', focus: 'Killer.sh Scenario: Audit and restrict a ServiceAccount that has excessive cluster-wide permissions.' },
+    { topic: 'JSONPath & Resource Sorting', cmd: 'kubectl get pods -A -o jsonpath="{.items[*].metadata.name}"', focus: 'Killer.sh Scenario: Extract specific resource names and sort them by creation timestamp using complex JSONPath.' },
+    { topic: 'Pod Security Admission', cmd: 'kubectl label ns restricted pod-security.kubernetes.io/enforce=restricted', focus: 'Killer.sh Scenario: Migrate a namespace from Privileged to Restricted while identifying and fixing violating pods.' },
+  ],
   python: [
     { topic: 'Data Structures', cmd: 'python3 -c "print([x for x in range(10)])"', focus: 'Master lists, dictionaries, and list comprehensions.' },
     { topic: 'Asynchronous Programming', cmd: 'python3 -c "import asyncio"', focus: 'Build high-performance concurrent applications with async/await.' },
@@ -262,6 +273,7 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   const lowerId = courseId.toLowerCase();
   
   if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
+  else if (lowerId.includes('cka') || lowerId.includes('ckad')) bank = TOPIC_BANKS.killer_sh;
   else if (lowerId.includes('k8s-ops') || lowerTitle.includes('production') || lowerTitle.includes('cluster')) bank = TOPIC_BANKS.k8s_ops;
   else if (lowerId.includes('k8s-security') || lowerTitle.includes('policy')) bank = TOPIC_BANKS.k8s_security;
   else if (lowerId.includes('k8s-net') || lowerTitle.includes('mesh') || lowerTitle.includes('ingress')) bank = TOPIC_BANKS.k8s_networking;
