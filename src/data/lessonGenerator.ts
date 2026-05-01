@@ -179,6 +179,27 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Kernel Inspection', cmd: 'uname -a', focus: 'Check kernel versions and understand system architecture.' },
     { topic: 'Network Sockets', cmd: 'ss -tuln', focus: 'Identify listening ports and active network connections.' },
     { topic: 'Text Stream Editing (Sed)', cmd: 'sed --version', focus: 'Perform non-interactive text transformations on the fly.' },
+    { topic: 'Hardware Topology', cmd: 'lscpu', focus: 'Understand CPU architecture, cores, and cache hierarchy.' },
+    { topic: 'Memory Utilization', cmd: 'free -m', focus: 'Monitor RAM and swap usage to prevent system slowdowns.' },
+    { topic: 'Network Routing', cmd: 'route -n', focus: 'Examine the gateway and routing table for packet delivery.' },
+    { topic: 'Library Dependencies', cmd: 'ldd /bin/ls', focus: 'Identify shared library requirements for system binaries.' },
+    { topic: 'Kernel Versioning', cmd: 'cat /proc/version', focus: 'Identify the exact build and compiler used for the running kernel.' },
+    { topic: 'System Uptime', cmd: 'uptime', focus: 'Track system stability and load averages over time.' },
+    { topic: 'Disk Partitioning (Fdisk)', cmd: 'fdisk -l', focus: 'Master the legacy MBR and modern GPT partitioning schemes.' },
+    { topic: 'System Hostname', cmd: 'hostnamectl', focus: 'Manage the transient and static identity of the system.' },
+    { topic: 'Local Time & Timezones', cmd: 'timedatectl', focus: 'Synchronize system clocks and manage region-specific settings.' },
+    { topic: 'Login History', cmd: 'last -n 10', focus: 'Audit system access by reviewing previous user sessions.' },
+    { topic: 'System Message Buffer', cmd: 'dmesg | head', focus: 'Inspect boot-time hardware discovery and driver initialization.' },
+    { topic: 'Shell Aliases', cmd: 'alias', focus: 'Simplify complex command strings using custom shell shortcuts.' },
+    { topic: 'File Type Identification', cmd: 'file /bin/bash', focus: 'Determine the encoding and architecture of unknown files.' },
+    { topic: 'Disk Block IDs', cmd: 'blkid', focus: 'Identify UUIDs for persistent mounting in /etc/fstab.' },
+    { topic: 'Network Interface Stats', cmd: 'netstat -i', focus: 'Monitor error rates and collision counts on network cards.' },
+    { topic: 'User Group Management', cmd: 'groups', focus: 'Understand secondary group memberships and shared access.' },
+    { topic: 'Symbolic Links', cmd: 'ls -l /bin/sh', focus: 'Manage file pointers and cross-filesystem references.' },
+    { topic: 'Process Tree Visualization', cmd: 'pstree', focus: 'Understand the parent-child relationship of running tasks.' },
+    { topic: 'Terminal Capabilities', cmd: 'env | grep TERM', focus: 'Understand how the shell communicates with the display driver.' },
+    { topic: 'System Entropy', cmd: 'cat /proc/sys/kernel/random/entropy_avail', focus: 'Monitor the availability of random bits for cryptographic operations.' },
+    { topic: 'Module Dependencies', cmd: 'modinfo ipv6', focus: 'Inspect metadata and parameters for kernel loadable modules.' },
   ],
 
   linux_admin: [
@@ -299,6 +320,71 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Incident Response', cmd: 'echo "On-call Rotation"', focus: 'Build a repeatable process for detecting and resolving outages.' },
     { topic: 'Log Aggregation', cmd: 'echo "ELK / Loki"', focus: 'Centralize and index millions of logs for rapid troubleshooting.' },
   ],
+  git: [
+    { topic: 'Snapshot Isolation', cmd: 'git status', focus: 'Understand how Git tracks changes between the working tree and the index.' },
+    { topic: 'Commit Archaeology', cmd: 'git log --oneline --graph', focus: 'Master the art of navigating complex repository histories.' },
+    { topic: 'Branching Strategies', cmd: 'git branch -a', focus: 'Implement feature-branch and trunk-based development workflows.' },
+    { topic: 'Stash & Recovery', cmd: 'git stash list', focus: 'Safely store uncommitted work and recover it later.' },
+    { topic: 'Merge Conflict Resolution', cmd: 'git merge feature-branch', focus: 'Learn to resolve overlapping changes in shared codebases.' },
+    { topic: 'History Rewriting (Rebase)', cmd: 'git rebase main', focus: 'Clean up commit history before merging into the main branch.' },
+    { topic: 'Plumbing & Porcelains', cmd: 'git cat-file -p HEAD', focus: 'Explore the underlying object store (blobs, trees, commits).' },
+    { topic: 'Reflog Investigation', cmd: 'git reflog', focus: 'Recover "lost" commits and branches using the local reference log.' },
+    { topic: 'Submodule Management', cmd: 'git submodule status', focus: 'Manage complex dependencies across multiple repositories.' },
+    { topic: 'Git Hooks Automation', cmd: 'ls .git/hooks', focus: 'Automate linting and testing during the commit lifecycle.' },
+  ],
+  golang: [
+    { topic: 'Static Typing & Inference', cmd: 'go version', focus: 'Master the clean, efficient syntax of Google\'s systems language.' },
+    { topic: 'Goroutine Concurrency', cmd: 'echo "go func() { ... }()"', focus: 'Build highly concurrent systems with lightweight execution threads.' },
+    { topic: 'Channel Communication', cmd: 'echo "ch := make(chan int)"', focus: 'Implement safe memory sharing through message passing.' },
+    { topic: 'Interface Polymorphism', cmd: 'echo "type Reader interface { ... }"', focus: 'Master decoupled, composable architecture using interfaces.' },
+    { topic: 'Package Management (Modules)', cmd: 'go mod graph', focus: 'Manage dependencies and versioning with Go Modules.' },
+    { topic: 'Standard Library Tooling', cmd: 'go doc fmt', focus: 'Leverage the powerful built-in libraries for web and systems.' },
+    { topic: 'Garbage Collection Tuning', cmd: 'echo "GOGC=off"', focus: 'Understand the performance trade-offs of modern memory management.' },
+    { topic: 'Compile-time Safety', cmd: 'go build .', focus: 'Catch errors early with a fast and strict compiler.' },
+  ],
+  web_dev: [
+    { topic: 'Semantic HTML5', cmd: 'echo "<article>...</article>"', focus: 'Build accessible and SEO-friendly document structures.' },
+    { topic: 'CSS Grid & Flexbox', cmd: 'echo "display: grid;"', focus: 'Master modern layout techniques for responsive designs.' },
+    { topic: 'JS Event Loop', cmd: 'echo "setTimeout(() => { ... }, 0)"', focus: 'Understand asynchronous execution in the browser runtime.' },
+    { topic: 'DOM Manipulation', cmd: 'echo "document.querySelector(\'.btn\')"', focus: 'Interact with and modify web page content dynamically.' },
+    { topic: 'API Fetching', cmd: 'echo "fetch(\'/api/data\')"', focus: 'Integrate backend services into your frontend applications.' },
+    { topic: 'Responsive Breakpoints', cmd: 'echo "@media (max-width: 768px)"', focus: 'Ensure your app looks beautiful on every device size.' },
+  ],
+  react: [
+    { topic: 'Component Lifecycle (Hooks)', cmd: 'echo "useEffect(() => { ... }, [])"', focus: 'Master functional components and side-effect management.' },
+    { topic: 'State Orchestration', cmd: 'echo "useReducer(reducer, initialState)"', focus: 'Manage complex application states with predictable patterns.' },
+    { topic: 'Virtual DOM Reconciliation', cmd: 'echo "React.memo(MyComponent)"', focus: 'Optimize performance by reducing unnecessary re-renders.' },
+    { topic: 'Context API & Providers', cmd: 'echo "const value = useContext(MyContext)"', focus: 'Pass data through the component tree without prop drilling.' },
+    { topic: 'Client-side Routing', cmd: 'echo "<Routes>...</Routes>"', focus: 'Build single-page applications with seamless navigation.' },
+    { topic: 'Next.js SSR/SSG', cmd: 'echo "getStaticProps()"', focus: 'Master server-side rendering for speed and SEO.' },
+  ],
+  rust: [
+    { topic: 'Ownership & Borrowing', cmd: 'rustc --version', focus: 'Eliminate memory leaks and data races at compile time.' },
+    { topic: 'Pattern Matching (Enums)', cmd: 'echo "match result { ... }"', focus: 'Write expressive, type-safe logic using powerful enums.' },
+    { topic: 'Cargo Package Manager', cmd: 'cargo build', focus: 'Manage dependencies and build pipelines for systems software.' },
+    { topic: 'Traits & Generics', cmd: 'echo "trait Speak { ... }"', focus: 'Build highly reusable and performant abstractions.' },
+    { topic: 'Async/Await (Tokio)', cmd: 'echo "#[tokio::main]"', focus: 'Build high-performance, non-blocking network services.' },
+  ],
+  java: [
+    { topic: 'JVM Architecture', cmd: 'java -version', focus: 'Understand the "Write Once, Run Anywhere" runtime environment.' },
+    { topic: 'Spring Boot Microservices', cmd: 'echo "@SpringBootApplication"', focus: 'Build production-grade REST APIs with the enterprise standard.' },
+    { topic: 'JPA & Hibernate', cmd: 'echo "@Entity"', focus: 'Map object models to relational databases seamlessly.' },
+    { topic: 'Multi-threading (Virtual Threads)', cmd: 'echo "Thread.ofVirtual().start(...)"', focus: 'Scale concurrent applications with modern Java concurrency.' },
+    { topic: 'Maven/Gradle Dependency', cmd: 'ls pom.xml', focus: 'Manage complex project builds and artifact lifecycles.' },
+  ],
+  cpp: [
+    { topic: 'Manual Memory Management', cmd: 'g++ --version', focus: 'Master pointers, references, and the stack vs heap.' },
+    { topic: 'RAII & Smart Pointers', cmd: 'echo "std::unique_ptr<T>"', focus: 'Prevent memory leaks using modern C++ resource management.' },
+    { topic: 'Template Metaprogramming', cmd: 'echo "template <typename T>"', focus: 'Build highly optimized, generic code libraries.' },
+    { topic: 'STL Containers', cmd: 'echo "std::vector<int> v;"', focus: 'Leverage the powerful Standard Template Library for efficiency.' },
+  ],
+  data_science: [
+    { topic: 'Pandas Dataframes', cmd: 'python3 -c "import pandas"', focus: 'Clean, filter, and aggregate structured datasets at scale.' },
+    { topic: 'Matplotlib/Seaborn Viz', cmd: 'python3 -c "import matplotlib"', focus: 'Create compelling visual stories from raw numerical data.' },
+    { topic: 'Scikit-learn Pipelines', cmd: 'python3 -c "import sklearn"', focus: 'Build and evaluate predictive models using industry-standard ML.' },
+    { topic: 'Jupyter Interactive EDA', cmd: 'jupyter --version', focus: 'Master the document-based workflow for data exploration.' },
+    { topic: 'Statistical Hypothesis Testing', cmd: 'python3 -c "from scipy import stats"', focus: 'Validate your data findings using mathematical rigor.' },
+  ],
   prom: [
     { topic: 'Time-Series Database Architecture', cmd: 'prometheus --version', focus: 'Understand how Prometheus stores multi-dimensional data as time series.' },
     { topic: 'Metric Collection (Scraping)', cmd: 'curl http://localhost:9090/metrics', focus: 'Explore how Prometheus pulls metrics from targets using HTTP.' },
@@ -358,6 +444,14 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   else if (lowerId.includes('net') || lowerTitle.includes('network')) bank = TOPIC_BANKS.networking;
   else if (lowerId.includes('ai') || lowerTitle.includes('intelligence') || lowerTitle.includes('ml')) bank = TOPIC_BANKS.ai;
   else if (lowerId.includes('prom') || lowerTitle.includes('prometheus') || lowerTitle.includes('promql')) bank = TOPIC_BANKS.prom;
+  else if (lowerId.includes('git') || lowerTitle.includes('git')) bank = TOPIC_BANKS.git;
+  else if (lowerId.includes('go') || lowerTitle.includes('go')) bank = TOPIC_BANKS.golang;
+  else if (lowerId.includes('java') || lowerTitle.includes('java')) bank = TOPIC_BANKS.java;
+  else if (lowerId.includes('rust') || lowerTitle.includes('rust')) bank = TOPIC_BANKS.rust;
+  else if (lowerId.includes('react') || lowerTitle.includes('react')) bank = TOPIC_BANKS.react;
+  else if (lowerId.includes('cpp') || lowerTitle.includes('c++')) bank = TOPIC_BANKS.cpp;
+  else if (lowerId.includes('data') || lowerTitle.includes('data science') || lowerTitle.includes('statistics') || lowerTitle.includes('analysis')) bank = TOPIC_BANKS.data_science;
+  else if (lowerId.includes('web') || lowerTitle.includes('html') || lowerTitle.includes('css') || lowerTitle.includes('javascript')) bank = TOPIC_BANKS.web_dev;
 
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];

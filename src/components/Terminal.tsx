@@ -1006,8 +1006,55 @@ export const Terminal: React.FC<TerminalProps> = ({
           }
           break;
         }
+        case 'git':
+          if (!args[1]) {
+            output = 'usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]';
+          } else if (args[1] === 'status') {
+            output = 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nnothing to commit, working tree clean';
+          } else if (args[1] === 'log') {
+            output = 'commit 8e9e05f5 (HEAD -> main, origin/main)\nAuthor: Engineer <dev@realcloud.io>\nDate:   Fri May 1 12:00:00 2026 +0000\n\n    feat: implement high-fidelity simulations';
+          } else {
+            output = `Command "git ${args[1]}" executed successfully.`;
+          }
+          break;
+        case 'go':
+          if (args[1] === 'version') {
+            output = 'go version go1.18.1 linux/amd64';
+          } else {
+            output = 'Go is a tool for managing Go source code.\n\nUsage:\n\n\tgo <command> [arguments]';
+          }
+          break;
+        case 'cargo':
+          output = 'cargo 1.60.0 (d1fd93f2c 2022-03-23)';
+          break;
+        case 'rustc':
+          output = 'rustc 1.60.0 (d1fd93f2c 2022-03-23)';
+          break;
+        case 'g++':
+        case 'gcc':
+          output = 'g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0';
+          break;
+        case 'npm':
+          output = '8.5.0';
+          break;
+        case 'npx':
+          output = '8.5.0';
+          break;
+        case 'terraform':
+          output = 'Terraform v1.1.7\non linux_amd64';
+          if (args.includes('plan')) {
+            output = 'Terraform will perform the following actions:\n\n  # aws_instance.web will be created\n  + resource "aws_instance" "web" {\n      + ami                          = "ami-0c55b159cbfafe1f0"\n      + instance_type                = "t2.micro"\n    }\n\nPlan: 1 to add, 0 to change, 0 to destroy.';
+          }
+          break;
+        case 'ansible':
+        case 'ansible-playbook':
+          output = 'ansible-playbook [core 2.12.3]\n  config file = /etc/ansible/ansible.cfg\n  configured module search path = [\'/home/user/.ansible/plugins/modules\']';
+          if (baseCmd === 'ansible' && args.includes('-m') && args.includes('ping')) {
+            output = 'localhost | SUCCESS => {\n    "changed": false, \n    "ping": "pong"\n}';
+          }
+          break;
         case 'help':
-          output = `Available commands: ${[...availableCommands, 'kubectl', 'helm', 'etcdctl', 'kubeadm', 'kube-bench', 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
+          output = `Available commands: ${[...availableCommands, 'git', 'go', 'cargo', 'rustc', 'g++', 'npm', 'npx', 'terraform', 'ansible', 'kubectl', 'helm', 'etcdctl', 'kubeadm', 'kube-bench', 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
           break;
         default: {
           // Check if the user is typing a directory path or a directory definition
