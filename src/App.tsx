@@ -179,30 +179,35 @@ export default function App() {
         {activeTab === 'terms' && <StaticPage pageId="terms" onTabChange={setActiveTab} />}
         
         {/* Newsletter Section */}
-        <section className="py-24 bg-zinc-50 border-y border-zinc-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-[3rem] p-12 md:p-20 border border-zinc-200 shadow-xl relative overflow-hidden">
-              <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
-                <div>
-                  <h3 className="text-3xl md:text-5xl font-bold text-zinc-900 mb-6 tracking-tight">Stay ahead of the <br /><span className="text-brand-blue font-mono font-medium tracking-tight">cloud curve.</span></h3>
-                  <p className="text-zinc-500 text-lg leading-relaxed max-w-md">
-                    Get weekly labs, cloud engineering tips, and platform updates delivered straight to your inbox.
+        <section className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="relative group overflow-hidden bg-zinc-900 rounded-[2rem] p-8 md:p-10 border border-zinc-800">
+              {/* Subtle background glow */}
+              <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-brand-blue/10 rounded-full blur-[100px] group-hover:bg-brand-blue/20 transition-all duration-1000" />
+              <div className="absolute -left-24 -top-24 w-96 h-96 bg-zinc-800/20 rounded-full blur-[100px]" />
+              
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                <div className="text-center lg:text-left">
+                  <h3 className="text-2xl md:text-3xl font-light text-white tracking-tight">
+                    Stay ahead of the <span className="text-brand-blue font-semibold">cloud curve.</span>
+                  </h3>
+                  <p className="mt-2 text-zinc-400 text-base font-light max-w-sm">
+                    Weekly labs and engineering tips delivered to your inbox.
                   </p>
                 </div>
-                <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
+                
+                <form className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto" onSubmit={(e) => e.preventDefault()}>
                   <input 
                     type="email" 
                     placeholder="Enter your email" 
-                    className="flex-1 px-8 py-5 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all"
+                    className="flex-1 lg:w-80 px-6 py-4 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all"
                     required
                   />
-                  <button className="px-10 py-5 bg-zinc-900 text-white rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20">
+                  <button className="px-8 py-4 bg-white text-zinc-950 rounded-xl font-bold hover:bg-zinc-100 transition-all active:scale-[0.98] shadow-lg shadow-white/5">
                     Subscribe
                   </button>
                 </form>
               </div>
-              {/* Decorative background */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
             </div>
           </div>
         </section>
