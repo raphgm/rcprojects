@@ -3681,7 +3681,6 @@ export const labContents: LabContent[] = [
       { id: '5', title: 'Restart and View UI', instruction: 'Restart daemon and Apache; log in to /nagios.', summary: 'Live monitoring.', whyNeeded: 'See state in UI.', pillarConnection: 'Reliability',
         commands: [ { text: 'sudo systemctl restart nagios apache2', explanation: 'Restart.' }, { text: 'curl -u nagiosadmin:admin -s -o /dev/null -w "%{http_code}" http://localhost/nagios/', explanation: 'UI check.' } ], checkCommand: 'systemctl is-active nagios', expectedOutput: 'active' }
     ]
-  }
   },
   {
     projectId: 'crossplane-platform',
@@ -3968,7 +3967,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'Running'
       }
     ]
-  }
   },
   {
     projectId: '138',
@@ -4034,7 +4032,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'fluentd'
       }
     ]
-  }
   },
   {
     projectId: 'pfsense-firewall',
@@ -4163,7 +4160,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'pam_google_authenticator.so'
       }
     ]
-  }
   },
   {
     projectId: 'malware-analysis',
@@ -4259,7 +4255,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'Social-Engineer Toolkit'
       }
     ]
-  }
   },
   {
     projectId: 'zero-trust',
@@ -4488,7 +4483,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'thehive'
       }
     ]
-  }
   },
   {
     projectId: 'hash-cracking',
@@ -4559,7 +4553,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'Enumeration Done'
       }
     ]
-  }
   },
   {
     projectId: 'ecommerce-db',
@@ -4655,7 +4648,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'scram-sha-256'
       }
     ]
-  }
   },
   {
     projectId: 'titanic-analysis',
@@ -4726,7 +4718,6 @@ export const labContents: LabContent[] = [
         expectedOutput: '2'
       }
     ]
-  }
   },
   {
     projectId: 'docker-optimization',
@@ -4784,7 +4775,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'Version'
       }
     ]
-  }
   },
   {
     projectId: 'ingress-nginx',
@@ -4855,7 +4845,6 @@ export const labContents: LabContent[] = [
         expectedOutput: '6379'
       }
     ]
-  }
   },
   {
     projectId: 'flask-api',
@@ -4913,7 +4902,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'Name: scapy'
       }
     ]
-  }
   },
   {
     projectId: 'microservices-docker',
@@ -5028,7 +5016,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'cadvisor'
       }
     ]
-  }
   },
   {
     projectId: '125',
@@ -5200,7 +5187,6 @@ export const labContents: LabContent[] = [
         expectedOutput: 'John the Ripper'
       }
     ]
-  }
   },
   {
     projectId: 'git-f-01',

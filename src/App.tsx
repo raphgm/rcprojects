@@ -86,7 +86,12 @@ export default function App() {
         lessons: generateFallbackLessons(courseId, courseTitle, lessonCount),
         title: courseTitle
       });
+    }
+  };
+
   const startLab = (projectId: string, projectTitle: string) => {
+
+
     setActiveLesson(null); // Clear active lesson
     const content = labContents.find(l => l.projectId === projectId);
     if (content) {
@@ -103,7 +108,6 @@ export default function App() {
       });
     }
   };
-
 
 
   return (
