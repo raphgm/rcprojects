@@ -1339,5 +1339,85 @@ export const projects: Project[] = [
     duration: '10 hours',
     tags: ['Incident Response', 'TheHive', 'Cortex', 'Security Ops'],
     image: 'https://picsum.photos/seed/incident-response-sim/800/600'
+  },
+  {
+    id: 'hash-cracking',
+    title: 'Password Cracking with John the Ripper',
+    description: 'Learn to use John the Ripper to crack various password hashes and understand the importance of strong hashing algorithms.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['John the Ripper', 'Password Cracking', 'Security', 'Kali'],
+    image: 'https://picsum.photos/seed/john-the-ripper/800/600'
+  },
+  {
+    id: 'social-toolkit',
+    title: 'Social Engineering Toolkit (SET) Mastery',
+    description: 'Master the Social-Engineer Toolkit (SET) to perform advanced phishing and credential harvesting simulations.',
+    category: 'Security',
+    difficulty: 'Medium',
+    duration: '4 hours',
+    tags: ['SET', 'Social Engineering', 'Security', 'Kali'],
+    image: 'https://picsum.photos/seed/social-engineering-toolkit/800/600'
+  },
+  {
+    id: 'sqlmap-sqli',
+    title: 'SQL Injection with Sqlmap',
+    description: 'Use Sqlmap to automate the detection and exploitation of SQL injection vulnerabilities in web applications.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Sqlmap', 'SQLi', 'Web Security', 'Kali'],
+    image: 'https://picsum.photos/seed/sqlmap-security/800/600'
+  },
+  {
+    id: 'nikto-scan',
+    title: 'Web Vulnerability Scanning with Nikto',
+    description: 'Perform comprehensive web server scans using Nikto to find dangerous files, outdated software, and other security issues.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Nikto', 'Web Security', 'Scanning', 'Kali'],
+    image: 'https://picsum.photos/seed/nikto-web-scan/800/600'
+  },
+  {
+    id: 'hashcat-recovery',
+    title: 'Advanced Password Recovery with Hashcat',
+    description: 'Use the power of GPU-accelerated password recovery with Hashcat to crack complex hashes and multi-stage encryptions.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Hashcat', 'Password Cracking', 'GPU', 'Security'],
+    image: 'https://picsum.photos/seed/hashcat-security/800/600'
+  },
+  {
+    id: 'linpeas-privesc',
+    title: 'Linux Privilege Escalation with LinPEAS',
+    description: 'Search for privilege escalation paths on Linux systems using automated tools like LinPEAS and manual enumeration techniques.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['PrivEsc', 'LinPEAS', 'Linux Security', 'Kali'],
+    image: 'https://picsum.photos/seed/privilege-escalation/800/600'
+  },
+  {
+    id: 'dvwa-exploit',
+    title: 'Exploiting Web Vulnerabilities in DVWA',
+    description: 'Learn to identify and exploit common web vulnerabilities like XSS, CSRF, and File Inclusion in the Damn Vulnerable Web App (DVWA).',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '6 hours',
+    tags: ['DVWA', 'Web Security', 'XSS', 'CSRF'],
+    image: 'https://picsum.photos/seed/dvwa-security/800/600'
+  },
+  {
+    id: 'kali-hardening',
+    title: 'Kali Linux Security Hardening',
+    description: 'Secure your Kali Linux environment by configuring firewalls, disabling unnecessary services, and implementing full-disk encryption.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['Hardening', 'Kali Linux', 'Linux Security', 'Security'],
+    image: 'https://picsum.photos/seed/kali-hardening/800/600'
   }
 ];

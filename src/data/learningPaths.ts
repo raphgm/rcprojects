@@ -202,11 +202,21 @@ export const learningPaths: LearningPath[] = [
       { id: 'pen-testing', title: 'Advanced Penetration Testing', duration: '20h', level: 'Advanced', lessons: 50 }
     ],
     projects: [
-      { id: 'wifi-audit', title: 'Wireless Network Auditing', difficulty: 'Hard', estimatedTime: '4h' },
-      { id: 'nmap-scan', title: 'Network Reconnaissance with Nmap', difficulty: 'Medium', estimatedTime: '2h' },
-      { id: 'burp-suite-web', title: 'Web App Testing with Burp Suite', difficulty: 'Hard', estimatedTime: '6h' },
+      { id: 'wifi-security', title: 'Wireless Network Auditing', difficulty: 'Hard', estimatedTime: '4h' },
+      { id: '113', title: 'Network Reconnaissance with Nmap', difficulty: 'Medium', estimatedTime: '2h' },
+      { id: '116', title: 'Web App Testing with Burp Suite', difficulty: 'Hard', estimatedTime: '6h' },
       { id: 'hash-cracking', title: 'Password Cracking with John', difficulty: 'Medium', estimatedTime: '3h' },
-      { id: 'social-toolkit', title: 'Social Engineering Toolkit', difficulty: 'Medium', estimatedTime: '4h' }
+      { id: 'social-toolkit', title: 'Social Engineering Toolkit', difficulty: 'Medium', estimatedTime: '4h' },
+      { id: '115', title: 'Metasploit Framework Mastery', difficulty: 'Hard', estimatedTime: '8h' },
+      { id: '114', title: 'Network Traffic Analysis', difficulty: 'Medium', estimatedTime: '3h' },
+      { id: 'sqlmap-sqli', title: 'SQL Injection with Sqlmap', difficulty: 'Intermediate', estimatedTime: '3h' },
+      { id: 'nikto-scan', title: 'Web Scanning with Nikto', difficulty: 'Beginner', estimatedTime: '2h' },
+      { id: 'hashcat-recovery', title: 'Password Recovery with Hashcat', difficulty: 'Advanced', estimatedTime: '5h' },
+      { id: 'linpeas-privesc', title: 'Privilege Escalation', difficulty: 'Intermediate', estimatedTime: '4h' },
+      { id: '125', title: 'Vulnerability Scanning', difficulty: 'Intermediate', estimatedTime: '3h' },
+      { id: 'forensic-analysis', title: 'Forensic Investigation', difficulty: 'Hard', estimatedTime: '15h' },
+      { id: 'dvwa-exploit', title: 'Web Exploitation in DVWA', difficulty: 'Intermediate', estimatedTime: '6h' },
+      { id: 'kali-hardening', title: 'Kali Security Hardening', difficulty: 'Beginner', estimatedTime: '3h' }
     ]
   },
   {
