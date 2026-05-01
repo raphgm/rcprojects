@@ -83,14 +83,20 @@ export const learningPaths: LearningPath[] = [
     skills: 360,
     coursesCount: 11,
     projectsCount: 30,
-    description: 'DevOps bridges the gap between writing code and running it reliably in production. You\'ll build automated deployment pipelines (CI/CD), provision infrastructure with code using tools like Terraform and Ansible, and monitor live systems — so software ships faster with fewer failures.',
+    description: 'DevOps is the engine of modern software engineering, unifying development and operations into a single high-velocity lifecycle. You will master the automation of everything: from architecting robust CI/CD pipelines and provisioning immutable infrastructure with Terraform and Ansible, to implementing deep observability across distributed systems—ensuring your software scales effortlessly and ships with unmatched reliability.',
     color: 'bg-brand-blue',
     courses: [
       { id: 'devops-intro', title: 'Introduction to DevOps', duration: '3h', level: 'Beginner', lessons: 10 },
       { id: 'cicd-pipelines', title: 'Building CI/CD Pipelines', duration: '10h', level: 'Intermediate', lessons: 30 },
       { id: 'iac-terraform', title: 'Infrastructure as Code with Terraform', duration: '12h', level: 'Advanced', lessons: 25 },
       { id: 'ansible-config', title: 'Configuration Management with Ansible', duration: '8h', level: 'Intermediate', lessons: 20 },
-      { id: 'jenkins-mastery', title: 'Jenkins CI/CD Mastery', duration: '15h', level: 'Advanced', lessons: 45 }
+      { id: 'jenkins-mastery', title: 'Jenkins CI/CD Mastery', duration: '15h', level: 'Advanced', lessons: 45 },
+      { id: 'devops-k8s', title: 'Kubernetes for DevOps Engineers', duration: '10h', level: 'Advanced', lessons: 35 },
+      { id: 'sre-fundamentals', title: 'Site Reliability Engineering (SRE)', duration: '8h', level: 'Intermediate', lessons: 25 },
+      { id: 'devops-monitoring', title: 'Full-stack Monitoring & Observability', duration: '7h', level: 'Intermediate', lessons: 20 },
+      { id: 'devsecops-pipeline', title: 'DevSecOps: Integrating Security', duration: '9h', level: 'Advanced', lessons: 30 },
+      { id: 'gitops-argo-flux', title: 'GitOps with ArgoCD & Flux', duration: '6h', level: 'Advanced', lessons: 22 },
+      { id: 'pulumi-automation', title: 'Modern IaC with Pulumi', duration: '8h', level: 'Intermediate', lessons: 28 }
     ],
     projects: [
       { id: 'jenkins-pipeline', title: 'Automated Deployment Pipeline', difficulty: 'Hard', estimatedTime: '5h' },
@@ -121,7 +127,8 @@ export const learningPaths: LearningPath[] = [
       { id: 'sentry-errors', title: 'Error Tracking with Sentry', difficulty: 'Easy', estimatedTime: '1h' },
       { id: 'circleci-python', title: 'CircleCI for Python Apps', difficulty: 'Medium', estimatedTime: '3h' },
       { id: 'artifactory-repo', title: 'Repository Management with Artifactory', difficulty: 'Medium', estimatedTime: '4h' },
-      { id: 'nagios-monitor', title: 'Infrastructure Monitoring with Nagios', difficulty: 'Medium', estimatedTime: '5h' }
+      { id: 'nagios-monitor', title: 'Infrastructure Monitoring with Nagios', difficulty: 'Medium', estimatedTime: '5h' },
+      { id: 'terraform-k8s', title: 'Kubernetes Provisioning with Terraform', difficulty: 'Medium', estimatedTime: '4h' }
     ]
   },
   {
