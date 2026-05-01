@@ -18,6 +18,9 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Log Aggregation', cmd: 'docker logs --tail 20', focus: 'Debug application failures by inspecting stdout and stderr streams.' },
     { topic: 'Registry Operations', cmd: 'docker search alpine', focus: 'Learn how to discover and manage images in remote repositories.' },
     { topic: 'Runtime Cleanup', cmd: 'docker system df', focus: 'Maintain system health by pruning unused images, containers, and networks.' },
+    { topic: 'Docker Socket Security', cmd: 'ls -l /var/run/docker.sock', focus: 'Understand the risks of exposing the Docker daemon to untrusted containers.' },
+    { topic: 'Resource Constraints (cgroups)', cmd: 'docker run --memory="256m" alpine', focus: 'Limit container memory and CPU usage to ensure host stability.' },
+    { topic: 'Custom Bridge Networks', cmd: 'docker network create my-net', focus: 'Isolate application components using user-defined networking.' },
   ],
   k8s: [
     { topic: 'Cluster Architecture', cmd: 'kubectl get nodes', focus: 'Understand the relationship between the control plane and worker nodes.' },
@@ -27,6 +30,14 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'ConfigMaps & Secrets', cmd: 'kubectl get configmaps', focus: 'Externalize application configuration and sensitive data.' },
     { topic: 'Storage Classes & PVCs', cmd: 'kubectl get pvc', focus: 'Provision persistent storage dynamically for stateful workloads.' },
     { topic: 'RBAC & Identity', cmd: 'kubectl auth can-i create pods', focus: 'Implement fine-grained access control using ServiceAccounts.' },
+    { topic: 'Namespaces & Isolation', cmd: 'kubectl get ns', focus: 'Organize resources and enforce boundaries within a single cluster.' },
+    { topic: 'Resource Limits', cmd: 'kubectl describe pod', focus: 'Prevent noisy neighbor issues by defining CPU and memory constraints.' },
+    { topic: 'Liveness & Readiness', cmd: 'kubectl get pods -w', focus: 'Configure health checks to ensure traffic only hits healthy pods.' },
+    { topic: 'Horizontal Pod Autoscaling', cmd: 'kubectl get hpa', focus: 'Scale workloads automatically based on resource utilization.' },
+    { topic: 'Ingress Controllers', cmd: 'kubectl get ing', focus: 'Route external HTTP(S) traffic to internal services.' },
+    { topic: 'Network Policies', cmd: 'kubectl get netpol', focus: 'Secure your cluster by restricting traffic between pods.' },
+    { topic: 'Jobs & CronJobs', cmd: 'kubectl get cronjobs', focus: 'Manage short-lived tasks and scheduled operations.' },
+    { topic: 'Node Selectors & Affinity', cmd: 'kubectl get nodes --show-labels', focus: 'Direct pod placement to specific nodes based on hardware or tags.' },
   ],
   k8s_ops: [
     { topic: 'Cluster Bootstrapping', cmd: 'kubeadm version', focus: 'Understand the multi-stage process of initializing a Kubernetes control plane.' },
@@ -155,6 +166,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Systemd Service Lifecycle', cmd: 'systemctl status nginx', focus: 'Master the management of background daemons and service states.' },
     { topic: 'Log Rotation Policies', cmd: 'logrotate -d /etc/logrotate.conf', focus: 'Understand how Linux manages disk space for system logs.' },
     { topic: 'System Runlevels & Targets', cmd: 'systemctl get-default', focus: 'Manage system boot states and target environments.' },
+    { topic: 'Process Priority (Nice/Renice)', cmd: 'nice -n 10 top', focus: 'Adjust CPU priority for critical and background processes.' },
+    { topic: 'Crontab Automation', cmd: 'crontab -l', focus: 'Schedule recurring tasks and maintenance scripts.' },
+    { topic: 'Disk Quotas & Limits', cmd: 'repquota -a', focus: 'Enforce storage boundaries for multi-user environments.' },
+    { topic: 'Environment Variables', cmd: 'printenv', focus: 'Configure system-wide and user-specific shells.' },
+    { topic: 'Package Dependency resolution', cmd: 'apt-cache depends nginx', focus: 'Understand how Linux managers resolve complex library requirements.' },
   ],
   linux_security: [
     { topic: 'Firewall Management', cmd: 'iptables -L -n', focus: 'Configure packet filtering rules to protect the network perimeter.' },
@@ -162,6 +178,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'SELinux & AppArmor', cmd: 'sestatus', focus: 'Implement Mandatory Access Control (MAC) to restrict process capabilities.' },
     { topic: 'SSH Hardening', cmd: 'sshd -t', focus: 'Secure remote access by disabling password auth and restricting protocols.' },
     { topic: 'File Integrity Monitoring', cmd: 'aide --version', focus: 'Detect unauthorized changes to critical system binaries.' },
+    { topic: 'Rootkit Detection', cmd: 'rkhunter --version', focus: 'Scan for backdoors and kernel-level exploits.' },
+    { topic: 'Password Policy (PAM)', cmd: 'cat /etc/pam.d/common-password', focus: 'Enforce complexity and rotation requirements for local accounts.' },
+    { topic: 'USB & Hardware Security', cmd: 'lsusb', focus: 'Control physical interface access in secure environments.' },
+    { topic: 'Fail2Ban Integration', cmd: 'fail2ban-client status', focus: 'Automate brute-force protection for exposed services.' },
+    { topic: 'Kernel Hardening', cmd: 'sysctl kernel.modules_disabled', focus: 'Lock down the kernel to prevent runtime module insertion.' },
   ],
   linux_networking: [
     { topic: 'Interface Configuration', cmd: 'ip addr show', focus: 'Manage network interfaces and IP address assignments.' },
@@ -169,6 +190,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Packet Inspection', cmd: 'tcpdump -i eth0 -c 5', focus: 'Analyze raw network traffic to diagnose connectivity issues.' },
     { topic: 'DNS Resolution', cmd: 'dig +short google.com', focus: 'Troubleshoot hostname resolution across recursive and authoritative servers.' },
     { topic: 'Socket Statistics', cmd: 'ss -atp', focus: 'Examine active TCP/UDP connections and the processes that own them.' },
+    { topic: 'Network Namespace Isolation', cmd: 'ip netns list', focus: 'Understand how containers isolate network stacks using namespaces.' },
+    { topic: 'Bridge & Tunneling', cmd: 'brctl show', focus: 'Manage virtual networking for VMs and container runtimes.' },
+    { topic: 'Bandwidth Management', cmd: 'tc qdisc show', focus: 'Enforce traffic shaping and QoS on busy interfaces.' },
+    { topic: 'Neighbor Table (ARP)', cmd: 'ip neighbor show', focus: 'Inspect L2 to L3 mapping and troubleshoot local network segments.' },
+    { topic: 'VLAN Tagging', cmd: 'ip link add link eth0 name eth0.10 type vlan id 10', focus: 'Configure 802.1Q tagging for multi-tenant networks.' },
   ],
   linux_storage: [
     { topic: 'Partition Management', cmd: 'lsblk', focus: 'List block devices and understand disk partitioning.' },
@@ -176,6 +202,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Filesystem Creation', cmd: 'mkfs.ext4 -n /dev/sdb1', focus: 'Format raw partitions with modern Linux filesystems.' },
     { topic: 'Mount Points & Fstab', cmd: 'findmnt', focus: 'Manage persistent mounts and understand the /etc/fstab structure.' },
     { topic: 'Disk Usage Analysis', cmd: 'du -sh /var/log', focus: 'Identify space-consuming directories and manage disk quotas.' },
+    { topic: 'RAID Array Health', cmd: 'cat /proc/mdstat', focus: 'Monitor software RAID redundancy and rebuild progress.' },
+    { topic: 'NFS & Network Storage', cmd: 'showmount -e localhost', focus: 'Integrate remote filesystems into the local directory tree.' },
+    { topic: 'Swap Space Tuning', cmd: 'swapon --show', focus: 'Optimize virtual memory and OOM killer behavior.' },
+    { topic: 'Inodes & Metadata', cmd: 'df -i', focus: 'Troubleshoot "disk full" errors caused by small file exhaustion.' },
+    { topic: 'Bad Block Recovery', cmd: 'badblocks -v /dev/sdb1', focus: 'Perform hardware-level diagnostics on failing storage media.' },
   ],
   linux_kernel: [
     { topic: 'Kernel Modules', cmd: 'lsmod | head', focus: 'Load and unload dynamic kernel components on the fly.' },
@@ -183,6 +214,11 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'System Buffer Logs', cmd: 'dmesg | tail -n 20', focus: 'Inspect kernel-level messages and hardware events.' },
     { topic: 'Interrupt Distribution', cmd: 'cat /proc/interrupts | head', focus: 'Understand how the CPU handles hardware and software interrupts.' },
     { topic: 'Boot Parameters', cmd: 'cat /proc/cmdline', focus: 'Inspect the arguments passed to the kernel at system boot.' },
+    { topic: 'Kprobes & Tracing', cmd: 'ls /sys/kernel/debug/tracing', focus: 'Master low-level kernel performance profiling.' },
+    { topic: 'Cgroups v2', cmd: 'ls /sys/fs/cgroup', focus: 'Manage resource isolation for the next generation of containers.' },
+    { topic: 'Kernel panic Debugging', cmd: 'ls /var/crash', focus: 'Analyze kdump outputs to find root causes of system crashes.' },
+    { topic: 'EBPF Program loading', cmd: 'bpftool prog list', focus: 'Harness the power of the Linux kernel for observability and security.' },
+    { topic: 'Load Average internals', cmd: 'cat /proc/loadavg', focus: 'Deep dive into the 1, 5, and 15-minute system load metrics.' },
   ],
   terraform: [
     { topic: 'HCL Syntax & Providers', cmd: 'terraform version', focus: 'Understand declarative configuration and provider plugins.' },
@@ -305,15 +341,27 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];
     const isK8s = lowerId.includes('k8s') || lowerId.includes('cka') || lowerId.includes('ckad') || lowerTitle.includes('kubernetes');
+    const phase = Math.floor(i / bank.length) + 1;
+    const isRepeat = i >= bank.length;
     
     lessons.push({
       id: `${courseId}-lesson-${i + 1}`,
-      title: i === 0 ? `Introduction to ${courseTitle}` : m.topic,
-      content: `\n# ${i === 0 ? `Welcome to ${courseTitle}` : m.topic}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\nUnderstanding ${m.topic.toLowerCase()} is a building block for mastering ${courseTitle}.\n\n## What You'll Practice\n- Run a real command in the interactive sandbox\n- Read the output and reason about it\n- Apply the idea to a representative scenario\n      `,
-      task: `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}.`,
+      title: i === 0 ? `Introduction to ${courseTitle}` : (isRepeat ? `${m.topic} (Phase ${phase})` : m.topic),
+      content: `\n# ${i === 0 ? `Welcome to ${courseTitle}` : (isRepeat ? `${m.topic}: Deep Dive (Phase ${phase})` : m.topic)}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\n${
+        i % 3 === 0 
+          ? `Mastering ${m.topic.toLowerCase()} is essential for building resilient, production-grade systems in the ${courseTitle} track.` 
+          : i % 3 === 1 
+            ? `Understanding the nuances of ${m.topic.toLowerCase()} allows you to optimize performance and reduce operational overhead.` 
+            : `Deep domain knowledge in ${m.topic.toLowerCase()} is what separates junior engineers from senior infrastructure architects.`
+      }\n\n## What You'll Practice\n- Execute the \`${m.cmd}\` command to observe real-time system behavior\n- Analyze the output to verify configuration accuracy\n- ${
+        isRepeat 
+          ? `Refine your approach to handle ${m.topic.toLowerCase()} at scale.` 
+          : `Apply these concepts to a representative ${lowerTitle} scenario.`
+      }\n      `,
+      task: `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}${isRepeat ? ` at an advanced level` : ''}.`,
       demoType: 'terminal' as const,
       demoConfig: {
-        initialMessage: `${courseTitle} sandbox ready. Try \`${m.cmd}\`.`,
+        initialMessage: `${courseTitle} sandbox ready. [Mission ${i + 1}/${total}]\nType \`${m.cmd}\` to begin.`,
         availableCommands: [m.cmd.split(' ')[0], 'ls', 'pwd', 'help', 'clear'],
       },
     });
