@@ -216,8 +216,6 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     }
     case 'minikube':
       return `(minikube ${sub || ''} completed)`;
-    case 'argocd':
-    case 'flux':
     case 'istioctl':
     case 'kustomize':
     case 'crossplane':
@@ -230,8 +228,10 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'ansible-playbook':
     case 'ansible-galaxy':
     case 'jenkins-cli':
-    case 'argocd':
-    case 'flux':
+    case 'etcdctl':
+    case 'cilium':
+    case 'falco':
+      return `(${base} ${sub || ''} completed successfully)`;
     case 'useradd':
     case 'visudo':
     case 'logrotate':

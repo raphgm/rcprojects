@@ -24,10 +24,37 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Pod Lifecycle', cmd: 'kubectl get pods', focus: 'Master the smallest deployable unit and its ephemeral nature.' },
     { topic: 'Deployments & Replicas', cmd: 'kubectl get deployments', focus: 'Manage desired state and automated rollouts with controllers.' },
     { topic: 'Service Discovery', cmd: 'kubectl get svc', focus: 'Expose pods to the cluster or external traffic via stable IPs.' },
-    { topic: 'Ingress Controllers', cmd: 'kubectl get ingress', focus: 'Route HTTP traffic using hostname and path-based rules.' },
     { topic: 'ConfigMaps & Secrets', cmd: 'kubectl get configmaps', focus: 'Externalize application configuration and sensitive data.' },
     { topic: 'Storage Classes & PVCs', cmd: 'kubectl get pvc', focus: 'Provision persistent storage dynamically for stateful workloads.' },
     { topic: 'RBAC & Identity', cmd: 'kubectl auth can-i create pods', focus: 'Implement fine-grained access control using ServiceAccounts.' },
+  ],
+  k8s_ops: [
+    { topic: 'Cluster Bootstrapping', cmd: 'kubeadm version', focus: 'Understand the multi-stage process of initializing a Kubernetes control plane.' },
+    { topic: 'Etcd Maintenance', cmd: 'etcdctl member list', focus: 'Manage the cluster\'s distributed key-value store and perform backups.' },
+    { topic: 'Control Plane Health', cmd: 'kubectl get componentstatuses', focus: 'Monitor the health of the API server, scheduler, and controller manager.' },
+    { topic: 'Node Taints & Tolerations', cmd: 'kubectl describe node', focus: 'Control pod placement by marking nodes as unschedulable or reserved.' },
+    { topic: 'Cluster Upgrades', cmd: 'kubeadm upgrade plan', focus: 'Learn the lifecycle management of a production-grade Kubernetes cluster.' },
+  ],
+  k8s_dev: [
+    { topic: 'Helm Chart Management', cmd: 'helm list', focus: 'Package and version your applications using the K8s package manager.' },
+    { topic: 'Kustomize Overlays', cmd: 'kubectl kustomize .', focus: 'Manage environment-specific configurations without duplicating manifests.' },
+    { topic: 'Application Rollouts', cmd: 'kubectl rollout status deployment/web', focus: 'Master zero-downtime updates and automated rollback strategies.' },
+    { topic: 'Port Forwarding & Debugging', cmd: 'kubectl port-forward svc/web 8080:80', focus: 'Access cluster services locally for rapid development and testing.' },
+    { topic: 'Resource Limits & Quotas', cmd: 'kubectl describe quota', focus: 'Enforce resource boundaries to prevent noisy neighbor issues.' },
+  ],
+  k8s_security: [
+    { topic: 'Admission Controllers', cmd: 'kubectl get mutatingwebhookconfigurations', focus: 'Intercept and modify requests to the API server based on custom policies.' },
+    { topic: 'Runtime Threat Detection', cmd: 'falco --version', focus: 'Detect suspicious activity within your pods using kernel-level monitoring.' },
+    { topic: 'Pod Security Standards', cmd: 'kubectl label ns default pod-security.kubernetes.io/enforce=baseline', focus: 'Enforce security profiles at the namespace level.' },
+    { topic: 'Container Image Scanning', cmd: 'trivy k8s cluster', focus: 'Identify vulnerabilities in running containers across the entire cluster.' },
+    { topic: 'Secret Encryption at Rest', cmd: 'kubectl get secrets --all-namespaces', focus: 'Understand how Kubernetes secures sensitive data in etcd.' },
+  ],
+  k8s_networking: [
+    { topic: 'Service Mesh (Istio)', cmd: 'istioctl analyze', focus: 'Implement advanced traffic routing, security, and observability at the L7 layer.' },
+    { topic: 'eBPF Networking (Cilium)', cmd: 'cilium status', focus: 'Master high-performance networking and security using kernel-level eBPF.' },
+    { topic: 'Network Policies', cmd: 'kubectl get netpol', focus: 'Implement zero-trust security by restricting traffic between microservices.' },
+    { topic: 'Ingress Controllers', cmd: 'kubectl get ingress -A', focus: 'Manage external access to cluster services via HTTP/HTTPS.' },
+    { topic: 'CoreDNS & Discovery', cmd: 'kubectl get pods -n kube-system -l k8s-app=kube-dns', focus: 'Understand how Kubernetes performs internal hostname resolution.' },
   ],
   cyber: [
     { topic: 'Network Reconnaissance', cmd: 'nmap -sS localhost', focus: 'Identify active hosts and open ports on a target network.' },
@@ -235,7 +262,10 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   const lowerId = courseId.toLowerCase();
   
   if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
-  else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s;
+  else if (lowerId.includes('k8s-ops') || lowerTitle.includes('production') || lowerTitle.includes('cluster')) bank = TOPIC_BANKS.k8s_ops;
+  else if (lowerId.includes('k8s-security') || lowerTitle.includes('policy')) bank = TOPIC_BANKS.k8s_security;
+  else if (lowerId.includes('k8s-net') || lowerTitle.includes('mesh') || lowerTitle.includes('ingress')) bank = TOPIC_BANKS.k8s_networking;
+  else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s_dev;
   else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
   else if (lowerId.includes('hacking') || lowerTitle.includes('penetration') || lowerTitle.includes('ethical') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber_hacking;
   else if (lowerId.includes('defense') || lowerTitle.includes('soc') || lowerTitle.includes('incident')) bank = TOPIC_BANKS.cyber_defense;
