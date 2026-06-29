@@ -18,7 +18,7 @@ import { StaticPage } from './components/StaticPage';
 import type { FooterTab } from './components/Footer';
 import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
-import { labContents } from './data/labContent';
+import { cloudLabs } from './data/cloudLabs';
 import { learningPaths } from './data/learningPaths';
 import { Lesson, LabContent } from './types/content';
 import { generateFallbackLessons } from './data/lessonGenerator';
@@ -33,8 +33,8 @@ export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
 export type CloudProvider = 'azure';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<FooterTab>('learn');
-  const [activeLesson, setActiveLesson] = useState<{ lessons: Lesson[], title: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<FooterTab>('projects');
+  const [activeLesson, setActiveLesson] = useState<{ courseId: string, lessons: Lesson[], title: string } | null>(null);
   const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
   const [completedLabs, setCompletedLabs] = useState<string[]>([]);
   const [linuxFlavor, setLinuxFlavor] = useState<LinuxFlavor>('ubuntu');
@@ -74,7 +74,7 @@ export default function App() {
     setActiveLab(null); // Clear active lab
     const content = courseContents.find(c => c.courseId === courseId);
     if (content) {
-      setActiveLesson({ lessons: content.lessons, title: courseTitle });
+      setActiveLesson({ courseId, lessons: content.lessons, title: courseTitle });
     } else {
       // Generate a full set of interactive lessons for any course defined in learningPaths
       let lessonCount = 20;
@@ -83,22 +83,32 @@ export default function App() {
         if (course) { lessonCount = course.lessons || 20; break; }
       }
       setActiveLesson({
+        courseId,
         lessons: generateFallbackLessons(courseId, courseTitle, lessonCount),
         title: courseTitle
       });
     }
   };
 
+  const inferCategoryFromTitle = (title: string): string => {
+    const normalized = title.toLowerCase();
+    if (normalized.includes('kubernetes') || normalized.includes('k8s')) return 'Kubernetes';
+    if (normalized.includes('azure') || normalized.includes('entra') || normalized.includes('aks')) return 'Azure';
+    if (normalized.includes('security') || normalized.includes('compliance') || normalized.includes('siem') || normalized.includes('audit')) return 'Security';
+    if (normalized.includes('python') || normalized.includes('ml') || normalized.includes('model') || normalized.includes('data science')) return 'Python';
+    if (normalized.includes('data') || normalized.includes('sql') || normalized.includes('etl') || normalized.includes('pipeline')) return 'Data Science';
+    if (normalized.includes('devops') || normalized.includes('cicd') || normalized.includes('ci/cd') || normalized.includes('gitops') || normalized.includes('terraform') || normalized.includes('ansible')) return 'DevOps';
+    return 'General';
+  };
+
   const startLab = (projectId: string, projectTitle: string) => {
-
-
     setActiveLesson(null); // Clear active lesson
-    const content = labContents.find(l => l.projectId === projectId);
+    const content = cloudLabs.find(l => l.projectId === projectId);
     if (content) {
       setActiveLab({ lab: content, title: projectTitle });
     } else {
       // Find category for specific fallback
-      let category = 'General';
+      let category = inferCategoryFromTitle(projectTitle);
       const project = projects.find(p => p.id === projectId);
       if (project) category = project.category;
 
@@ -220,8 +230,10 @@ export default function App() {
         {activeLesson && (
           <LessonView 
             key="lesson-view"
+            courseId={activeLesson.courseId}
             lessons={activeLesson.lessons}
             courseTitle={activeLesson.title}
+            onLaunchExercise={startLab}
             onClose={() => setActiveLesson(null)}
             linuxFlavor={linuxFlavor}
             onFlavorChange={setLinuxFlavor}

@@ -7,7 +7,7 @@ import {
   Coffee, Cpu, Atom, Cloud, Wrench, Binary,
   Layers, Brain, FileCode, Server, Command,
   CloudFog, CloudSun, X, Clock, BarChart3,
-  CheckCircle2, PlayCircle, Lock
+  CheckCircle2, PlayCircle, Lock, Sparkles
 } from 'lucide-react';
 import { learningPaths, LearningPath, Course, Project } from '../data/learningPaths';
 import { SquigglyArrow, Sparkle, ZigZag, DoodleWrapper } from './Doodles';
@@ -25,27 +25,29 @@ const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: b
 
   return (
     <motion.div
-      whileHover={isLocked ? undefined : { y: -5 }}
+      whileHover={isLocked ? { scale: 1.01 } : { y: -5 }}
       onClick={() => { if (!isLocked) onClick(); }}
-      className={`relative bg-white border border-zinc-200 rounded-2xl p-6 transition-all group ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'}`}
+      className={`relative bg-white border border-zinc-200 rounded-2xl p-6 transition-all group overflow-hidden ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'}`}
     >
       {isLocked && (
         <div className="absolute top-3 right-3 z-20 flex items-center justify-center w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-zinc-100 pointer-events-none">
-          <Lock className="w-3 h-3 text-zinc-400" />
+          <Lock className="w-3 h-3 text-amber-500" />
         </div>
       )}
-      <div className={`w-12 h-12 ${path.color} rounded-xl flex items-center justify-center mb-6 text-white shadow-lg`}>
+      
+      <div className={`w-12 h-12 ${path.color} rounded-xl flex items-center justify-center mb-6 text-white shadow-lg relative`}>
         <Icon className="w-6 h-6" />
+        {isLocked && <div className="absolute inset-0 bg-white/10 rounded-xl backdrop-blur-[1px]" />}
       </div>
       
-      <h3 className="text-xl font-bold text-zinc-900 mb-2 group-hover:text-zinc-700 transition-colors">
+      <h3 className={`text-xl font-bold mb-2 transition-colors ${isLocked ? 'text-zinc-400' : 'text-zinc-900 group-hover:text-zinc-700'}`}>
         {path.title}
       </h3>
       <p className="text-zinc-500 text-sm mb-6 line-clamp-2">
         {path.description}
       </p>
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 opacity-80">
         <div className="flex flex-col">
           <span className="text-lg font-bold text-zinc-900">{path.skills}</span>
           <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Skills</span>
@@ -66,8 +68,12 @@ const PathCard: React.FC<{ path: LearningPath; onClick: () => void; isLocked?: b
         )}
       </div>
 
-      <div className="flex items-center text-zinc-900 font-bold text-sm group-hover:gap-2 transition-all">
-        Start Learning <ArrowRight className="w-4 h-4 ml-1" />
+      <div className={`flex items-center font-bold text-sm transition-all ${isLocked ? 'text-zinc-300' : 'text-zinc-900 group-hover:gap-2'}`}>
+        {isLocked ? (
+          <>Coming Soon <Sparkles className="w-3 h-3 ml-1.5 text-amber-500/50" /></>
+        ) : (
+          <>Start Learning <ArrowRight className="w-4 h-4 ml-1" /></>
+        )}
       </div>
     </motion.div>
   );
@@ -327,7 +333,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={index >= 4 && path.id !== 'cka' && path.id !== 'ckad' && path.id !== 'kubernetes' && path.id !== 'docker' && !path.id.startsWith('k8s-')}
+              isLocked={path.id !== 'linux' && path.id !== 'devops' && !path.id.startsWith('k8s-') && path.id !== 'kubernetes'}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">

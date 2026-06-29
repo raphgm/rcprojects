@@ -1,3 +1,5 @@
+import { learningPaths } from './learningPaths';
+
 export interface Project {
   id: string;
   title: string;
@@ -9,7 +11,7 @@ export interface Project {
   image: string;
 }
 
-export const projects: Project[] = [
+const staticProjects: Project[] = [
   {
     id: '1',
     title: 'Linux Web Server Setup & Security',
@@ -17,7 +19,7 @@ export const projects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '1.5 hours',
-    tags: ['Linux', 'Apache', 'Security', 'UFW'],
+    tags: ['Linux', 'Apache', 'Security', 'UFW', 'DevOps Deep Dive'],
     image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2000&auto=format&fit=crop'
   },
   {
@@ -47,7 +49,7 @@ export const projects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '3 hours',
-    tags: ['Bash', 'Automation', 'Cron', 'Linux'],
+    tags: ['Bash', 'Automation', 'Cron', 'Linux', 'DevOps Deep Dive'],
     image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2000&auto=format&fit=crop'
   },
   {
@@ -57,7 +59,7 @@ export const projects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '2 hours',
-    tags: ['GitHub Actions', 'Docker', 'CI/CD'],
+    tags: ['GitHub Actions', 'Docker', 'CI/CD', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/github-actions/800/600'
   },
   {
@@ -67,7 +69,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Advanced',
     duration: '5 hours',
-    tags: ['Istio', 'K8s', 'Service Mesh', 'Envoy'],
+    tags: ['Istio', 'K8s', 'Service Mesh', 'Envoy', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/istio-service-mesh/800/600'
   },
   {
@@ -77,7 +79,7 @@ export const projects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '3 hours',
-    tags: ['ArgoCD', 'GitOps', 'K8s', 'Helm'],
+    tags: ['ArgoCD', 'GitOps', 'K8s', 'Helm', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/argocd-gitops/800/600'
   },
   {
@@ -87,7 +89,7 @@ export const projects: Project[] = [
     category: 'Security',
     difficulty: 'Intermediate',
     duration: '1.5 hours',
-    tags: ['Prowler', 'Compliance', 'AWS', 'Security'],
+    tags: ['Prowler', 'Compliance', 'AWS', 'Security', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/aws-security-audit/800/600'
   },
   {
@@ -97,7 +99,7 @@ export const projects: Project[] = [
     category: 'Azure',
     difficulty: 'Beginner',
     duration: '1 hour',
-    tags: ['VPN Gateway', 'VNet', 'Networking', 'Azure'],
+    tags: ['VPN Gateway', 'VNet', 'Networking', 'Azure', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/azure-networking-vpn/800/600'
   },
   {
@@ -107,7 +109,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '2.5 hours',
-    tags: ['Kubeadm', 'Linux', 'Cluster', 'K8s'],
+    tags: ['Kubeadm', 'Linux', 'Cluster', 'K8s', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-cluster/800/600'
   },
   {
@@ -117,7 +119,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '1.5 hours',
-    tags: ['Secrets', 'External Secrets', 'Security', 'K8s'],
+    tags: ['Secrets', 'External Secrets', 'Security', 'K8s', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-security/800/600'
   },
   {
@@ -127,7 +129,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '2 hours',
-    tags: ['Autoscaling', 'HPA', 'VPA', 'K8s'],
+    tags: ['Autoscaling', 'HPA', 'VPA', 'K8s', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-autoscaling/800/600'
   },
   {
@@ -137,7 +139,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Beginner',
     duration: '1.5 hours',
-    tags: ['Ingress', 'NGINX', 'Networking', 'K8s'],
+    tags: ['Ingress', 'NGINX', 'Networking', 'K8s', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-ingress/800/600'
   },
   {
@@ -147,7 +149,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Intermediate',
     duration: '2.5 hours',
-    tags: ['Storage', 'CSI', 'PV', 'PVC'],
+    tags: ['Storage', 'CSI', 'PV', 'PVC', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-storage/800/600'
   },
   {
@@ -157,7 +159,7 @@ export const projects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Advanced',
     duration: '3.5 hours',
-    tags: ['Network Policy', 'Security', 'Calico', 'K8s'],
+    tags: ['Network Policy', 'Security', 'Calico', 'K8s', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/kubernetes-network-policy/800/600'
   },
   {
@@ -2610,4 +2612,29 @@ export const projects: Project[] = [
     tags: ['Python', 'Regex', 'Cloud', 'Logs'],
     image: 'https://picsum.photos/seed/py-logs/800/600'
   }
+];
+
+const derivedProjects: Project[] = [];
+
+learningPaths.forEach(path => {
+  if (path.id === 'kubernetes' || path.id.startsWith('k8s-')) {
+    path.projects.forEach(proj => {
+      const tags = path.title.split(' + ').map(t => t.trim());
+      derivedProjects.push({
+        id: proj.id,
+        title: proj.title,
+        description: `Hands-on lab project from the "${path.title}" learning tree. Solve step-by-step in the browser terminal.`,
+        category: 'Kubernetes',
+        difficulty: proj.difficulty || 'Intermediate',
+        duration: proj.estimatedTime || '1 hour',
+        tags: [...tags, 'Interactive Lab', 'Kubernetes'],
+        image: `https://picsum.photos/seed/${proj.id}/800/600`
+      });
+    });
+  }
+});
+
+export const projects: Project[] = [
+  ...staticProjects,
+  ...derivedProjects
 ];

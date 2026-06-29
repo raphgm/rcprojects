@@ -44,6 +44,102 @@ const GENERIC_LAB = [
   { title: 'Production Validation', instruction: 'Verify the solution against the expected output and reliability standards.' },
 ];
 
+const MISSION_BLUEPRINTS: { title: string; summary: string; pillar: string }[] = [
+  { title: 'Environment Initialization', summary: 'Prepare baseline runtime and dependencies.', pillar: 'Operational Excellence' },
+  { title: 'Access and Security Baseline', summary: 'Enforce least-privilege and secure defaults.', pillar: 'Security' },
+  { title: 'Core Service Configuration', summary: 'Configure the primary service for the scenario.', pillar: 'Reliability' },
+  { title: 'Automation and Repeatability', summary: 'Codify repeatable setup and operations.', pillar: 'Operational Excellence' },
+  { title: 'Observability and Diagnostics', summary: 'Add diagnostics to verify behavior and triage issues.', pillar: 'Performance Efficiency' },
+  { title: 'Resilience and Recovery', summary: 'Prepare rollback, restart, and incident-response controls.', pillar: 'Reliability' },
+  { title: 'Final Validation and Handoff', summary: 'Run final checks and produce deployment-ready evidence.', pillar: 'Cost Optimization' },
+];
+
+const CATEGORY_COMMANDS: Record<string, string[]> = {
+  docker: [
+    'docker --version',
+    'docker build -t lab-app:latest .',
+    'docker run --rm -p 8080:80 lab-app:latest',
+    'docker ps --format "table {{.Names}}\t{{.Status}}"',
+    'docker logs --tail 50 $(docker ps -q | head -n 1)',
+    'docker stop $(docker ps -q | head -n 1)',
+    'docker image ls | head -n 10'
+  ],
+  k8s: [
+    'kubectl config current-context',
+    'kubectl apply -f manifests/',
+    'kubectl get pods -A',
+    'kubectl rollout status deploy/app -n default',
+    'kubectl logs deploy/app --tail=50',
+    'kubectl describe pod $(kubectl get pod -n default -o name | head -n 1)',
+    'kubectl get svc -n default'
+  ],
+  cyber: [
+    'sudo systemctl status ssh --no-pager',
+    'sudo ufw status verbose',
+    'sudo ss -tulpn | head -n 20',
+    'sudo grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config',
+    'sudo tail -n 40 /var/log/auth.log',
+    'sudo fail2ban-client status || true',
+    'sudo passwd -S root'
+  ],
+  db: [
+    'psql --version',
+    'psql -c "SELECT now();"',
+    'psql -c "\\dt"',
+    'psql -c "EXPLAIN SELECT 1;"',
+    'psql -c "SELECT count(*) FROM information_schema.tables;"',
+    'psql -c "SELECT current_database();"',
+    'psql -c "SELECT version();"'
+  ],
+  azure: [
+    'az account show --output table',
+    'az group list --top 5 --output table',
+    'az resource list --top 5 --output table',
+    'az deployment group what-if --help',
+    'az monitor metrics list-definitions --resource "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/sites/<app>" || true',
+    'az role assignment list --assignee <principal-id> --output table || true',
+    'az configure --list-defaults'
+  ],
+  networking: [
+    'ip -br a',
+    'ip route',
+    'nslookup example.com',
+    'curl -I https://example.com',
+    'ss -tulpn | head -n 20',
+    'ping -c 3 8.8.8.8',
+    'traceroute example.com | head -n 15 || true'
+  ],
+  ai: [
+    'python -V',
+    'python -c "print(\"dataset loaded\")"',
+    'python -c "print(\"inference complete\")"',
+    'python -c "print(\"latency baseline captured\")"',
+    'python -c "print(\"metrics exported\")"',
+    'python -c "print(\"rollback checkpoint saved\")"',
+    'python -c "print(\"validation complete\")"'
+  ],
+  generic: [
+    'pwd',
+    'ls -la',
+    'mkdir -p workspace && cd workspace',
+    'echo "automation check" > checklist.txt',
+    'cat checklist.txt',
+    'date',
+    'echo "final validation passed"'
+  ]
+};
+
+const resolveCategoryKey = (lowerCat: string): keyof typeof CATEGORY_COMMANDS => {
+  if (lowerCat.includes('docker')) return 'docker';
+  if (lowerCat.includes('k8s') || lowerCat.includes('kubernetes')) return 'k8s';
+  if (lowerCat.includes('cyber') || lowerCat.includes('security')) return 'cyber';
+  if (lowerCat.includes('db') || lowerCat.includes('data') || lowerCat.includes('sql')) return 'db';
+  if (lowerCat.includes('azure')) return 'azure';
+  if (lowerCat.includes('net') || lowerCat.includes('network')) return 'networking';
+  if (lowerCat.includes('ai') || lowerCat.includes('intelligence') || lowerCat.includes('ml')) return 'ai';
+  return 'generic';
+};
+
 export function generateFallbackLab(projectId: string, projectTitle: string, category: string): LabContent {
   const lowerCat = category.toLowerCase();
   let steps = GENERIC_LAB;
@@ -56,16 +152,38 @@ export function generateFallbackLab(projectId: string, projectTitle: string, cat
   else if (lowerCat.includes('net') || lowerCat.includes('network')) steps = CATEGORY_LABS.networking;
   else if (lowerCat.includes('ai') || lowerCat.includes('intelligence') || lowerCat.includes('ml')) steps = CATEGORY_LABS.ai;
 
+  const commandSet = CATEGORY_COMMANDS[resolveCategoryKey(lowerCat)];
+
+  const expandedSteps = MISSION_BLUEPRINTS.map((mission, index) => {
+    const sourceStep = steps[index % steps.length];
+    const command = commandSet[index % commandSet.length];
+
+    return {
+      id: `step-${index + 1}`,
+      title: sourceStep?.title || mission.title,
+      instruction: `${sourceStep?.instruction || mission.summary} (${projectTitle})`,
+      summary: mission.summary,
+      whyNeeded: `Completing this mission ensures ${projectTitle} meets production-grade standards for ${mission.pillar.toLowerCase()}.`,
+      pillarConnection: `${mission.pillar} - enforced through reproducible hands-on validation.`,
+      commands: [
+        {
+          text: command,
+          explanation: `Run this verification command to complete mission ${index + 1}.`
+        }
+      ],
+      checkCommand: command,
+      expectedOutput: 'success'
+    };
+  });
+
   return {
     projectId,
     environment: 'linux',
-    steps: steps.map((s, i) => ({
-      id: `step-${i + 1}`,
-      title: s.title,
-      instruction: `${s.instruction} (${projectTitle})`,
-      summary: s.title,
-      whyNeeded: `This step is critical for ${projectTitle} to ensure structural integrity and professional standards.`,
-      pillarConnection: 'Operational Excellence — maintaining high-fidelity workflows even in fallback scenarios.',
-    }))
+    description: `${projectTitle} hands-on sandbox with mission-driven guidance, live terminal validation, and production-focused checks.`,
+    objective: `Complete all ${MISSION_BLUEPRINTS.length} missions to validate ${projectTitle} end-to-end in an interactive environment.`,
+    missionNumber: 1,
+    totalMissions: MISSION_BLUEPRINTS.length,
+    xpReward: 300,
+    steps: expandedSteps
   };
 }

@@ -88,6 +88,17 @@ export const Footer: React.FC<FooterProps> = ({ onTabChange }) => {
                   Enterprise
                 </button>
               </li>
+              <li>
+                <a 
+                  href="https://skill-sch.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-zinc-500 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2 group"
+                >
+                  <div className="w-1 h-1 rounded-full bg-zinc-200 group-hover:bg-brand-blue transition-colors"></div>
+                  SKILL.SCH
+                </a>
+              </li>
             </ul>
           </div>
 

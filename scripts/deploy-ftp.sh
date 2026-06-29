@@ -21,10 +21,8 @@ fi
 : "${FTP_PORT:=21}"
 : "${FTP_REMOTE_DIR:=public_html}"
 
-if [ ! -d dist ]; then
-  echo "→ dist/ not found, running build..."
-  npm run build
-fi
+echo "→ Running fresh build..."
+npm run build
 
 echo "→ Deploying dist/ to ftp://$FTP_HOST:$FTP_PORT/$FTP_REMOTE_DIR ..."
 

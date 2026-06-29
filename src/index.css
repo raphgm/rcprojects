@@ -62,3 +62,21 @@
 .markdown-body pre code {
   @apply bg-transparent p-0 text-brand-blue;
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; filter: blur(20px); }
+  50% { opacity: 0.8; filter: blur(30px); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s infinite ease-in-out;
+}

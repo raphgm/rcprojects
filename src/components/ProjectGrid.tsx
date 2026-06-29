@@ -82,12 +82,12 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence mode="popLayout">
-          {filteredProjects.map((project, index) => (
+          {filteredProjects.map((project) => (
             <ProjectCard 
               key={project.id} 
               project={project} 
               isCompleted={completedLabs.includes(project.id)}
-              isLocked={index >= 4}
+              isLocked={!['1', '2', '3', '4', '5', '9', '10', '11', '12', '19', '20', '21', '22', '23', '24'].includes(project.id)}
               onStart={() => onStartLab(project.id, project.title)} 
             />
           ))}

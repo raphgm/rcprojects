@@ -8,9 +8,11 @@ import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
 import { LinuxFlavor, CloudProvider } from '../App';
 
 interface LessonViewProps {
+  courseId?: string;
   lessons: Lesson[];
   onClose: () => void;
   courseTitle: string;
+  onLaunchExercise?: (id: string, title: string) => void;
   linuxFlavor?: LinuxFlavor;
   onFlavorChange?: (flavor: LinuxFlavor) => void;
   cloudProvider?: CloudProvider;
@@ -18,9 +20,11 @@ interface LessonViewProps {
 }
 
 export const LessonView: React.FC<LessonViewProps> = ({ 
+  courseId,
   lessons, 
   onClose, 
   courseTitle,
+  onLaunchExercise,
   linuxFlavor = 'ubuntu',
   onFlavorChange,
   cloudProvider = 'aws',
@@ -60,6 +64,23 @@ export const LessonView: React.FC<LessonViewProps> = ({
       setCurrentLessonIndex(prev => prev - 1);
       setIsSandboxOpen(false);
     }
+  };
+
+  const toSlug = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const launchCurrentExercise = () => {
+    if (!onLaunchExercise) {
+      setIsSandboxOpen(true);
+      return;
+    }
+
+    const baseId = courseId ? toSlug(courseId) : toSlug(courseTitle);
+    const lessonId = currentLesson.id ? toSlug(currentLesson.id) : toSlug(currentLesson.title);
+    onLaunchExercise(`sandbox-${baseId}-${lessonId}`, `${courseTitle} - ${currentLesson.title}`);
   };
 
   return (
@@ -194,7 +215,7 @@ export const LessonView: React.FC<LessonViewProps> = ({
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setIsSandboxOpen(true)}
+                onClick={launchCurrentExercise}
                 className="bg-brand-blue text-white px-8 py-4 rounded-2xl font-bold hover:bg-brand-blue/90 transition-all shadow-xl shadow-brand-blue/20 flex items-center gap-3 shrink-0 cursor-pointer"
               >
                 <Play className="w-5 h-5 fill-white" />

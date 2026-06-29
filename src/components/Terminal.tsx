@@ -5,6 +5,71 @@ import { LinuxFlavor } from '../App';
 
 import { LabStep } from '../types/content';
 
+const normalizeCommandToLinux = (cmd: string): string => {
+  let newCmd = cmd.trim();
+  
+  // macOS mappings to Linux
+  if (newCmd.includes('brew install ')) {
+    newCmd = newCmd.replace(/brew\s+install\s+([a-zA-Z0-9\-\s]+)/g, 'sudo apt install -y $1');
+  }
+  if (newCmd.includes('brew update')) {
+    newCmd = newCmd.replace(/brew\s+update/g, 'sudo apt update');
+  }
+  if (newCmd.includes('brew services start ')) {
+    newCmd = newCmd.replace(/brew\s+services\s+start\s+(\w+)/g, 'sudo systemctl start $1');
+  }
+  if (newCmd.includes('brew services restart ')) {
+    newCmd = newCmd.replace(/brew\s+services\s+restart\s+(\w+)/g, 'sudo systemctl restart $1');
+  }
+  if (newCmd.includes('brew services list')) {
+    const grepMatch = newCmd.match(/brew\s+services\s+list\s*\|\s*grep\s+(\w+)/);
+    if (grepMatch) {
+      newCmd = `systemctl is-active ${grepMatch[1]}`;
+    }
+  }
+
+  // Windows/PowerShell mappings to Linux
+  if (newCmd.includes('winget install ')) {
+    newCmd = newCmd.replace(/winget\s+install\s+([a-zA-Z0-9\-\s]+)/g, 'sudo apt install -y $1');
+  }
+  if (newCmd.includes('winget upgrade')) {
+    newCmd = newCmd.replace(/winget\s+upgrade/g, 'sudo apt update');
+  }
+  if (newCmd.includes('Start-Service ')) {
+    newCmd = newCmd.replace(/Start-Service\s+(\w+)/g, 'sudo systemctl start $1');
+  }
+  if (newCmd.includes('Restart-Service ')) {
+    newCmd = newCmd.replace(/Restart-Service\s+(\w+)/g, 'sudo systemctl restart $1');
+  }
+  if (newCmd.includes('Get-Service ')) {
+    newCmd = newCmd.replace(/Get-Service\s+(\w+)/g, 'systemctl is-active $1');
+  }
+  if (newCmd === 'Get-ChildItem -Force') {
+    newCmd = 'ls -la';
+  }
+  if (newCmd === 'Get-ChildItem') {
+    newCmd = 'ls';
+  }
+  if (newCmd === 'Get-Location') {
+    newCmd = 'pwd';
+  }
+  if (newCmd.startsWith('Get-Content ')) {
+    newCmd = newCmd.replace(/^Get-Content\s+/, 'cat ');
+  }
+  if (newCmd.includes('| Out-File')) {
+    newCmd = newCmd.replace(/(["'].*?["'])\s*\|\s*Out-File\s+-FilePath\s+(.*)/g, 'echo $1 | sudo tee $2');
+  }
+  if (newCmd.includes('Invoke-WebRequest ')) {
+    if (newCmd.includes('-UseBasicParsing')) {
+      newCmd = newCmd.replace(/Invoke-WebRequest\s+-Uri\s+http:\/\/(.*?)\s+-UseBasicParsing/g, 'curl -s $1');
+    } else {
+      newCmd = newCmd.replace(/Invoke-WebRequest\s+-Uri\s+(.*)/g, 'curl $1');
+    }
+  }
+
+  return newCmd;
+};
+
 // Best-effort plausible output for common cloud/devops CLIs used in labs.
 // Returns null if the command is not recognized so callers can fall through.
 const simulateLabCommand = (cmd: string, args: string[]): string | null => {
@@ -224,15 +289,15 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'node_exporter':
     case 'grafana-cli':
     case 'amtool':
-    case 'ansible':
-    case 'ansible-playbook':
-    case 'ansible-galaxy':
     case 'jenkins-cli':
     case 'etcdctl':
     case 'cilium':
     case 'falco':
       return `(${base} ${sub || ''} completed successfully)`;
-    case 'useradd':
+    case 'prowler':
+      return 'Prowler scan completed: 124 checks passed, 3 findings (LOW severity)';
+    case 'trivy':
+      return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;
     case 'visudo':
     case 'logrotate':
     case 'auditctl':
@@ -248,19 +313,12 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'volatility':
     case 'fls':
     case 'exiftool':
-    case 'prowler':
     case 'checkov':
     case 'aircrack-ng':
     case 'hashcat':
     case 'nikto':
     case 'burpsuite':
       return `(${base} ${sub || ''} completed successfully)`;
-      return `(${base} ${sub || ''} completed successfully)`;
-      return `(${base} ${sub || ''} completed successfully)`;
-    case 'trivy':
-      return `Total: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\n\n${args[args.length - 1] || 'target'} (alpine 3.18) — no vulnerabilities found`;
-    case 'prowler':
-      return 'Prowler scan completed: 124 checks passed, 3 findings (LOW severity)';
     case 'consul':
     case 'vault':
     case 'nomad':
@@ -361,6 +419,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'groupdel':
     case 'passwd':
       return base === 'passwd' ? 'passwd: password updated successfully' : '';
+
     case 'crontab':
       return sub === '-l' ? '# m h  dom mon dow   command\n0 2 * * * /usr/local/bin/backup.sh' : '(crontab updated)';
     // ---- Editors
@@ -465,6 +524,10 @@ interface TerminalProps {
   // Real terminal mode — when provided, all input is forwarded to a live container
   sessionId?: string;
   authToken?: string;
+  hideSidebar?: boolean;
+  runCommandTrigger?: { command: string; timestamp: number } | null;
+  checkProgressTrigger?: number | null;
+  onCheckingProgressChange?: (isChecking: boolean, progress: number) => void;
 }
 
 const SESSION_API = import.meta.env.VITE_SESSION_API_URL ?? 'ws://localhost:3001';
@@ -486,6 +549,10 @@ export const Terminal: React.FC<TerminalProps> = ({
   xpReward = 250,
   sessionId,
   authToken,
+  hideSidebar = false,
+  runCommandTrigger = null,
+  checkProgressTrigger = 0,
+  onCheckingProgressChange,
 }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [input, setInput] = useState('');
@@ -605,6 +672,27 @@ export const Terminal: React.FC<TerminalProps> = ({
     }
   }, [currentStepIndex]);
 
+  // Run command from external trigger
+  useEffect(() => {
+    if (runCommandTrigger && runCommandTrigger.command) {
+      runCommandWithSudoCheck(runCommandTrigger.command);
+    }
+  }, [runCommandTrigger]);
+
+  // Run progress check from external trigger
+  useEffect(() => {
+    if (checkProgressTrigger && checkProgressTrigger > 0) {
+      handleCheckProgress();
+    }
+  }, [checkProgressTrigger]);
+
+  // Notify parent component about checking progress state
+  useEffect(() => {
+    if (onCheckingProgressChange) {
+      onCheckingProgressChange(isCheckingProgress, progressPercentage);
+    }
+  }, [isCheckingProgress, progressPercentage]);
+
   const handleCommand = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isBooting || isExecuting || !input.trim()) return;
@@ -627,10 +715,7 @@ export const Terminal: React.FC<TerminalProps> = ({
       return;
     }
 
-    const args = cmd.split(' ');
-    const baseCmd = args[0].toLowerCase();
-
-    // Add command to history immediately (handle password separately)
+    // Add command to history immediately (handle password separately) using the original cmd
     if (isWaitingForPassword) {
       setHistory(prev => [...prev, '●●●●●●●●']); // Mask password in history
     } else {
@@ -657,11 +742,16 @@ export const Terminal: React.FC<TerminalProps> = ({
       return;
     }
 
+    // Normalize command for all subsequent mock shell processing
+    const normalizedCmd = normalizeCommandToLinux(cmd);
+    const args = normalizedCmd.split(' ');
+    const baseCmd = args[0].toLowerCase();
+
     // Check if it's a sudo command
     if (baseCmd === 'sudo') {
       if (isSudoAuthenticated) {
         // Already authenticated, just process the command
-        const originalCmd = cmd.replace(/^sudo\s+/, '');
+        const originalCmd = normalizedCmd.replace(/^sudo\s+/, '');
         await processActualCommand(originalCmd);
         setInput('');
         return;
@@ -674,13 +764,13 @@ export const Terminal: React.FC<TerminalProps> = ({
         '[HINT] Use password: cloudlabs123'
       ]);
       setIsWaitingForPassword(true);
-      setPendingCommand(cmd.replace(/^sudo\s+/, '')); // Save the remainder of the command
+      setPendingCommand(normalizedCmd.replace(/^sudo\s+/, '')); // Save the remainder of the command
       setIsExecuting(false);
       setInput('');
       return;
     }
 
-    await processActualCommand(cmd);
+    await processActualCommand(normalizedCmd);
     setInput('');
   };
 
@@ -718,6 +808,17 @@ export const Terminal: React.FC<TerminalProps> = ({
       for (const sub of cmd.split('\n').map(s => s.trim()).filter(Boolean)) {
         setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${sub}`]);
         await processActualCommand(sub);
+      }
+      setInput('');
+      return;
+    }
+
+    // Handle && chaining — run each part sequentially
+    if (cmd.includes(' && ')) {
+      const parts = cmd.split(' && ').map(s => s.trim()).filter(Boolean);
+      for (const part of parts) {
+        setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${part}`]);
+        await processActualCommand(part);
       }
       setInput('');
       return;
@@ -856,6 +957,43 @@ export const Terminal: React.FC<TerminalProps> = ({
             } else {
               output = `touch: cannot touch '${name}': No such file or directory`;
             }
+          }
+          break;
+        }
+        case 'func': {
+          const funcSub = args[1];
+          if (funcSub === 'init') {
+            const projectName = args[2];
+            if (!projectName) {
+              output = 'func: project name required';
+            } else {
+              const projectPath = currentDir === '/' ? `/${projectName}` : `${currentDir}/${projectName}`;
+              const baseName = projectName.replace(/^.*\//, '');
+              setFileSystem(prev => ({
+                ...prev,
+                [currentDir]: [...(prev[currentDir] || []), baseName],
+                [projectPath]: ['host.json', 'local.settings.json', 'requirements.txt', '.gitignore'],
+              }));
+              output = `Writing ${projectName}/host.json\nWriting ${projectName}/local.settings.json\nWriting ${projectName}/requirements.txt\nWriting ${projectName}/.gitignore\n\nYour project is now ready. Run 'func new' to add a function.`;
+            }
+          } else if (funcSub === 'new') {
+            const nameIdx = args.indexOf('--name');
+            const funcName = nameIdx !== -1 ? args[nameIdx + 1] : null;
+            if (!funcName) {
+              output = 'func: --name is required';
+            } else {
+              const funcPath = currentDir === '/' ? `/${funcName}` : `${currentDir}/${funcName}`;
+              setFileSystem(prev => ({
+                ...prev,
+                [currentDir]: [...(prev[currentDir] || []), funcName],
+                [funcPath]: ['__init__.py', 'function.json'],
+              }));
+              output = `Select a number for template:\n1. EventHubTrigger\n2. HttpTrigger\n3. TimerTrigger\n\nWriting ${funcName}/__init__.py\nWriting ${funcName}/function.json\n\nThe function "${funcName}" was successfully created.`;
+            }
+          } else if (funcSub === 'start') {
+            output = 'Azure Functions Core Tools\nCore Tools Version: 4.x\n\nFunctions:\n\tProcessEvents: eventhubTrigger\n\nFor detailed output, run func with --verbose flag.';
+          } else {
+            output = `(func ${funcSub || ''} completed)`;
           }
           break;
         }
@@ -1053,8 +1191,56 @@ export const Terminal: React.FC<TerminalProps> = ({
             output = 'localhost | SUCCESS => {\n    "changed": false, \n    "ping": "pong"\n}';
           }
           break;
+        case 'argocd':
+          output = 'argocd controls the Argo CD server.\n\nUsage:\n  argocd [command] [flags]';
+          if (args.includes('app') && (args.includes('list') || args.includes('get'))) {
+            output = 'NAME      CLUSTER                         NAMESPACE  STATUS    HEALTH   REVISION  \nweb-app   https://kubernetes.default.svc  default    Synced    Healthy  main/7e1a2f';
+          } else if (args.includes('sync')) {
+            output = 'Project:            default\nStatus:             Synced\nHealth Status:      Healthy\nOperation:          Sync\nPhase:              Succeeded';
+          }
+          break;
+        case 'trivy':
+          output = 'trivy v0.24.2';
+          if (args.includes('image') || args.includes('k8s') || args.includes('rootfs')) {
+            output = 'Scanning... \n\nTotal: 0 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)\nNo vulnerabilities found.';
+          }
+          break;
+        case 'vault':
+          output = 'Vault v1.9.3\n\nUsage: vault <command> [args]';
+          if (args.includes('read') || args.includes('get')) {
+            output = 'Key                 Value\n---                 -----\napi_key             re_live_8e9e05f5...\ndb_password         ********\nstatus              active';
+          }
+          break;
+        case 'istioctl':
+          output = 'istioctl v1.13.2';
+          if (args.includes('analyze')) {
+            output = '✔ No validation issues found when analyzing namespace: default.';
+          } else if (args.includes('proxy-status')) {
+            output = 'NAME                                                   CDS        LDS        EDS        RDS        ISTIOD                      VERSION\nweb-app-7e1a2f-8b9c.default                            Synced     Synced     Synced     Synced     istiod-7b9f8d8f-m2k1x       1.13.2';
+          }
+          break;
+        case 'promtool':
+          output = 'promtool, version 2.33.1';
+          if (args.includes('check') && args.includes('config')) {
+            output = 'Checking prometheus.yml\n  SUCCESS: 1 rule files found';
+          } else if (args.includes('query')) {
+            output = 'prometheus_http_requests_total{code="200",handler="/api/v1/query"} 42\nnode_cpu_seconds_total{mode="idle"} 3456.78';
+          }
+          break;
+        case 'logcli':
+          output = 'logcli v2.4.2';
+          if (args.includes('query')) {
+            output = '2026-05-01T12:00:00Z {app="frontend"} level=info msg="User login successful"\n2026-05-01T12:01:00Z {app="frontend"} level=warn msg="Latency peak detected"';
+          }
+          break;
+        case 'jenkins-cli':
+          output = 'Jenkins CLI v2.332.1';
+          if (args.includes('build')) {
+            output = 'Build #42 of main-pipeline has been scheduled and is now running.';
+          }
+          break;
         case 'help':
-          output = `Available commands: ${[...availableCommands, 'git', 'go', 'cargo', 'rustc', 'g++', 'npm', 'npx', 'terraform', 'ansible', 'kubectl', 'helm', 'etcdctl', 'kubeadm', 'kube-bench', 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
+          output = `Available commands: ${[...availableCommands, 'git', 'terraform', 'ansible', 'kubectl', 'helm', 'argocd', 'flux', 'trivy', 'vault', 'istioctl', 'promtool', 'logcli', 'jenkins-cli', 'etcdctl', 'kubeadm', 'kube-bench', 'cat', 'mkdir', 'touch', 'rm', 'sudo', 'apt', 'top', 'uname', 'echo', 'ps', 'cp', 'mv', 'cd'].join(', ')}, help, clear`;
           break;
         default: {
           // Check if the user is typing a directory path or a directory definition
@@ -1135,7 +1321,7 @@ export const Terminal: React.FC<TerminalProps> = ({
 
   return (
     <div className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 shadow-2xl font-mono text-sm flex-1 flex flex-row h-full min-h-[400px]">
-      {currentStep && (
+      {currentStep && !hideSidebar && (
         <div className="w-1/3 flex flex-col text-zinc-300 border-r border-zinc-800 bg-zinc-950 h-full">
           <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-800">
             {allSteps.length > 0 && (

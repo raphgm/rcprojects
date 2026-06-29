@@ -264,11 +264,27 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
   ],
   terraform: [
     { topic: 'HCL Syntax & Providers', cmd: 'terraform version', focus: 'Understand declarative configuration and provider plugins.' },
-    { topic: 'State Management', cmd: 'terraform state list', focus: 'Learn how Terraform tracks managed infrastructure in state files.' },
-    { topic: 'Variable Interpolation', cmd: 'echo "var.region"', focus: 'Make configurations reusable using input variables and locals.' },
-    { topic: 'Module Composition', cmd: 'ls modules/', focus: 'Organize infrastructure into reusable, logical components.' },
-    { topic: 'Plan & Speculative Runs', cmd: 'terraform plan', focus: 'Preview infrastructure changes before applying them.' },
-    { topic: 'Resource Dependencies', cmd: 'terraform graph', focus: 'Visualize and manage implicit and explicit resource dependencies.' },
+    { topic: 'Remote State Locking', cmd: 'terraform force-unlock <id>', focus: 'Manage distributed state and prevent concurrent modification collisions.' },
+    { topic: 'Variable Interpolation', cmd: 'terraform console', focus: 'Test and debug complex HCL expressions and data lookups in real-time.' },
+    { topic: 'Module Composition', cmd: 'ls -R modules/', focus: 'Organize infrastructure into reusable, logical, and versioned components.' },
+    { topic: 'Speculative Execution', cmd: 'terraform plan -out=tfplan', focus: 'Preview infrastructure changes and save the plan for deterministic execution.' },
+    { topic: 'Dependency Graphing', cmd: 'terraform graph | dot -Tpng > graph.png', focus: 'Visualize and manage implicit and explicit resource dependencies.' },
+    { topic: 'Resource Targeting', cmd: 'terraform plan -target=azurerm_vnet.main', focus: 'Isolate changes to specific resources in complex deployments.' },
+    { topic: 'Taint & Replacement', cmd: 'terraform taint azurerm_linux_virtual_machine.web', focus: 'Force the recreation of a specific resource on the next apply.' },
+    { topic: 'Workspace Isolation', cmd: 'terraform workspace list', focus: 'Manage multiple environments (Dev/Prod) from a single configuration.' },
+    { topic: 'Data Source Lookups', cmd: 'cat data.tf', focus: 'Reference existing cloud resources that are not managed by the current config.' },
+    { topic: 'Sensitive Data Masking', cmd: 'terraform show -json', focus: 'Identify how Terraform handles sensitive outputs and state data.' },
+    { topic: 'Dynamic Block Logic', cmd: 'grep -A 5 "dynamic" main.tf', focus: 'Use complex for_each loops to generate nested configuration blocks.' },
+    { topic: 'Importing Legacy Resources', cmd: 'terraform import azurerm_resource_group.legacy /subscriptions/...', focus: 'Bring existing manual infrastructure under Terraform management.' },
+    { topic: 'Backend Migrations', cmd: 'terraform init -migrate-state', focus: 'Transition local state files to secure remote storage like S3 or Azure Blob.' },
+    { topic: 'State Inspection & Pruning', cmd: 'terraform state rm azurerm_vnet.old', focus: 'Manually adjust the state file when resources are deleted out-of-band.' },
+    { topic: 'Provisioner Anti-Patterns', cmd: 'grep "remote-exec" main.tf', focus: 'Understand when to use provisioners vs cloud-init or post-deploy scripts.' },
+    { topic: 'Output Aggregation', cmd: 'terraform output -json', focus: 'Pass infrastructure data to downstream CI/CD pipelines or automation tools.' },
+    { topic: 'Provider Version Pinning', cmd: 'cat versions.tf', focus: 'Prevent breaking changes by enforcing strict provider version constraints.' },
+    { topic: 'Drift Detection Engine', cmd: 'terraform plan -detailed-exitcode', focus: 'Implement automated drift detection to identify out-of-band changes.' },
+    { topic: 'Infrastructure Unit Testing', cmd: 'terratest ./test', focus: 'Validate IaC modules using real infrastructure lifecycle tests.' },
+    { topic: 'Cost Impact Analysis', cmd: 'infracost breakdown --path .', focus: 'Estimate the cost impact of infrastructure changes before they are applied.' },
+    { topic: 'Security Compliance Scan', cmd: 'checkov -d .', focus: 'Scan IaC configurations for compliance with security policies.' },
   ],
   azure: [
     { topic: 'Resource Groups & RBAC', cmd: 'az group list', focus: 'Organize resources and manage permissions at the subscription level.' },
@@ -293,18 +309,58 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
   ],
   ansible: [
     { topic: 'Inventory Management', cmd: 'ansible-inventory --list', focus: 'Define and manage groups of hosts for automated configuration.' },
-    { topic: 'Playbook Orchestration', cmd: 'ansible-playbook --syntax-check site.yml', focus: 'Master declarative configuration using YAML-based playbooks.' },
-    { topic: 'Module Execution', cmd: 'ansible all -m ping', focus: 'Execute ad-hoc commands across your entire infrastructure fleet.' },
-    { topic: 'Roles & Reusability', cmd: 'ansible-galaxy role list', focus: 'Organize complex automation tasks into modular, reusable roles.' },
-    { topic: 'Variable Precedence', cmd: 'ansible-debug --version', focus: 'Understand how variables are merged and overridden in Ansible.' },
-    { topic: 'Vault & Secret Encryption', cmd: 'ansible-vault --version', focus: 'Securely manage sensitive data like passwords and API keys.' },
+    { topic: 'Playbook Syntax Audit', cmd: 'ansible-playbook --syntax-check site.yml', focus: 'Master declarative configuration using YAML-based playbooks.' },
+    { topic: 'Ad-hoc Module Execution', cmd: 'ansible all -m shell -a "uptime"', focus: 'Execute rapid commands across your entire infrastructure fleet.' },
+    { topic: 'Roles & Reusability', cmd: 'ansible-galaxy role init webserver', focus: 'Organize complex automation tasks into modular, reusable roles.' },
+    { topic: 'Variable Precedence', cmd: 'ansible-inventory --graph --vars', focus: 'Understand how variables are merged and overridden in Ansible.' },
+    { topic: 'Vault & Secret Encryption', cmd: 'ansible-vault view secrets.yml', focus: 'Securely manage sensitive data like passwords and API keys.' },
+    { topic: 'Jinja2 Dynamic Templating', cmd: 'cat templates/nginx.conf.j2', focus: 'Generate environment-specific configuration files using Jinja2.' },
+    { topic: 'Conditionals & Handlers', cmd: 'grep "when:" tasks/main.yml', focus: 'Execute tasks based on system facts and trigger service restarts.' },
+    { topic: 'Dynamic Cloud Inventories', cmd: 'ansible-inventory -i azure_rm.yml --list', focus: 'Automatically discover cloud resources as they are provisioned.' },
+    { topic: 'Error Handling (Block/Rescue)', cmd: 'cat playbooks/resilience.yml', focus: 'Implement graceful failure recovery within your automation logic.' },
+    { topic: 'Parallelism & Performance', cmd: 'ansible-playbook site.yml --forks 50', focus: 'Tune execution speed by adjusting the number of parallel workers.' },
+    { topic: 'Check Mode (Dry Run)', cmd: 'ansible-playbook site.yml --check', focus: 'Predict changes before they are applied to the managed nodes.' },
+    { topic: 'Fact Gathering & Caching', cmd: 'ansible all -m setup', focus: 'Leverage system metadata to drive intelligent automation decisions.' },
+    { topic: 'Ansible Collections', cmd: 'ansible-galaxy collection list', focus: 'Manage specialized automation plugins and modules from the community.' },
+    { topic: 'Callback Plugins', cmd: 'grep "stdout_callback" ansible.cfg', focus: 'Customize the visual output and logging of your playbook execution.' },
+    { topic: 'Molecule Infrastructure Testing', cmd: 'molecule test', focus: 'Implement automated, multi-node testing for Ansible roles.' },
+    { topic: 'Idempotency Validation', cmd: 'ansible-playbook site.yml --changed-when', focus: 'Ensure that playbooks do not make unnecessary changes on repeat execution.' },
+    { topic: 'Host Pattern Matching', cmd: 'ansible "web:&db" -m ping', focus: 'Master complex inventory patterns to target specific resource intersections.' },
   ],
   jenkins: [
     { topic: 'Pipeline as Code', cmd: 'jenkins-cli version', focus: 'Define end-to-end CI/CD workflows using Groovy-based Jenkinsfiles.' },
-    { topic: 'Distributed Build Agents', cmd: 'echo "node { ... }"', focus: 'Scale your build infrastructure using remote worker nodes.' },
-    { topic: 'Plugin Ecosystem', cmd: 'echo "install-plugin git"', focus: 'Extend Jenkins functionality with thousands of community-built plugins.' },
-    { topic: 'Shared Libraries', cmd: 'echo "library \'my-shared-lib\'"', focus: 'Standardize pipeline logic across hundreds of repositories.' },
-    { topic: 'Declarative vs Scripted', cmd: 'echo "pipeline { agent any }"', focus: 'Understand the two primary syntax styles for Jenkins pipelines.' },
+    { topic: 'Distributed Build Agents', cmd: 'jenkins-cli list-nodes', focus: 'Scale your build infrastructure using remote worker nodes.' },
+    { topic: 'Plugin Governance', cmd: 'jenkins-cli list-plugins', focus: 'Extend Jenkins functionality with thousands of community-built plugins.' },
+    { topic: 'Shared Libraries', cmd: 'jenkins-cli help build', focus: 'Standardize pipeline logic across an entire organization to reduce boilerplate.' },
+    { topic: 'Declarative Syntax', cmd: 'cat Jenkinsfile', focus: 'Understand the structured, declarative syntax for Jenkins pipelines.' },
+    { topic: 'Credential Security', cmd: 'jenkins-cli help credentials', focus: 'Securely manage API tokens and SSH keys within the controller.' },
+    { topic: 'Build Triggers', cmd: 'jenkins-cli build "main-app" -s', focus: 'Configure SCM polling and webhook-based execution triggers.' },
+    { topic: 'Multi-branch Discovery', cmd: 'jenkins-cli help reload-job', focus: 'Automatically discover and build new branches in your repository.' },
+    { topic: 'Artifact Archiving', cmd: 'jenkins-cli help copy-artifacts', focus: 'Manage the lifecycle and retention of build outputs.' },
+    { topic: 'Node Labels & Affinity', cmd: 'jenkins-cli get-node "worker-1"', focus: 'Direct build tasks to specific agents based on hardware or OS labels.' },
+    { topic: 'Security Matrix Audit', cmd: 'cat /var/jenkins_home/config.xml | grep "authorizationStrategy"', focus: 'Implement fine-grained access control for teams and projects.' },
+    { topic: 'Pipeline Visualization', cmd: 'jenkins-cli help console', focus: 'Monitor and debug real-time build execution logs.' },
+    { topic: 'Parameterization', cmd: 'jenkins-cli build "deploy-prod" -p VERSION=1.2.0', focus: 'Drive flexible delivery workflows using runtime build parameters.' },
+    { topic: 'Pipeline DSL Linter', cmd: 'jenkins-cli declarative-linter < Jenkinsfile', focus: 'Validate Jenkinsfile syntax before committing to version control.' },
+    { topic: 'Quiet Down Operations', cmd: 'jenkins-cli quiet-down', focus: 'Prepare the controller for maintenance by preventing new build starts.' },
+    { topic: 'Job DSL Orchestration', cmd: 'jenkins-cli get-job "seed-job"', focus: 'Automate the creation and configuration of hundreds of jobs using Job DSL.' },
+  ],
+  cicd: [
+    { topic: 'Pipeline Orchestration', cmd: 'jenkins-cli build "production-deploy"', focus: 'Coordinate complex delivery workflows across multiple stages.' },
+    { topic: 'GitHub Actions Workflows', cmd: 'ls .github/workflows', focus: 'Master event-driven automation using GitHub-native runners.' },
+    { topic: 'GitLab-CI Pipelines', cmd: 'cat .gitlab-ci.yml', focus: 'Configure multi-stage pipelines using GitLab\'s YAML-based engine.' },
+    { topic: 'Artifact Versioning', cmd: 'curl -X GET http://artifactory:8081/api/storage', focus: 'Manage the lifecycle and promotion of build artifacts.' },
+    { topic: 'SAST Security Gates', cmd: 'sonarqube-scanner --version', focus: 'Implement static analysis to identify security flaws in source code.' },
+    { topic: 'SCA Vulnerability Scan', cmd: 'trivy fs .', focus: 'Scan third-party dependencies for known vulnerabilities (CVEs).' },
+    { topic: 'Environment Promotion', cmd: 'argocd app sync web-app-prod', focus: 'Promote verified artifacts through Staging to Production environments.' },
+    { topic: 'Canary Deployments', cmd: 'kubectl get rollouts', focus: 'Implement gradual traffic shifting to minimize deployment risk.' },
+    { topic: 'Secret Injection', cmd: 'vault read secret/ci/deploy-key', focus: 'Inject sensitive credentials into pipelines at runtime securely.' },
+    { topic: 'Containerized Runners', cmd: 'docker ps --filter "label=runner"', focus: 'Scale CI/CD capacity using ephemeral, container-based execution agents.' },
+    { topic: 'Test Suite Automation', cmd: 'pytest --junitxml=results.xml', focus: 'Integrate automated unit and integration tests into the CI loop.' },
+    { topic: 'Deployment Observability', cmd: 'logcli query "{job=\"cicd-pipeline\"}"', focus: 'Monitor pipeline health and identify bottlenecks in the delivery flow.' },
+    { topic: 'Trunk-based Development', cmd: 'git log --oneline --graph', focus: 'Optimize delivery velocity by merging small, frequent changes into main.' },
+    { topic: 'Automated Rollbacks', cmd: 'kubectl rollout undo deployment/web', focus: 'Configure automated recovery when health gates fail in production.' },
+    { topic: 'Infrastructure-as-Code Integration', cmd: 'terraform plan -out=tfplan', focus: 'Integrate IaC provisioning directly into the delivery pipeline.' },
   ],
   gitops: [
     { topic: 'Declarative State', cmd: 'argocd version', focus: 'Understand why Git should be the single source of truth for infrastructure.' },
@@ -385,6 +441,34 @@ const TOPIC_BANKS: Record<string, Topic[]> = {
     { topic: 'Jupyter Interactive EDA', cmd: 'jupyter --version', focus: 'Master the document-based workflow for data exploration.' },
     { topic: 'Statistical Hypothesis Testing', cmd: 'python3 -c "from scipy import stats"', focus: 'Validate your data findings using mathematical rigor.' },
   ],
+  devops: [
+    { topic: 'Infrastructure as Code', cmd: 'terraform plan', focus: 'Provision and manage cloud infrastructure using declarative configuration files with Terraform.' },
+    { topic: 'Container Orchestration', cmd: 'kubectl get pods', focus: 'Master the deployment and scaling of containerized microservices on Kubernetes.' },
+    { topic: 'CI/CD Pipeline Automation', cmd: 'jenkins-cli build "main-pipeline"', focus: 'Automate the end-to-end software delivery lifecycle from commit to production.' },
+    { topic: 'Configuration Management', cmd: 'ansible-playbook site.yml', focus: 'Enforce consistent system states across thousands of servers using Ansible playbooks.' },
+    { topic: 'Cloud-Native Observability', cmd: 'promtool check config prometheus.yml', focus: 'Implement deep monitoring and alerting for distributed systems using Prometheus.' },
+    { topic: 'GitOps Continuous Delivery', cmd: 'argocd app sync web-app', focus: 'Manage Kubernetes application states through Git-based version control with ArgoCD.' },
+    { topic: 'Continuous Deployment', cmd: 'flux get kustomizations', focus: 'Automate the deployment of Kubernetes resources using FluxCD.' },
+    { topic: 'Cloud Infrastructure Audit', cmd: 'checkov -d .', focus: 'Scan infrastructure-as-code files for security misconfigurations.' },
+    { topic: 'Service Discovery', cmd: 'consul members', focus: 'Maintain dynamic service discovery and health monitoring across distributed environments.' },
+    { topic: 'Load Balancing Configuration', cmd: 'haproxy -f haproxy.cfg -c', focus: 'Configure high-performance load balancing for distributed applications.' },
+    { topic: 'Edge Computing Management', cmd: 'kubectl get nodes --selector=node-role.kubernetes.io/edge', focus: 'Orchestrate and manage workloads on edge computing devices.' },
+    { topic: 'Chaos Engineering Test', cmd: 'chaos-mesh-cli attack', focus: 'Inject faults into your system to test its resilience and fault tolerance.' },
+    { topic: 'Database Migration Pipeline', cmd: 'flyway migrate', focus: 'Automate database schema changes as part of your CI/CD workflow.' },
+    { topic: 'API Gateway Management', cmd: 'kong config parse kong.yml', focus: 'Manage and secure microservice APIs using the Kong gateway.' },
+    { topic: 'Site Reliability Engineering', cmd: 'echo "SLO: 99.9% Availability"', focus: 'Implement SRE principles to balance feature velocity with system reliability.' },
+    { topic: 'Cluster Security Benchmarking', cmd: 'kube-bench run --targets master', focus: 'Assess your Kubernetes cluster against CIS security benchmarks.' },
+    { topic: 'Distributed Tracing', cmd: 'jaeger-query --version', focus: 'Trace requests across microservices to identify performance bottlenecks.' },
+    { topic: 'Cloud Cost Optimization', cmd: 'kubecost tui', focus: 'Monitor and optimize the cost of your Kubernetes resources in real-time.' },
+    { topic: 'Secret Governance', cmd: 'vault read secret/production/db', focus: 'Implement secure, auditable secret management for distributed applications.' },
+    { topic: 'Service Mesh Analysis', cmd: 'istioctl analyze', focus: 'Audit and troubleshoot traffic flow and security between microservices.' },
+    { topic: 'Log Aggregation & Query', cmd: 'logcli query "{app=\"frontend\"}"', focus: 'Query application logs at scale to identify anomalous patterns.' },
+    { topic: 'Canary Release Strategy', cmd: 'kubectl get rollouts', focus: 'Implement gradual, automated traffic shifting for zero-downtime releases.' },
+    { topic: 'Vulnerability Scanning', cmd: 'trivy image nginx:latest', focus: 'Audit container images for security vulnerabilities before they reach production.' },
+    { topic: 'Policy Enforcement (OPA)', cmd: 'opa test ./policies', focus: 'Implement fine-grained access control and governance using Rego.' },
+    { topic: 'Network Policy Isolation', cmd: 'kubectl get netpol', focus: 'Secure microservices by restricting inter-pod communication.' },
+    { topic: 'Infrastructure Drift Analysis', cmd: 'terraform plan -detailed-exitcode', focus: 'Automatically detect and remediate configuration drift in cloud environments.' },
+  ],
   prom: [
     { topic: 'Time-Series Database Architecture', cmd: 'prometheus --version', focus: 'Understand how Prometheus stores multi-dimensional data as time series.' },
     { topic: 'Metric Collection (Scraping)', cmd: 'curl http://localhost:9090/metrics', focus: 'Explore how Prometheus pulls metrics from targets using HTTP.' },
@@ -416,11 +500,18 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   const lowerId = courseId.toLowerCase();
   
   if (lowerId.includes('docker') || lowerTitle.includes('docker')) bank = TOPIC_BANKS.docker;
-  else if (lowerId.includes('cka') || lowerId.includes('ckad')) bank = TOPIC_BANKS.killer_sh;
+  else if (lowerId.includes('cka') || lowerId.includes('ckad') || lowerId.includes('killer')) bank = TOPIC_BANKS.killer_sh;
   else if (lowerId.includes('k8s-ops') || lowerTitle.includes('production') || lowerTitle.includes('cluster')) bank = TOPIC_BANKS.k8s_ops;
   else if (lowerId.includes('k8s-security') || lowerTitle.includes('policy')) bank = TOPIC_BANKS.k8s_security;
   else if (lowerId.includes('k8s-net') || lowerTitle.includes('mesh') || lowerTitle.includes('ingress')) bank = TOPIC_BANKS.k8s_networking;
   else if (lowerId.includes('k8s') || lowerId.includes('kubernetes') || lowerTitle.includes('kubernetes')) bank = TOPIC_BANKS.k8s_dev;
+  else if (lowerId.includes('terraform') || lowerTitle.includes('terraform') || lowerId.includes('iac')) bank = TOPIC_BANKS.terraform;
+  else if (lowerId.includes('ansible') || lowerTitle.includes('ansible')) bank = TOPIC_BANKS.ansible;
+  else if (lowerId.includes('cicd') || lowerTitle.includes('pipeline') || lowerId.includes('ci-cd')) bank = TOPIC_BANKS.cicd;
+  else if (lowerId.includes('jenkins') || lowerTitle.includes('jenkins')) bank = TOPIC_BANKS.jenkins;
+  else if (lowerId.includes('gitops') || lowerTitle.includes('argo') || lowerTitle.includes('flux')) bank = TOPIC_BANKS.gitops;
+  else if (lowerId.includes('sre') || lowerTitle.includes('reliability') || lowerTitle.includes('monitoring') || lowerTitle.includes('observability')) bank = TOPIC_BANKS.sre;
+  else if (lowerId.includes('devops') || lowerTitle.includes('devops') || lowerTitle.includes('engineering') || lowerTitle.includes('automation')) bank = TOPIC_BANKS.devops;
   else if (lowerId.includes('python') || lowerTitle.includes('python')) bank = TOPIC_BANKS.python;
   else if (lowerId.includes('hacking') || lowerTitle.includes('penetration') || lowerTitle.includes('ethical') || lowerTitle.includes('kali')) bank = TOPIC_BANKS.cyber_hacking;
   else if (lowerId.includes('defense') || lowerTitle.includes('soc') || lowerTitle.includes('incident')) bank = TOPIC_BANKS.cyber_defense;
@@ -435,11 +526,6 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   else if (lowerId.includes('storage') || lowerTitle.includes('file system')) bank = TOPIC_BANKS.linux_storage;
   else if (lowerId.includes('admin') || lowerTitle.includes('administration')) bank = TOPIC_BANKS.linux_admin;
   else if (lowerId.includes('linux') || lowerTitle.includes('linux')) bank = TOPIC_BANKS.linux;
-  else if (lowerId.includes('terraform') || lowerTitle.includes('terraform')) bank = TOPIC_BANKS.terraform;
-  else if (lowerId.includes('ansible') || lowerTitle.includes('ansible')) bank = TOPIC_BANKS.ansible;
-  else if (lowerId.includes('jenkins') || lowerTitle.includes('jenkins')) bank = TOPIC_BANKS.jenkins;
-  else if (lowerId.includes('gitops') || lowerTitle.includes('argo') || lowerTitle.includes('flux')) bank = TOPIC_BANKS.gitops;
-  else if (lowerId.includes('sre') || lowerTitle.includes('reliability') || lowerTitle.includes('monitoring') || lowerTitle.includes('observability')) bank = TOPIC_BANKS.sre;
   else if (lowerId.includes('azure') || lowerTitle.includes('azure')) bank = TOPIC_BANKS.azure;
   else if (lowerId.includes('net') || lowerTitle.includes('network')) bank = TOPIC_BANKS.networking;
   else if (lowerId.includes('ai') || lowerTitle.includes('intelligence') || lowerTitle.includes('ml')) bank = TOPIC_BANKS.ai;
@@ -456,34 +542,32 @@ export function generateFallbackLessons(courseId: string, courseTitle: string, c
   for (let i = 0; i < total; i++) {
     const m = bank[i % bank.length];
     const isK8s = lowerId.includes('k8s') || lowerId.includes('cka') || lowerId.includes('ckad') || lowerTitle.includes('kubernetes');
-    const phase = Math.floor(i / bank.length) + 1;
-    const isRepeat = i >= bank.length;
+    const isCyber = lowerId.includes('cyber') || lowerId.includes('hacking') || lowerTitle.includes('security');
+    const isDevOps = lowerId.includes('devops') || lowerTitle.includes('devops') || bank === TOPIC_BANKS.devops || bank === TOPIC_BANKS.cicd || bank === TOPIC_BANKS.jenkins;
     
-    // Rich, domain-specific introduction for Mission 1
-    const introContent = i === 0 
-      ? `\n# Welcome to ${courseTitle}\n\nThis comprehensive learning track is designed to take you from foundational concepts to production-grade mastery. Over the next ${total} missions, you will engage in high-fidelity simulations that mirror real-world engineering challenges.\n\n## Learning Objectives\n- **Foundational Theory**: Understand the core architecture and design principles of ${courseTitle.split(' ')[0]}.\n- **Interactive Labs**: Apply your knowledge in a stateful, interactive sandbox environment.\n- **Production Best Practices**: Learn the "why" behind industry-standard configurations and security policies.\n\n## Your Journey Starts Here\nIn this first mission, we will initialize your environment and verify your access to the core toolsets. This baseline is critical for the advanced scenarios that follow.\n`
-      : `\n# ${isRepeat ? `${m.topic}: Deep Dive (Phase ${phase})` : m.topic}\n${m.focus}\n\n${isK8s ? `> [!TIP]\n> **Pro Tip:** Make sure your kubectl context is set correctly especially if you are using these in your own local environment — cost me 20 min debugging!\n\n` : ''}## Why It Matters\n${
-        i % 3 === 0 
-          ? `Mastering ${m.topic.toLowerCase()} is essential for building resilient, production-grade systems in the ${courseTitle} track.` 
-          : i % 3 === 1 
-            ? `Understanding the nuances of ${m.topic.toLowerCase()} allows you to optimize performance and reduce operational overhead.` 
-            : `Deep domain knowledge in ${m.topic.toLowerCase()} is what separates junior engineers from senior infrastructure architects.`
-      }\n\n## What You'll Practice\n- Execute the \`${m.cmd}\` command to observe real-time system behavior\n- Analyze the output to verify configuration accuracy\n- ${
-        isRepeat 
-          ? `Refine your approach to handle ${m.topic.toLowerCase()} at scale.` 
-          : `Apply these concepts to a representative ${lowerTitle} scenario.`
-      }\n      `;
+    const phase = Math.floor(i / bank.length) + 1;
+    const suffix = phase > 1 ? ` (Phase ${phase})` : '';
+    const verb = ['Analyze', 'Implement', 'Verify', 'Optimize', 'Secure', 'Deploy', 'Configure', 'Audit'][i % 8];
+    const context = isDevOps ? 'high-fidelity engineering mission' : isK8s ? 'cloud-native orchestration task' : isCyber ? 'security research lab' : 'professional development lab';
 
     lessons.push({
-      id: `${courseId}-lesson-${i + 1}`,
-      title: i === 0 ? `Introduction to ${courseTitle}` : (isRepeat ? `${m.topic} (Phase ${phase})` : m.topic),
-      content: introContent,
-      task: i === 0 ? `Verify your environment by running \`${m.cmd}\` in the sandbox.` : `Run \`${m.cmd}\` in the sandbox to explore ${m.topic.toLowerCase()}${isRepeat ? ` at an advanced level` : ''}.`,
-      demoType: 'terminal' as const,
+      id: `${courseId}-fallback-${i}`,
+      title: `${m.topic}${suffix}`,
+      content: `Mission ${i + 2}: ${m.focus} This ${context} involves advanced technical workflows and industry-standard tooling.`,
+      task: `${verb} the current state by executing the \`${m.cmd}\` command and ensuring the output matches expectations for a production environment.`,
+      demoType: 'terminal',
+      commands: [
+        {
+          text: m.cmd,
+          explanation: `Validates the ${m.topic.toLowerCase()} configuration within the laboratory sandbox.`
+        }
+      ],
       demoConfig: {
-        initialMessage: `${courseTitle} sandbox ready. [Mission ${i + 1}/${total}]\nType \`${m.cmd}\` to begin.`,
+        flavor: isK8s ? 'kubernetes' : isCyber ? 'kali' : 'ubuntu',
+        welcomeMessage: `Welcome to the ${courseTitle} Laboratory Environment.\nReady for task: ${m.topic}.\nTooling initialized: ${m.cmd.split(' ')[0]}`,
         availableCommands: [m.cmd.split(' ')[0], 'ls', 'pwd', 'help', 'clear'],
-      },
+        expectedCommand: m.cmd,
+      }
     });
   }
   return lessons;
