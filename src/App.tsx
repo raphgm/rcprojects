@@ -216,6 +216,23 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const labId = params.get('lab');
+    if (labId) {
+      const staticLab = cloudLabs.find(l => l.projectId === labId);
+      if (staticLab) {
+        const projTitle = projects.find(p => p.id === labId)?.title || 'Interactive Lab';
+        startLab(labId, projTitle);
+      } else {
+        const project = projects.find(p => p.id === labId);
+        if (project) {
+          startLab(labId, project.title);
+        }
+      }
+    }
+  }, []);
+
 
   return (
     <ErrorBoundary>

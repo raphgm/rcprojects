@@ -384,6 +384,19 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   }
 
   const [selectedOS, setSelectedOS] = useState<'macos' | 'windows' | 'linux'>('linux');
+  const [shareText, setShareText] = useState('Share Lab');
+
+  const handleShare = () => {
+    const url = `${window.location.origin}${window.location.pathname}?lab=${encodeURIComponent(lab.projectId)}`;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setShareText('Copied!');
+        setTimeout(() => setShareText('Share Lab'), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy share link:', err);
+      });
+  };
   const [runCommandTrigger, setRunCommandTrigger] = useState<{ command: string; timestamp: number } | null>(null);
   const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
   const [isCheckingProgress, setIsCheckingProgress] = useState(false);
@@ -621,14 +634,14 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
           {/* Left Column: Guide */}
           <div className="w-[45%] min-w-[360px] max-w-[55%] border-r border-zinc-200 bg-[#f8fafc] h-full overflow-y-auto flex flex-col scrollbar-thin scrollbar-thumb-zinc-200">
             {/* Header Card */}
-            <div className="bg-[#101935] text-white p-6 m-6 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden">
+            <div className="bg-[#101935] text-white px-6 pb-6 pt-3.5 m-6 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden">
               {/* Decorative background glow */}
               <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -left-16 -top-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative z-10">
                 {/* Header Buttons */}
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-5">
                   <button 
                     onClick={onClose}
                     className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98]"
@@ -636,9 +649,12 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                     <ChevronLeft className="w-3.5 h-3.5" />
                     All Labs
                   </button>
-                  <button className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98]">
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98]"
+                  >
                     <Share2 className="w-3.5 h-3.5" />
-                    Share Lab
+                    {shareText}
                   </button>
                 </div>
 
