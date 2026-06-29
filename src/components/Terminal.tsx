@@ -575,6 +575,18 @@ export const Terminal: React.FC<TerminalProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isLiveMode = Boolean(sessionId && authToken);
+  const [fileSystem, setFileSystem] = useState<Record<string, string[]>>({
+    '/': ['bin', 'etc', 'home', 'var', 'tmp', 'usr', 'root', 'dev', 'proc'],
+    '/bin': ['bash', 'ls', 'pwd', 'cat', 'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo', 'ps', 'apt', 'top', 'uname'],
+    '/etc': ['passwd', 'shadow', 'group', 'hosts', 'hostname', 'network', 'ssh', 'os-release'],
+    '/home': ['user'],
+    '/home/user': ['Documents', 'Downloads', 'README.md', 'projects'],
+    '/home/user/Documents': ['notes.txt', 'budget.xlsx'],
+    '/home/user/Downloads': ['installer.sh'],
+    '/home/user/projects': ['cloud-app', 'devops-scripts'],
+    '/var': ['log', 'mail', 'spool', 'www'],
+    '/tmp': []
+  });
   const fileSystemRef = useRef(fileSystem);
   const currentDirRef = useRef(currentDir);
   const virtualFilesRef = useRef(virtualFiles);
@@ -632,18 +644,6 @@ export const Terminal: React.FC<TerminalProps> = ({
     setSudoAuthTimeout(timeout);
   };
 
-  const [fileSystem, setFileSystem] = useState<Record<string, string[]>>({
-    '/': ['bin', 'etc', 'home', 'var', 'tmp', 'usr', 'root', 'dev', 'proc'],
-    '/bin': ['bash', 'ls', 'pwd', 'cat', 'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo', 'ps', 'apt', 'top', 'uname'],
-    '/etc': ['passwd', 'shadow', 'group', 'hosts', 'hostname', 'network', 'ssh', 'os-release'],
-    '/home': ['user'],
-    '/home/user': ['Documents', 'Downloads', 'README.md', 'projects'],
-    '/home/user/Documents': ['notes.txt', 'budget.xlsx'],
-    '/home/user/Downloads': ['installer.sh'],
-    '/home/user/projects': ['cloud-app', 'devops-scripts'],
-    '/var': ['log', 'mail', 'spool', 'www'],
-    '/tmp': []
-  });
 
   const bootSequence = [
     `[    0.000000] Linux version 5.15.0-generic (buildd@lgw01-amd64-060) (${flavor})`,
