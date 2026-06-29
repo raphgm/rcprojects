@@ -184,7 +184,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       }
       if (sub === 'list' || sub === 'ls') return 'NAME    NAMESPACE   REVISION   STATUS    CHART';
       if (sub === 'version') return 'version.BuildInfo{Version:"v3.13.0"}';
-      return `[helm ${sub || ''}] completed.`;
+      return '';
     }
     case 'docker': {
       if (sub === 'build') return 'Sending build context to Docker daemon...\nSuccessfully built abc123def456\nSuccessfully tagged ' + (args.find(a => a.startsWith('-t='))?.split('=')[1] || 'image:latest');
@@ -193,11 +193,11 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'pull') return `Using default tag: latest\nlatest: Pulling from library/${rest[0] || 'image'}\nDigest: sha256:fakedigest\nStatus: Downloaded newer image`;
       if (sub === 'push') return 'The push refers to repository [docker.io/...]\nlatest: digest: sha256:fakedigest size: 1234';
       if (sub === 'images') return 'REPOSITORY   TAG      IMAGE ID       CREATED        SIZE\nnginx        latest   abc123def456   2 weeks ago    142MB';
-      if (sub === 'exec') return '(exec session simulated)';
-      if (sub === 'compose') return `Compose ${rest[0] || 'up'} succeeded.`;
+      if (sub === 'exec') return '';
+      if (sub === 'compose') return 'Container web-1  Running\nContainer db-1   Running';
       if (sub === 'login') return 'Login Succeeded';
       if (sub === 'version') return 'Docker version 24.0.7, build afdd53b';
-      return `[docker ${sub || ''}] completed.`;
+      return '';
     }
     case 'terraform': {
       if (sub === 'init') return 'Initializing the backend...\nInitializing provider plugins...\nTerraform has been successfully initialized!';
@@ -205,10 +205,10 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'apply') return 'Apply complete! Resources: 5 added, 0 changed, 0 destroyed.';
       if (sub === 'destroy') return 'Destroy complete! Resources: 5 destroyed.';
       if (sub === 'validate') return 'Success! The configuration is valid.';
-      if (sub === 'fmt') return '(formatted)';
+      if (sub === 'fmt') return '';
       if (sub === 'output') return 'cluster_endpoint = "https://realcloud.example.com"';
       if (sub === 'version') return 'Terraform v1.7.0';
-      return `[terraform ${sub || ''}] completed.`;
+      return '';
     }
     case 'git': {
       if (sub === 'init') return 'Initialized empty Git repository in ./.git/';
@@ -222,27 +222,27 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'log') return 'commit abc1234\nAuthor: Cloud Student <student@cloud-labs.com>\nDate:   ' + new Date().toString() + '\n\n    Initial commit';
       if (sub === 'branch') return '* main';
       if (sub === 'checkout' || sub === 'switch') return `Switched to branch '${rest[0] || 'main'}'`;
-      return `[git ${sub || ''}] completed.`;
+      return '';
     }
     case 'aws': {
       if (sub === 'configure') return '';
       if (sub === 's3') return rest[0] === 'ls' ? '2025-01-01 00:00:00 my-bucket' : '(s3 operation completed)';
       if (sub === 'ec2') return rest[0] === 'describe-instances' ? '{ "Reservations": [ { "Instances": [ { "InstanceId": "i-0abc123def456" } ] } ] }' : '(ec2 operation completed)';
-      if (sub === 'sts') return rest[0] === 'get-caller-identity' ? '{\n    "UserId": "AIDAEXAMPLE",\n    "Account": "123456789012",\n    "Arn": "arn:aws:iam::123456789012:user/student"\n}' : '(sts operation completed)';
-      return `(aws ${sub || ''} completed)`;
+      if (sub === 'sts') return rest[0] === 'get-caller-identity' ? '{\n    "UserId": "AIDAEXAMPLE",\n    "Account": "123456789012",\n    "Arn": "arn:aws:iam::123456789012:user/student"\n}' : '';
+      return '';
     }
     case 'az': {
       if (sub === 'login') return '[\n  {\n    "name": "Realcloud Subscription",\n    "id": "00000000-0000-0000-0000-000000000000",\n    "isDefault": true\n  }\n]';
       if (sub === 'group') return rest[0] === 'create' ? '{\n  "id": "/subscriptions/.../resourceGroups/...",\n  "location": "eastus",\n  "properties": { "provisioningState": "Succeeded" }\n}' : '[]';
-      if (sub === 'aks' || sub === 'vm' || sub === 'storage' || sub === 'webapp') return `(az ${sub} ${rest[0] || ''} succeeded)`;
+      if (sub === 'aks' || sub === 'vm' || sub === 'storage' || sub === 'webapp') return '';
       if (sub === 'account') return 'Subscription: Realcloud Subscription';
-      return `(az ${sub || ''} completed)`;
+      return '';
     }
     case 'gcloud': {
       if (sub === 'auth') return '(authenticated)';
       if (sub === 'projects') return rest[0] === 'list' ? 'PROJECT_ID         NAME            PROJECT_NUMBER\nrealcloud-demo     Realcloud       123456789012' : '(project op completed)';
-      if (sub === 'compute' || sub === 'container' || sub === 'sql' || sub === 'storage') return `(gcloud ${sub} ${rest[0] || ''} succeeded)`;
-      return `(gcloud ${sub || ''} completed)`;
+      if (sub === 'compute' || sub === 'container' || sub === 'sql' || sub === 'storage') return '';
+      return '';
     }
     case 'curl':
     case 'wget': {
@@ -264,14 +264,14 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'status') return `● ${rest[0] || 'service'}.service - active (running)`;
       if (sub === 'start' || sub === 'stop' || sub === 'restart' || sub === 'reload' || sub === 'enable' || sub === 'disable') return '';
       if (sub === 'list-units') return 'UNIT                LOAD   ACTIVE SUB     DESCRIPTION\nnginx.service       loaded active running nginx web server';
-      return `(systemctl ${sub || ''} completed)`;
+      return '';
     }
     case 'journalctl':
       return `-- Logs begin at ${new Date().toUTCString()} --\n${new Date().toUTCString()} realcloud systemd[1]: Started service.`;
     case 'openssl': {
       if (sub === 'rand') return btoa(Math.random().toString()).slice(0, 44);
-      if (sub === 'genrsa' || sub === 'req' || sub === 'x509') return '(openssl operation completed)';
-      return `(openssl ${sub || ''} completed)`;
+      if (sub === 'genrsa' || sub === 'req' || sub === 'x509') return '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDh4l1K...\n-----END PRIVATE KEY-----';
+      return '';
     }
     case 'nmap':
       return `Starting Nmap 7.94\nNmap scan report for ${args[args.length - 1] || 'target'}\nHost is up (0.0010s latency).\nPORT     STATE  SERVICE\n22/tcp   open   ssh\n80/tcp   open   http\n443/tcp  open   https`;
@@ -283,7 +283,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (sub === 'init') return 'Your Kubernetes control-plane has initialized successfully!\n\nTo start using your cluster, run:\n  mkdir -p $HOME/.kube\n  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config';
       if (sub === 'join') return 'This node has joined the cluster.';
       if (sub === 'reset') return '[reset] Reset succeeded.';
-      return `(kubeadm ${sub || ''} completed)`;
+      return '';
     }
     case 'minikube':
       return `(minikube ${sub || ''} completed)`;
@@ -299,7 +299,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'etcdctl':
     case 'cilium':
     case 'falco':
-      return `(${base} ${sub || ''} completed successfully)`;
+      return '';
     case 'prowler':
       return 'Prowler scan completed: 124 checks passed, 3 findings (LOW severity)';
     case 'trivy':
@@ -324,22 +324,22 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'hashcat':
     case 'nikto':
     case 'burpsuite':
-      return `(${base} ${sub || ''} completed successfully)`;
+      return '';
     case 'consul':
     case 'vault':
     case 'nomad':
-      return `(${base} ${sub || ''} completed)`;
+      return '';
     case 'python':
     case 'python3':
     case 'node':
     case 'java':
-      return `(${base} ${args[1] || ''} executed)`;
+      return '';
     case 'pip':
     case 'pip3':
     case 'npm':
     case 'yarn':
     case 'pnpm':
-      return `(${base} ${sub || ''} completed)`;
+      return '';
     // ---- Networking / system inspection
     case 'ifconfig':
     case 'ip':
@@ -363,7 +363,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'iptables':
     case 'ufw':
     case 'firewall-cmd':
-      return sub === 'status' || rest[0] === 'status' ? 'Status: active' : `(${base} ${sub || ''} succeeded)`;
+      return sub === 'status' || rest[0] === 'status' ? 'Status: active' : '';
     // ---- Resource / process tools
     case 'htop':
     case 'free':
@@ -376,7 +376,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       return `${Math.floor(Math.random() * 500 + 50)}M\t${args[args.length - 1] || '.'}`;
     case 'mount':
     case 'umount':
-      return base === 'mount' ? '/dev/sda1 on / type ext4 (rw,relatime)' : `(unmounted ${args[1] || 'device'})`;
+      return base === 'mount' ? '/dev/sda1 on / type ext4 (rw,relatime)' : '';
     case 'lsblk':
       return 'NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS\nsda      8:0    0   40G  0 disk\n└─sda1   8:1    0   40G  0 part /';
     case 'fdisk':
@@ -402,16 +402,16 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'tee':
     case 'tr':
     case 'xargs':
-      return `(${base} processed input successfully)`;
+      return '';
     case 'tar':
-      return sub?.includes('x') ? '(archive extracted)' : '(archive created)';
+      return sub?.includes('x') ? 'tar: Archive extracted successfully' : 'tar: Archive created successfully';
     case 'zip':
     case 'unzip':
     case 'gzip':
     case 'gunzip':
     case 'bzip2':
     case 'xz':
-      return `(${base} ${sub || ''} completed)`;
+      return '';
     case 'chmod':
     case 'chown':
     case 'chgrp':
@@ -447,7 +447,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'gradle':
     case 'sbt':
     case 'dotnet':
-      return `(${base} ${sub || ''} completed successfully)`;
+      return '';
     case 'tsc':
     case 'eslint':
     case 'prettier':
@@ -455,7 +455,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'vitest':
     case 'pytest':
     case 'mocha':
-      return `(${base} ${sub || ''} completed — 0 errors)`;
+      return '';
     // ---- Databases
     case 'psql':
     case 'mysql':
@@ -467,12 +467,12 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
       if (cmd.includes('-c') || cmd.includes('--eval') || cmd.includes('-e')) {
         return ' id | name | created_at\n----+------+-------------\n  1 | demo | 2026-01-01';
       }
-      return `(connected to ${base}; type \\q to quit)`;
+      return `Connected to ${base} server. Type \\q to quit.`;
     // ---- Web servers / runtimes
     case 'nginx':
     case 'apache2':
     case 'httpd':
-      return sub === '-t' ? 'syntax is ok\nconfiguration test is successful' : `(${base} ${sub || 'reload'} succeeded)`;
+      return sub === '-t' ? 'syntax is ok\nconfiguration test is successful' : '';
     // ---- Container / cloud-native add-ons
     case 'podman':
     case 'buildah':
@@ -482,7 +482,7 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
     case 'kind':
     case 'k3d':
     case 'k3s':
-      return `(${base} ${sub || ''} succeeded)`;
+      return '';
     case 'cosign':
       return sub === 'sign' ? 'tlog entry created with index: 12345' : 'Verified OK';
     case 'syft':
@@ -491,21 +491,19 @@ const simulateLabCommand = (cmd: string, args: string[]): string | null => {
         ? 'NAME              VERSION    TYPE\nopenssl           3.0.7      apk\nzlib              1.2.13     apk'
         : 'NAME              INSTALLED  FIXED-IN  TYPE  VULNERABILITY  SEVERITY\nopenssl           3.0.7      3.0.8     apk   CVE-2023-XXXX  Medium';
     case 'opa':
-      return sub === 'eval' ? '{\n  "result": [{ "expressions": [{ "value": true }]}]\n}' : `(opa ${sub || ''} completed)`;
+      return sub === 'eval' ? '{\n  "result": [{ "expressions": [{ "value": true }]}]\n}' : '';
     // ---- IaC + cloud
     case 'pulumi':
     case 'bicep':
     case 'arm':
     case 'cdk':
     case 'azd':
-      return `(${base} ${sub || ''} succeeded)`;
+      return '';
     // ---- Generic plausible fallback for any reasonable token
     default: {
-      // Treat anything that looks like a real command as a successful no-op
-      // rather than failing — keeps simulations alive.
       if (/^[a-z][a-z0-9_-]{1,40}$/i.test(base || '')) {
-        if (sub) return `(${base} ${sub} completed)`;
-        return `(${base} completed)`;
+        // Standard Unix convention: successful commands remain silent
+        return '';
       }
       return null;
     }
