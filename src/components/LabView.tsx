@@ -178,6 +178,38 @@ const getCommandBreakdown = (cmd: string): { term: string; explanation: string }
     }
   }
 
+  if (cleanCmd.includes('swapoff')) {
+    breakdown.push({
+      term: "swapoff -a",
+      explanation: "Disables all swap paging/virtual memory space instantly to satisfy Kubernetes cluster installation prerequisites."
+    });
+  }
+
+  if (cleanCmd.includes('sed ')) {
+    breakdown.push({
+      term: "sed",
+      explanation: "Stream Editor: used to search, find, replace, or edit text in files programmatically."
+    });
+    if (cleanCmd.includes('-i')) {
+      breakdown.push({
+        term: "-i",
+        explanation: "In-place: saves the modified changes directly back to the original file."
+      });
+    }
+    if (cleanCmd.includes('/etc/fstab')) {
+      breakdown.push({
+        term: "/etc/fstab",
+        explanation: "File System Table: system file that controls static disk partition mount settings."
+      });
+    }
+    if (cleanCmd.includes('/ swap /')) {
+      breakdown.push({
+        term: '"/ swap / ..."',
+        explanation: "Finds the line containing 'swap' and comments it out by adding a hash (#) prefix, preventing it from mounting on system boot."
+      });
+    }
+  }
+
   if (cleanCmd.includes('mkdir -p')) {
     breakdown.push({
       term: "mkdir -p",
