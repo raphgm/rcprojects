@@ -50,8 +50,8 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
           <Rocket className="w-3 h-3 text-zinc-600" />
           Hands-on Practice
         </motion.div>
-        <h1 className="text-5xl md:text-7xl font-bold text-zinc-900 mb-8 tracking-tight leading-[0.95]">
-          Master Cloud & DevOps <br />
+        <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 mb-8 tracking-tight leading-tight">
+          Master Cloud & DevOps with <br />
           <span className="text-zinc-400 font-mono font-medium tracking-tight">Real-World</span> Projects
         </h1>
         <p className="text-zinc-500 text-xl max-w-2xl mx-auto leading-relaxed">
