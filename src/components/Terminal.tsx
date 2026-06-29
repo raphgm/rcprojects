@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal as TerminalIcon, ChevronRight } from 'lucide-react';
-import { LinuxFlavor } from '../App';
 
-import { LabStep } from '../types/content';
+import { LabStep, LinuxFlavor } from '../types/content';
 
 const normalizeCommandToLinux = (cmd: string): string => {
   let newCmd = cmd.trim();
