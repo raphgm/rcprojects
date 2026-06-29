@@ -247,10 +247,6 @@ export default function App() {
         
         {activeTab === 'projects' && (
           <div id="projects-section" className="py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-              <h2 className="text-2xl font-bold text-zinc-900">Featured Projects</h2>
-              <p className="text-zinc-500 text-sm mt-2">Hands-on experience with real-world scenarios.</p>
-            </div>
             <ProjectGrid onStartLab={startLab} completedLabs={completedLabs} />
           </div>
         )}

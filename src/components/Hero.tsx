@@ -163,12 +163,18 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
             {/* Social proof */}
             <div className="flex items-center gap-4">
               <div className="flex -space-x-3">
-                {[1,2,3,4,5].map(i => (
+                {[
+                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&fit=crop&crop=faces&q=80'
+                ].map((url, idx) => (
                   <img
-                    key={i}
-                    src={`https://picsum.photos/seed/u${i}/80/80`}
-                    alt=""
-                    className="w-9 h-9 rounded-full border-2 border-white shadow-sm"
+                    key={idx}
+                    src={url}
+                    alt="Engineer Profile"
+                    className="w-9 h-9 rounded-full border-2 border-white shadow-sm object-cover"
                     referrerPolicy="no-referrer"
                   />
                 ))}
