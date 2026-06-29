@@ -72,7 +72,7 @@ const getOSCommand = (cmd: string, os: 'macos' | 'windows' | 'linux'): string =>
 
 const getCommandBreakdown = (cmd: string): { term: string; explanation: string }[] => {
   const breakdown: { term: string; explanation: string }[] = [];
-  const cleanCmd = cmd.trim();
+  const cleanCmd = (cmd || '').trim();
 
   if (cleanCmd.includes('echo') && cleanCmd.includes('>>')) {
     breakdown.push({
@@ -371,8 +371,9 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [newTag, setNewTag] = useState<Comment['tag']>('general');
   const earnedXp = lab.xpReward ?? 250;
 
-  // Reset progress when lab ID changes to prevent out-of-bounds crashes
-  useEffect(() => {
+  const [prevProjectId, setPrevProjectId] = useState(lab.projectId);
+  if (lab.projectId !== prevProjectId) {
+    setPrevProjectId(lab.projectId);
     setCurrentStepIndex(0);
     setCompletedSteps([]);
     setIsStarted(false);
@@ -380,7 +381,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     setConnectionProgress(0);
     setConnectionStatus('');
     setProgressPercentage(0);
-  }, [lab.projectId]);
+  }
 
   const [selectedOS, setSelectedOS] = useState<'macos' | 'windows' | 'linux'>('linux');
   const [runCommandTrigger, setRunCommandTrigger] = useState<{ command: string; timestamp: number } | null>(null);

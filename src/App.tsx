@@ -102,6 +102,7 @@ export default function App() {
   };
 
   const configureKubernetesLab = (lab: LabContent): LabContent => {
+    if (!lab || !lab.steps || lab.steps.length === 0) return lab;
     if (lab.environment !== 'kubernetes') return lab;
 
     // Check if Kubeconfig copy is already part of the first step (to avoid double prepending)
