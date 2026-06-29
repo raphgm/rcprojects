@@ -93,9 +93,9 @@ export class ErrorBoundary extends Component<Props, State> {
             >
               Refresh Page
             </button>
-            {import.meta.env.DEV && this.state.error && (
-              <pre className="mt-8 p-4 bg-zinc-50 rounded-xl text-left text-xs text-zinc-400 overflow-auto max-h-40">
-                {this.state.error.message}
+            {this.state.error && (
+              <pre className="mt-8 p-4 bg-zinc-50 rounded-xl text-left text-xs text-zinc-600 overflow-auto max-h-60 border border-zinc-200">
+                {this.state.error.stack || this.state.error.message}
               </pre>
             )}
           </div>
