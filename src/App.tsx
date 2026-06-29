@@ -20,7 +20,7 @@ import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { cloudLabs } from './data/cloudLabs';
 import { learningPaths } from './data/learningPaths';
-import { Lesson, LabContent, LabStep } from './types/content';
+import { Lesson, LabContent, LabStep, LinuxFlavor } from './types/content';
 import { generateFallbackLessons } from './data/lessonGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { db } from './firebase';
@@ -29,7 +29,6 @@ import { projects } from './data/projects';
 import { generateFallbackLab } from './data/labGenerator';
 
 
-export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
 export type CloudProvider = 'azure';
 
 export default function App() {

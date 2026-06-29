@@ -67,3 +67,5 @@ export interface LabContent {
   xpReward?: number;
   steps: LabStep[];
 }
+
+export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';

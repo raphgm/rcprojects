@@ -164,11 +164,11 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
             <div className="flex items-center gap-4">
               <div className="flex -space-x-3">
                 {[
-                  'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&fit=crop&crop=faces&q=80',
                   'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&fit=crop&crop=faces&q=80',
-                  'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=80&fit=crop&crop=faces&q=80',
-                  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&fit=crop&crop=faces&q=80',
-                  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&fit=crop&crop=faces&q=80'
+                  'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1507152832244-10d45c7eda57?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&fit=crop&crop=faces&q=80'
                 ].map((url, idx) => (
                   <img
                     key={idx}
