@@ -8,6 +8,12 @@ import { LabStep } from '../types/content';
 const normalizeCommandToLinux = (cmd: string): string => {
   let newCmd = cmd.trim();
   
+  // Expand shell helper shortcuts
+  newCmd = newCmd.replace(/\$HOME/g, '/home/user');
+  newCmd = newCmd.replace(/~/g, '/home/user');
+  newCmd = newCmd.replace(/\$\(id -u\)/g, '1000');
+  newCmd = newCmd.replace(/\$\(id -g\)/g, '1000');
+  
   // macOS mappings to Linux
   if (newCmd.includes('brew install ')) {
     newCmd = newCmd.replace(/brew\s+install\s+([a-zA-Z0-9\-\s]+)/g, 'sudo apt install -y $1');
@@ -1064,6 +1070,12 @@ export const Terminal: React.FC<TerminalProps> = ({
         case 'cp':
           output = args[1] && args[2] ? `Copied ${args[1]} to ${args[2]}` : 'cp: missing file operand';
           break;
+        case 'chown':
+          output = '';
+          break;
+        case 'chmod':
+          output = '';
+          break;
         case 'mv':
           output = args[1] && args[2] ? `Moved ${args[1]} to ${args[2]}` : 'mv: missing destination file operand';
           break;
@@ -1120,10 +1132,19 @@ export const Terminal: React.FC<TerminalProps> = ({
           const sub = args[1];
           if (!sub || sub === '--help' || sub === 'help') {
             output = 'kubectl controls the Kubernetes cluster manager.\n\nUsage:\n  kubectl [command] [flags]\n\nAvailable Commands:\n  get             Display one or many resources\n  describe        Show details of a specific resource or group of resources\n  create          Create a resource from a file or from stdin\n  delete          Delete resources by filenames, stdin, resources and names, or by resources and label selector\n  apply           Apply a configuration to a resource by filename or stdin\n  exec            Execute a command in a container';
+          } else if (sub === 'cluster-info') {
+            output = 'Kubernetes control plane is running at https://127.0.0.1:6443\nCoreDNS is running at https://127.0.0.1:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy\n\nTo further debug and diagnose cluster problems, use \'kubectl cluster-info dump\'.';
           } else if (sub === 'get') {
             const resource = args[2];
-            if (resource === 'nodes') {
-              output = 'NAME           STATUS   ROLES                  AGE   VERSION\ncontrol-plane  Ready    control-plane,master   12d   v1.23.0\nworker-01      Ready    <none>                 12d   v1.23.0\nworker-02      Ready    <none>                 12d   v1.23.0';
+            if (resource === 'nodes' || resource === 'node') {
+              output = 'NAME            STATUS   ROLES                  AGE   VERSION\ncontrol-plane   Ready    control-plane,master   12d   v1.29.0\nworker-01       Ready    <none>                 12d   v1.29.0\nworker-02       Ready    <none>                 12d   v1.29.0';
+            } else if (resource === 'ns' || resource === 'namespace' || resource === 'namespaces') {
+              const specificNs = args[3];
+              if (specificNs) {
+                output = `NAME      STATUS   AGE\n${specificNs}   Active   15s`;
+              } else {
+                output = 'NAME              STATUS   AGE\ndefault           Active   12d\nkube-system       Active   12d\nkube-public       Active   12d\nkube-node-lease   Active   12d\nargocd            Active   10s';
+              }
             } else if (resource === 'pods' || resource === 'pod') {
               output = 'NAME                     READY   STATUS    RESTARTS   AGE\nnginx-6799fc88d8-7p9z2   1/1     Running   0          4h\nredis-5f4b9f9-m2k1x      1/1     Running   0          2h';
             } else if (resource === 'deployments' || resource === 'deployment' || resource === 'deploy') {
@@ -1139,6 +1160,14 @@ export const Terminal: React.FC<TerminalProps> = ({
             }
           } else if (sub === 'describe') {
             output = `Name: ${args[3] || 'resource'}\nNamespace: default\nStatus: Running\nIP: 10.244.0.123\nControlled By: ReplicaSet/nginx-6799fc88d8`;
+          } else if (sub === 'create') {
+            const what = args[2];
+            const name = args[3];
+            if (what === 'namespace' || what === 'ns') {
+              output = `namespace/${name || 'new-namespace'} created`;
+            } else {
+              output = `${what || 'resource'}/${name || 'resource'} created`;
+            }
           } else {
             output = `Command "kubectl ${sub}" executed successfully.`;
           }
