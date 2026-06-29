@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, Play, CheckCircle, BookOpen, Terminal as TerminalIcon, Layout, Code, Settings2 } from 'lucide-react';
 import Markdown from 'react-markdown';
-import { Lesson } from '../types/content';
+import { Lesson, LinuxFlavor, CloudProvider } from '../types/content';
 import { Terminal } from './Terminal';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
-import { LinuxFlavor, CloudProvider } from '../App';
 
 interface LessonViewProps {
   courseId?: string;

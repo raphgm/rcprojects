@@ -69,3 +69,4 @@ export interface LabContent {
 }
 
 export type LinuxFlavor = 'ubuntu' | 'centos' | 'alpine' | 'rhel';
+export type CloudProvider = 'azure';
