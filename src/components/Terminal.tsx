@@ -568,6 +568,7 @@ export const Terminal: React.FC<TerminalProps> = ({
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [bootProgress, setBootProgress] = useState(0);
   const [currentDir, setCurrentDir] = useState('/home/user');
+  const [virtualFiles, setVirtualFiles] = useState<Record<string, string>>({});
   const [isWaitingForPassword, setIsWaitingForPassword] = useState(false);
   const [pendingCommand, setPendingCommand] = useState<string | null>(null);
   const [isSudoAuthenticated, setIsSudoAuthenticated] = useState(false);
@@ -799,6 +800,22 @@ export const Terminal: React.FC<TerminalProps> = ({
           `[OK] Wrote ${fileName}`
         ]);
         setIsExecuting(false);
+
+        const resolvedPath = fileName.startsWith('/') ? fileName : (currentDir === '/' ? `/${fileName}` : `${currentDir}/${fileName}`);
+        const parentDir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/')) || '/';
+        const baseName = resolvedPath.substring(resolvedPath.lastIndexOf('/') + 1);
+        if (fileSystem[parentDir]) {
+          if (!fileSystem[parentDir].includes(baseName)) {
+            setFileSystem(prev => ({
+              ...prev,
+              [parentDir]: [...(prev[parentDir] || []), baseName]
+            }));
+          }
+          setVirtualFiles(prev => ({
+            ...prev,
+            [resolvedPath]: fileContent
+          }));
+        }
         // Run any leading or trailing commands sequentially
         const remaining = [before, after].map(s => s.trim()).filter(Boolean).join('\n');
         if (remaining) {
@@ -830,7 +847,24 @@ export const Terminal: React.FC<TerminalProps> = ({
       return;
     }
 
-    const args = cmd.split(' ');
+    let isRedirecting = false;
+    let redirectMode: 'overwrite' | 'append' = 'overwrite';
+    let redirectFile = '';
+    let commandToRun = cmd;
+
+    const redirectMatch = cmd.match(/(.*?)\s+(>>|>)\s+(.*)/);
+    if (redirectMatch) {
+      commandToRun = redirectMatch[1].trim();
+      redirectMode = redirectMatch[2] === '>>' ? 'append' : 'overwrite';
+      redirectFile = redirectMatch[3].trim();
+      if ((redirectFile.startsWith('"') && redirectFile.endsWith('"')) || 
+          (redirectFile.startsWith("'") && redirectFile.endsWith("'"))) {
+        redirectFile = redirectFile.slice(1, -1);
+      }
+      isRedirecting = true;
+    }
+
+    const args = commandToRun.split(' ');
     const baseCmd = args[0].toLowerCase();
 
     // Simulate different processing times based on command
@@ -898,47 +932,85 @@ export const Terminal: React.FC<TerminalProps> = ({
         case 'date':
           output = new Date().toString();
           break;
-        case 'cat':
-          if (args[1]?.toLowerCase() === 'readme.md') {
-            output = '# Welcome to Realcloud\nThis is a simulated Linux environment for learning cloud engineering and DevOps.';
-          } else if (args[1]?.toLowerCase() === '/etc/passwd') {
-            output = 'root:x:0:0:root:/root:/bin/bash\nuser:x:1000:1000:user:/home/user:/bin/bash';
-          } else if (args[1]?.toLowerCase() === '/etc/os-release') {
-            if (flavor === 'ubuntu') {
-              output = 'PRETTY_NAME="Ubuntu 22.04.3 LTS"\nNAME="Ubuntu"\nVERSION_ID="22.04"\nID=ubuntu\nID_LIKE=debian';
-            } else if (flavor === 'centos') {
-              output = 'PRETTY_NAME="CentOS Linux 7 (Core)"\nNAME="CentOS Linux"\nVERSION_ID="7"\nID="centos"\nID_LIKE="rhel fedora"';
-            } else if (flavor === 'rhel') {
-              output = 'PRETTY_NAME="Red Hat Enterprise Linux 9.2 (Plow)"\nNAME="Red Hat Enterprise Linux"\nVERSION_ID="9.2"\nID="rhel"\nID_LIKE="fedora"';
-            } else {
-              output = 'PRETTY_NAME="Alpine Linux v3.15"\nNAME="Alpine Linux"\nID=alpine\nVERSION_ID=3.15.0';
-            }
-          } else if (!args[1]) {
+        case 'cat': {
+          const path = args[1];
+          if (!path) {
             output = 'cat: missing file operand';
           } else {
-            output = `cat: ${args[1]}: No such file or directory`;
+            const resolvedPath = path.startsWith('/') ? path : (currentDir === '/' ? `/${path}` : `${currentDir}/${path}`);
+            if (virtualFiles[resolvedPath] !== undefined) {
+              output = virtualFiles[resolvedPath];
+            } else if (path.toLowerCase() === 'readme.md' || resolvedPath === '/home/user/README.md') {
+              output = '# Welcome to Realcloud\nThis is a simulated Linux environment for learning cloud engineering and DevOps.';
+            } else if (resolvedPath === '/etc/passwd') {
+              output = 'root:x:0:0:root:/root:/bin/bash\nuser:x:1000:1000:user:/home/user:/bin/bash';
+            } else if (resolvedPath === '/etc/os-release') {
+              if (flavor === 'ubuntu') {
+                output = 'PRETTY_NAME="Ubuntu 22.04.3 LTS"\nNAME="Ubuntu"\nVERSION_ID="22.04"\nID=ubuntu\nID_LIKE=debian';
+              } else if (flavor === 'centos') {
+                output = 'PRETTY_NAME="CentOS Linux 7 (Core)"\nNAME="CentOS Linux"\nVERSION_ID="7"\nID="centos"\nID_LIKE="rhel fedora"';
+              } else if (flavor === 'rhel') {
+                output = 'PRETTY_NAME="Red Hat Enterprise Linux 9.2 (Plow)"\nNAME="Red Hat Enterprise Linux"\nVERSION_ID="9.2"\nID="rhel"\nID_LIKE="fedora"';
+              } else {
+                output = 'PRETTY_NAME="Alpine Linux v3.15"\nNAME="Alpine Linux"\nID=alpine\nVERSION_ID=3.15.0';
+              }
+            } else {
+              output = `cat: ${path}: No such file or directory`;
+            }
           }
           break;
+        }
         case 'mkdir': {
-          const name = args[1];
+          const hasP = args.includes('-p');
+          const name = args.slice(1).find(arg => !arg.startsWith('-'));
           if (!name) {
             output = 'mkdir: missing operand';
           } else {
             let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
             if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
             
-            const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
-            const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+            const parts = targetPath.split('/').filter(Boolean);
+            let success = true;
             
-            if (fileSystem[parentDir]) {
-              setFileSystem(prev => ({
-                ...prev,
-                [parentDir]: [...(prev[parentDir] || []), baseName],
-                [targetPath]: []
-              }));
-              output = `Created directory ${baseName}`;
+            if (hasP) {
+              let tempFS = { ...fileSystem };
+              for (let i = 0; i < parts.length; i++) {
+                const parent = '/' + parts.slice(0, i).join('/');
+                const currentName = parts[i];
+                const fullPath = parent === '/' ? `/${currentName}` : `${parent}/${currentName}`;
+                
+                if (!tempFS[parent]) {
+                  success = false;
+                  break;
+                }
+                
+                if (!tempFS[parent].includes(currentName)) {
+                  tempFS[parent] = [...tempFS[parent], currentName];
+                }
+                if (!tempFS[fullPath]) {
+                  tempFS[fullPath] = [];
+                }
+              }
+              if (success) {
+                setFileSystem(tempFS);
+                output = `Created directory ${name}`;
+              } else {
+                output = `mkdir: cannot create directory '${name}': No such file or directory`;
+              }
             } else {
-              output = `mkdir: cannot create directory '${name}': No such file or directory`;
+              const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
+              const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+              
+              if (fileSystem[parentDir]) {
+                setFileSystem(prev => ({
+                  ...prev,
+                  [parentDir]: [...(prev[parentDir] || []), baseName],
+                  [targetPath]: []
+                }));
+                output = `Created directory ${baseName}`;
+              } else {
+                output = `mkdir: cannot create directory '${name}': No such file or directory`;
+              }
             }
           }
           break;
@@ -958,6 +1030,10 @@ export const Terminal: React.FC<TerminalProps> = ({
               setFileSystem(prev => ({
                 ...prev,
                 [parentDir]: prev[parentDir].includes(baseName) ? prev[parentDir] : [...prev[parentDir], baseName]
+              }));
+              setVirtualFiles(prev => ({
+                ...prev,
+                [targetPath]: prev[targetPath] !== undefined ? prev[targetPath] : ''
               }));
               output = `Created file ${baseName}`;
             } else {
@@ -1061,9 +1137,14 @@ export const Terminal: React.FC<TerminalProps> = ({
             output = 'Linux';
           }
           break;
-        case 'echo':
-          output = args.slice(1).join(' ');
+        case 'echo': {
+          let text = args.slice(1).join(' ');
+          if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+            text = text.slice(1, -1);
+          }
+          output = text;
           break;
+        }
         case 'ps':
           output = '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps';
           break;
@@ -1311,6 +1392,34 @@ export const Terminal: React.FC<TerminalProps> = ({
         }
       }
       
+      if (isRedirecting) {
+        const resolvedPath = redirectFile.startsWith('/') ? redirectFile : (currentDir === '/' ? `/${redirectFile}` : `${currentDir}/${redirectFile}`);
+        const parentDir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/')) || '/';
+        const baseName = resolvedPath.substring(resolvedPath.lastIndexOf('/') + 1);
+
+        if (fileSystem[parentDir]) {
+          if (!fileSystem[parentDir].includes(baseName)) {
+            setFileSystem(prev => ({
+              ...prev,
+              [parentDir]: [...(prev[parentDir] || []), baseName]
+            }));
+          }
+          setVirtualFiles(prev => {
+            const currentContent = prev[resolvedPath] || '';
+            const newContent = redirectMode === 'append'
+              ? (currentContent ? currentContent + '\n' + output : output)
+              : output;
+            return {
+              ...prev,
+              [resolvedPath]: newContent
+            };
+          });
+          output = '';
+        } else {
+          output = `bash: ${redirectFile}: No such file or directory`;
+        }
+      }
+
       if (output) {
         setHistory(prev => [...prev, output]);
       }

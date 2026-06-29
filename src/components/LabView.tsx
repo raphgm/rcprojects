@@ -70,6 +70,203 @@ const getOSCommand = (cmd: string, os: 'macos' | 'windows' | 'linux'): string =>
   return cmd;
 };
 
+const getCommandBreakdown = (cmd: string): { term: string; explanation: string }[] => {
+  const breakdown: { term: string; explanation: string }[] = [];
+  const cleanCmd = cmd.trim();
+
+  if (cleanCmd.includes('echo') && cleanCmd.includes('>>')) {
+    breakdown.push({
+      term: "echo '...'",
+      explanation: "Prints the specified string/text to the standard output."
+    });
+    breakdown.push({
+      term: ">>",
+      explanation: "Appends the output to the end of the target file instead of displaying it on the screen."
+    });
+  } else if (cleanCmd.includes('echo') && cleanCmd.includes('>')) {
+    breakdown.push({
+      term: "echo '...'",
+      explanation: "Prints the specified string/text to the standard output."
+    });
+    breakdown.push({
+      term: ">",
+      explanation: "Redirects the output, overwriting the target file's content entirely."
+    });
+  }
+
+  if (cleanCmd.includes('tar ')) {
+    breakdown.push({
+      term: "tar",
+      explanation: "Tape Archive utility: bundles multiple files or directories into a single archive file."
+    });
+    if (cleanCmd.includes('-c') || cleanCmd.includes(' c')) {
+      breakdown.push({
+        term: "-c",
+        explanation: "Tells tar to CREATE a new archive."
+      });
+    }
+    if (cleanCmd.includes('-z') || cleanCmd.includes(' z')) {
+      breakdown.push({
+        term: "-z",
+        explanation: "Compresses the archive file using gzip compression to save space."
+      });
+    }
+    if (cleanCmd.includes('-f') || cleanCmd.includes(' f')) {
+      breakdown.push({
+        term: "-f",
+        explanation: "Specifies the filename of the archive file to create."
+      });
+    }
+    if (cleanCmd.includes('/etc')) {
+      breakdown.push({
+        term: "/etc",
+        explanation: "The target system folder containing system-wide configuration files to backup."
+      });
+    }
+  }
+
+  if (cleanCmd.includes('date +%F') || cleanCmd.includes('$(date +%F)')) {
+    breakdown.push({
+      term: "$(date +%F)",
+      explanation: "Command substitution: runs 'date +%F' which prints the current date in YYYY-MM-DD format and embeds it dynamically into the filename."
+    });
+  }
+
+  if (cleanCmd.includes('crontab')) {
+    breakdown.push({
+      term: "crontab -l",
+      explanation: "Lists the active cron jobs for the current user."
+    });
+    breakdown.push({
+      term: "| crontab -",
+      explanation: "Pipes the text output into crontab to install/update the crontab configuration."
+    });
+    breakdown.push({
+      term: "0 0 * * *",
+      explanation: "Cron schedule expression: runs the command daily at exactly midnight (00:00)."
+    });
+  }
+
+  if (cleanCmd.includes('kubectl')) {
+    breakdown.push({
+      term: "kubectl",
+      explanation: "The official command-line tool for controlling Kubernetes clusters."
+    });
+    if (cleanCmd.includes('create namespace') || cleanCmd.includes('create ns')) {
+      breakdown.push({
+        term: "create namespace",
+        explanation: "Creates a new virtual boundary/workspace inside the cluster to isolate resources."
+      });
+    }
+    if (cleanCmd.includes('apply -f') || cleanCmd.includes('apply')) {
+      breakdown.push({
+        term: "apply -f",
+        explanation: "Deploys or updates resources defined in a local or remote YAML manifest configuration file."
+      });
+    }
+    if (cleanCmd.includes('get nodes')) {
+      breakdown.push({
+        term: "get nodes",
+        explanation: "Queries the cluster control plane to list all active worker and master nodes."
+      });
+    }
+    if (cleanCmd.includes('cluster-info')) {
+      breakdown.push({
+        term: "cluster-info",
+        explanation: "Displays connection endpoints and status information for master and core services."
+      });
+    }
+  }
+
+  if (cleanCmd.includes('mkdir -p')) {
+    breakdown.push({
+      term: "mkdir -p",
+      explanation: "Creates directories recursively, ensuring parent directories are created if they do not exist."
+    });
+  }
+
+  if (cleanCmd.includes('sudo cp -i')) {
+    breakdown.push({
+      term: "sudo",
+      explanation: "Superuser Do: Executes the command with administrator (root) privileges."
+    });
+    breakdown.push({
+      term: "cp -i",
+      explanation: "Copies files or directories, prompting before overwriting any existing files."
+    });
+  }
+
+  if (cleanCmd.includes('chown')) {
+    breakdown.push({
+      term: "chown",
+      explanation: "Changes the owner and/or group ownership of files and directories."
+    });
+    breakdown.push({
+      term: "$(id -u):$(id -g)",
+      explanation: "Dynamically gets the current user's numeric User ID and Group ID to apply permissions."
+    });
+  }
+
+  if (cleanCmd.includes('docker ')) {
+    breakdown.push({
+      term: "docker",
+      explanation: "Docker containerisation engine command line interface."
+    });
+    if (cleanCmd.includes('run')) {
+      breakdown.push({
+        term: "run",
+        explanation: "Creates and starts a new container instance from a Docker image."
+      });
+    }
+    if (cleanCmd.includes('-d')) {
+      breakdown.push({
+        term: "-d",
+        explanation: "Detached mode: runs the container in the background, leaving the terminal free."
+      });
+    }
+    if (cleanCmd.includes('-p ')) {
+      breakdown.push({
+        term: "-p",
+        explanation: "Port forwarding: maps a port on the host machine to a port inside the container."
+      });
+    }
+    if (cleanCmd.includes('build')) {
+      breakdown.push({
+        term: "build",
+        explanation: "Builds a Docker image from a local Dockerfile configuration."
+      });
+    }
+    if (cleanCmd.includes('-t ')) {
+      breakdown.push({
+        term: "-t",
+        explanation: "Tag: specifies a name and optional tag version for the built image."
+      });
+    }
+  }
+
+  if (cleanCmd.includes('curl ')) {
+    breakdown.push({
+      term: "curl",
+      explanation: "Client URL: utility for transferring data to/from a network server using protocols like HTTP."
+    });
+    if (cleanCmd.includes('-I') || cleanCmd.includes('-i')) {
+      breakdown.push({
+        term: "-I / -i",
+        explanation: "Fetches and displays HTTP header response information from the server."
+      });
+    }
+  }
+
+  if (cleanCmd.includes('&&')) {
+    breakdown.push({
+      term: "&&",
+      explanation: "Logical AND operator: executes the second command only if the first command succeeds."
+    });
+  }
+
+  return breakdown;
+};
+
 interface LabViewProps {
   lab: LabContent;
   onClose: () => void;
@@ -464,6 +661,36 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                             </p>
                           </div>
                         ))}
+
+                        {currentStep?.commands && currentStep.commands.length > 0 && (
+                          <div className="pt-4 border-t border-zinc-200 mt-4">
+                            <h5 className="text-[10px] font-black text-amber-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                              <Monitor className="w-3.5 h-3.5 text-amber-700" />
+                              Command Syntax Breakdown
+                            </h5>
+                            <div className="space-y-3">
+                              {currentStep.commands.map((cmd, cIdx) => {
+                                const breakdown = getCommandBreakdown(cmd.text);
+                                if (breakdown.length === 0) return null;
+                                return (
+                                  <div key={cIdx} className="bg-zinc-50 border border-zinc-200/50 rounded-xl p-3">
+                                    <div className="font-mono text-[10px] text-zinc-800 bg-zinc-200/50 px-2 py-1 rounded mb-2 border border-zinc-300/30 overflow-x-auto">
+                                      {cmd.text}
+                                    </div>
+                                    <div className="space-y-2">
+                                      {breakdown.map((item, iIdx) => (
+                                        <div key={iIdx} className="text-[11px] leading-relaxed flex items-start gap-1.5">
+                                          <span className="font-mono font-bold text-brand-blue bg-blue-50 border border-blue-100/50 px-1 rounded shrink-0">{item.term}</span>
+                                          <span className="text-zinc-600">— {item.explanation}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
