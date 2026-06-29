@@ -110,6 +110,56 @@ export default function App() {
       return lab;
     }
 
+    // Process the existing steps and split any compound namespace creation + apply/install commands
+    const processedSteps: LabStep[] = [];
+    lab.steps.forEach(step => {
+      const firstCmdText = step.commands?.[0]?.text || '';
+      const nsMatch = firstCmdText.match(/(?:kubectl\s+create\s+(?:namespace|ns)\s+(\w+))\s*(?:&&|\n)\s*(kubectl\s+(?:apply|create)\s+[^]+|helm\s+install\s+[^]+)/i);
+      
+      if (nsMatch) {
+        const nsName = nsMatch[1];
+        const deployCmdText = nsMatch[2].trim();
+        
+        // Split into Namespace Creation step and Manifest Deployment step
+        processedSteps.push({
+          id: `${step.id}-create-ns`,
+          title: `Create Namespace: ${nsName}`,
+          instruction: `Create a dedicated Kubernetes namespace named "${nsName}" to isolate the resources for this deployment.`,
+          summary: `Create namespace ${nsName}`,
+          whyNeeded: 'Namespaces provide a logical partition within a cluster. Creating a dedicated namespace prevents resource name collisions and isolates components from other cluster tenants.',
+          pillarConnection: 'Security',
+          commands: [
+            {
+              text: `kubectl create namespace ${nsName}`,
+              explanation: `Creates the "${nsName}" namespace in the active cluster.`
+            }
+          ],
+          checkCommand: `kubectl get namespace ${nsName}`,
+          expectedOutput: nsName
+        });
+
+        processedSteps.push({
+          id: `${step.id}-apply-manifests`,
+          title: step.title,
+          instruction: `Deploy the application components in the "${nsName}" namespace.`,
+          summary: step.summary,
+          whyNeeded: step.whyNeeded,
+          pillarConnection: step.pillarConnection || 'Operational Excellence',
+          commands: [
+            {
+              text: deployCmdText,
+              explanation: step.commands?.[0]?.explanation || 'Deploys resources in the target namespace.'
+            },
+            ...(step.commands?.slice(1) || [])
+          ],
+          checkCommand: step.checkCommand,
+          expectedOutput: step.expectedOutput
+        });
+      } else {
+        processedSteps.push(step);
+      }
+    });
+
     const setupSteps: LabStep[] = [
       {
         id: `${lab.projectId}-setup-kubeconfig`,
@@ -147,7 +197,7 @@ export default function App() {
 
     return {
       ...lab,
-      steps: [...setupSteps, ...lab.steps]
+      steps: [...setupSteps, ...processedSteps]
     };
   };
 
