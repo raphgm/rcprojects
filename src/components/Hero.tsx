@@ -164,9 +164,9 @@ export const Hero: React.FC<{ onStart?: () => void; onViewSkillTrees?: () => voi
             <div className="flex items-center gap-4">
               <div className="flex -space-x-3">
                 {[
-                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&fit=crop&crop=faces&q=80',
-                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&fit=crop&crop=faces&q=80',
-                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&fit=crop&crop=faces&q=80',
+                  'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=80&fit=crop&crop=faces&q=80',
                   'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&fit=crop&crop=faces&q=80',
                   'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&fit=crop&crop=faces&q=80'
                 ].map((url, idx) => (
