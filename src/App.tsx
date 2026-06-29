@@ -20,7 +20,7 @@ import { AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { cloudLabs } from './data/cloudLabs';
 import { learningPaths } from './data/learningPaths';
-import { Lesson, LabContent } from './types/content';
+import { Lesson, LabContent, LabStep } from './types/content';
 import { generateFallbackLessons } from './data/lessonGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { db } from './firebase';
@@ -101,11 +101,61 @@ export default function App() {
     return 'General';
   };
 
+  const configureKubernetesLab = (lab: LabContent): LabContent => {
+    if (lab.environment !== 'kubernetes') return lab;
+
+    // Check if Kubeconfig copy is already part of the first step (to avoid double prepending)
+    const firstStepText = lab.steps[0]?.commands?.[0]?.text || '';
+    if (firstStepText.includes('admin.conf') || firstStepText.includes('kubeconfig')) {
+      return lab;
+    }
+
+    const setupSteps: LabStep[] = [
+      {
+        id: `${lab.projectId}-setup-kubeconfig`,
+        title: 'Configure Cluster Credentials',
+        instruction: 'Configure credentials by copying the Kubernetes administrator configuration file to your user space.',
+        summary: 'Set up kubeconfig',
+        whyNeeded: 'By default, the Kubernetes API requires credentials for secure authentication. Copying admin.conf to ~/.kube/config enables your local kubectl client to authorize requests to the API server.',
+        pillarConnection: 'Security',
+        commands: [
+          {
+            text: 'mkdir -p $HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config',
+            explanation: 'Creates a directory for local kubectl configuration, copies the cluster root credentials from /etc/kubernetes, and gives owner permissions to the standard user.'
+          }
+        ],
+        checkCommand: 'ls $HOME/.kube/config',
+        expectedOutput: 'config'
+      },
+      {
+        id: `${lab.projectId}-setup-verify`,
+        title: 'Verify Cluster Connectivity',
+        instruction: 'Query the Kubernetes API server to check active nodes and retrieve connection metadata to ensure the cluster is ready.',
+        summary: 'Verify connectivity',
+        whyNeeded: 'Verifying cluster connectivity first confirms the API server is active and accessible before attempting any resource deployments, preventing deployment timeouts.',
+        pillarConnection: 'Operational Excellence',
+        commands: [
+          {
+            text: 'kubectl cluster-info && kubectl get nodes',
+            explanation: 'Displays cluster API endpoints, server statuses, and retrieves status list for all worker/control-plane nodes.'
+          }
+        ],
+        checkCommand: 'kubectl get nodes',
+        expectedOutput: 'Ready'
+      }
+    ];
+
+    return {
+      ...lab,
+      steps: [...setupSteps, ...lab.steps]
+    };
+  };
+
   const startLab = (projectId: string, projectTitle: string) => {
     setActiveLesson(null); // Clear active lesson
     const content = cloudLabs.find(l => l.projectId === projectId);
     if (content) {
-      setActiveLab({ lab: content, title: projectTitle });
+      setActiveLab({ lab: configureKubernetesLab(content), title: projectTitle });
     } else {
       // Find category for specific fallback
       let category = inferCategoryFromTitle(projectTitle);
@@ -113,7 +163,7 @@ export default function App() {
       if (project) category = project.category;
 
       setActiveLab({
-        lab: generateFallbackLab(projectId, projectTitle, category),
+        lab: configureKubernetesLab(generateFallbackLab(projectId, projectTitle, category)),
         title: projectTitle
       });
     }
