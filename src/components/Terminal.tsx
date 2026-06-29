@@ -578,6 +578,36 @@ export const Terminal: React.FC<TerminalProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isLiveMode = Boolean(sessionId && authToken);
+  const fileSystemRef = useRef(fileSystem);
+  const currentDirRef = useRef(currentDir);
+  const virtualFilesRef = useRef(virtualFiles);
+
+  useEffect(() => {
+    fileSystemRef.current = fileSystem;
+  }, [fileSystem]);
+
+  useEffect(() => {
+    currentDirRef.current = currentDir;
+  }, [currentDir]);
+
+  useEffect(() => {
+    virtualFilesRef.current = virtualFiles;
+  }, [virtualFiles]);
+
+  const updateFileSystem = (newFS: Record<string, string[]>) => {
+    fileSystemRef.current = newFS;
+    setFileSystem(newFS);
+  };
+
+  const updateCurrentDir = (newDir: string) => {
+    currentDirRef.current = newDir;
+    setCurrentDir(newDir);
+  };
+
+  const updateVirtualFiles = (newFiles: Record<string, string>) => {
+    virtualFilesRef.current = newFiles;
+    setVirtualFiles(newFiles);
+  };
 
   // Connect to real container session when sessionId + authToken are provided
   useEffect(() => {
@@ -801,26 +831,28 @@ export const Terminal: React.FC<TerminalProps> = ({
         ]);
         setIsExecuting(false);
 
-        const resolvedPath = fileName.startsWith('/') ? fileName : (currentDir === '/' ? `/${fileName}` : `${currentDir}/${fileName}`);
+        const resolvedPath = fileName.startsWith('/') ? fileName : (currentDirRef.current === '/' ? `/${fileName}` : `${currentDirRef.current}/${fileName}`);
         const parentDir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/')) || '/';
         const baseName = resolvedPath.substring(resolvedPath.lastIndexOf('/') + 1);
-        if (fileSystem[parentDir]) {
-          if (!fileSystem[parentDir].includes(baseName)) {
-            setFileSystem(prev => ({
-              ...prev,
-              [parentDir]: [...(prev[parentDir] || []), baseName]
-            }));
+        if (fileSystemRef.current[parentDir]) {
+          if (!fileSystemRef.current[parentDir].includes(baseName)) {
+            const nextFS = {
+              ...fileSystemRef.current,
+              [parentDir]: [...(fileSystemRef.current[parentDir] || []), baseName]
+            };
+            updateFileSystem(nextFS);
           }
-          setVirtualFiles(prev => ({
-            ...prev,
+          const nextFiles = {
+            ...virtualFilesRef.current,
             [resolvedPath]: fileContent
-          }));
+          };
+          updateVirtualFiles(nextFiles);
         }
         // Run any leading or trailing commands sequentially
         const remaining = [before, after].map(s => s.trim()).filter(Boolean).join('\n');
         if (remaining) {
           for (const sub of remaining.split('\n').map(s => s.trim()).filter(Boolean)) {
-            setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${sub}`]);
+            setHistory(prev => [...prev, `user@${flavor}:${currentDirRef.current}$ ${sub}`]);
             await processActualCommand(sub);
           }
         }
@@ -829,7 +861,7 @@ export const Terminal: React.FC<TerminalProps> = ({
       }
       // Generic multi-line: run each non-empty line in sequence
       for (const sub of cmd.split('\n').map(s => s.trim()).filter(Boolean)) {
-        setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${sub}`]);
+        setHistory(prev => [...prev, `user@${flavor}:${currentDirRef.current}$ ${sub}`]);
         await processActualCommand(sub);
       }
       setInput('');
@@ -840,7 +872,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     if (cmd.includes(' && ')) {
       const parts = cmd.split(' && ').map(s => s.trim()).filter(Boolean);
       for (const part of parts) {
-        setHistory(prev => [...prev, `user@${flavor}:${currentDir}$ ${part}`]);
+        setHistory(prev => [...prev, `user@${flavor}:${currentDirRef.current}$ ${part}`]);
         await processActualCommand(part);
       }
       setInput('');
@@ -888,14 +920,14 @@ export const Terminal: React.FC<TerminalProps> = ({
       // Check for built-in commands first
       switch (baseCmd) {
         case 'ls': {
-          let targetPath = currentDir;
+          let targetPath = currentDirRef.current;
           const pathArg = args.find(a => !a.startsWith('-') && a !== baseCmd);
           
           if (pathArg) {
             if (pathArg.startsWith('/')) {
               targetPath = pathArg;
             } else {
-              targetPath = currentDir === '/' ? `/${pathArg}` : `${currentDir}/${pathArg}`;
+              targetPath = currentDirRef.current === '/' ? `/${pathArg}` : `${currentDirRef.current}/${pathArg}`;
             }
           }
 
@@ -904,7 +936,7 @@ export const Terminal: React.FC<TerminalProps> = ({
             targetPath = targetPath.slice(0, -1);
           }
 
-          if (fileSystem[targetPath]) {
+          if (fileSystemRef.current[targetPath]) {
             // Permission check for sensitive files
             const sensitiveFiles = ['/etc/shadow', '/etc/sudoers', '/root'];
             const isSensitive = sensitiveFiles.some(f => targetPath.startsWith(f));
@@ -912,7 +944,7 @@ export const Terminal: React.FC<TerminalProps> = ({
             if (isSensitive && !isSudoAuthenticated) {
               output = `ls: cannot open directory '${targetPath}': Permission denied`;
             } else {
-              const files = [...fileSystem[targetPath]];
+              const files = [...fileSystemRef.current[targetPath]];
               if (args.includes('-a')) {
                 files.unshift('.', '..');
               }
@@ -924,7 +956,7 @@ export const Terminal: React.FC<TerminalProps> = ({
           break;
         }
         case 'pwd':
-          output = currentDir;
+          output = currentDirRef.current;
           break;
         case 'whoami':
           output = 'user';
@@ -937,9 +969,9 @@ export const Terminal: React.FC<TerminalProps> = ({
           if (!path) {
             output = 'cat: missing file operand';
           } else {
-            const resolvedPath = path.startsWith('/') ? path : (currentDir === '/' ? `/${path}` : `${currentDir}/${path}`);
-            if (virtualFiles[resolvedPath] !== undefined) {
-              output = virtualFiles[resolvedPath];
+            const resolvedPath = path.startsWith('/') ? path : (currentDirRef.current === '/' ? `/${path}` : `${currentDirRef.current}/${path}`);
+            if (virtualFilesRef.current[resolvedPath] !== undefined) {
+              output = virtualFilesRef.current[resolvedPath];
             } else if (path.toLowerCase() === 'readme.md' || resolvedPath === '/home/user/README.md') {
               output = '# Welcome to Realcloud\nThis is a simulated Linux environment for learning cloud engineering and DevOps.';
             } else if (resolvedPath === '/etc/passwd') {
@@ -966,14 +998,14 @@ export const Terminal: React.FC<TerminalProps> = ({
           if (!name) {
             output = 'mkdir: missing operand';
           } else {
-            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            let targetPath = name.startsWith('/') ? name : (currentDirRef.current === '/' ? `/${name}` : `${currentDirRef.current}/${name}`);
             if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
             
             const parts = targetPath.split('/').filter(Boolean);
             let success = true;
             
             if (hasP) {
-              let tempFS = { ...fileSystem };
+              let tempFS = { ...fileSystemRef.current };
               for (let i = 0; i < parts.length; i++) {
                 const parent = '/' + parts.slice(0, i).join('/');
                 const currentName = parts[i];
@@ -992,7 +1024,7 @@ export const Terminal: React.FC<TerminalProps> = ({
                 }
               }
               if (success) {
-                setFileSystem(tempFS);
+                updateFileSystem(tempFS);
                 output = `Created directory ${name}`;
               } else {
                 output = `mkdir: cannot create directory '${name}': No such file or directory`;
@@ -1001,12 +1033,13 @@ export const Terminal: React.FC<TerminalProps> = ({
               const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
               const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
               
-              if (fileSystem[parentDir]) {
-                setFileSystem(prev => ({
-                  ...prev,
-                  [parentDir]: [...(prev[parentDir] || []), baseName],
+              if (fileSystemRef.current[parentDir]) {
+                const nextFS = {
+                  ...fileSystemRef.current,
+                  [parentDir]: [...(fileSystemRef.current[parentDir] || []), baseName],
                   [targetPath]: []
-                }));
+                };
+                updateFileSystem(nextFS);
                 output = `Created directory ${baseName}`;
               } else {
                 output = `mkdir: cannot create directory '${name}': No such file or directory`;
@@ -1020,21 +1053,26 @@ export const Terminal: React.FC<TerminalProps> = ({
           if (!name) {
             output = 'touch: missing file operand';
           } else {
-            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            let targetPath = name.startsWith('/') ? name : (currentDirRef.current === '/' ? `/${name}` : `${currentDirRef.current}/${name}`);
             if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
             
             const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
             const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
             
-            if (fileSystem[parentDir]) {
-              setFileSystem(prev => ({
-                ...prev,
-                [parentDir]: prev[parentDir].includes(baseName) ? prev[parentDir] : [...prev[parentDir], baseName]
-              }));
-              setVirtualFiles(prev => ({
-                ...prev,
-                [targetPath]: prev[targetPath] !== undefined ? prev[targetPath] : ''
-              }));
+            if (fileSystemRef.current[parentDir]) {
+              const nextFS = {
+                ...fileSystemRef.current,
+                [parentDir]: fileSystemRef.current[parentDir].includes(baseName) 
+                  ? fileSystemRef.current[parentDir] 
+                  : [...fileSystemRef.current[parentDir], baseName]
+              };
+              updateFileSystem(nextFS);
+              
+              const nextFiles = {
+                ...virtualFilesRef.current,
+                [targetPath]: virtualFilesRef.current[targetPath] !== undefined ? virtualFilesRef.current[targetPath] : ''
+              };
+              updateVirtualFiles(nextFiles);
               output = `Created file ${baseName}`;
             } else {
               output = `touch: cannot touch '${name}': No such file or directory`;
@@ -1084,19 +1122,17 @@ export const Terminal: React.FC<TerminalProps> = ({
           if (!name) {
             output = 'rm: missing operand';
           } else {
-            let targetPath = name.startsWith('/') ? name : (currentDir === '/' ? `/${name}` : `${currentDir}/${name}`);
+            let targetPath = name.startsWith('/') ? name : (currentDirRef.current === '/' ? `/${name}` : `${currentDirRef.current}/${name}`);
             if (targetPath.length > 1 && targetPath.endsWith('/')) targetPath = targetPath.slice(0, -1);
             
             const parentDir = targetPath.substring(0, targetPath.lastIndexOf('/')) || '/';
             const baseName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
             
-            if (fileSystem[parentDir] && fileSystem[parentDir].includes(baseName)) {
-              setFileSystem(prev => {
-                const newParent = prev[parentDir].filter(f => f !== baseName);
-                const nextFs = { ...prev, [parentDir]: newParent };
-                if (nextFs[targetPath]) delete nextFs[targetPath];
-                return nextFs;
-              });
+            if (fileSystemRef.current[parentDir] && fileSystemRef.current[parentDir].includes(baseName)) {
+              const nextFS = { ...fileSystemRef.current };
+              nextFS[parentDir] = nextFS[parentDir].filter(f => f !== baseName);
+              if (nextFS[targetPath]) delete nextFS[targetPath];
+              updateFileSystem(nextFS);
               output = `Removed ${baseName}`;
             } else {
               output = `rm: cannot remove '${name}': No such file or directory`;
@@ -1163,21 +1199,21 @@ export const Terminal: React.FC<TerminalProps> = ({
         case 'cd': {
           const path = args[1];
           if (!path || path === '~') {
-            setCurrentDir('/home/user');
+            updateCurrentDir('/home/user');
           } else if (path === '..') {
-            const parts = currentDir.split('/').filter(Boolean);
+            const parts = currentDirRef.current.split('/').filter(Boolean);
             parts.pop();
-            setCurrentDir('/' + parts.join('/'));
+            updateCurrentDir('/' + parts.join('/'));
           } else if (path === '/') {
-            setCurrentDir('/');
+            updateCurrentDir('/');
           } else {
-            let targetPath = path.startsWith('/') ? path : (currentDir === '/' ? `/${path}` : `${currentDir}/${path}`);
+            let targetPath = path.startsWith('/') ? path : (currentDirRef.current === '/' ? `/${path}` : `${currentDirRef.current}/${path}`);
             // Normalize path
             if (targetPath.length > 1 && targetPath.endsWith('/')) {
               targetPath = targetPath.slice(0, -1);
             }
-            if (fileSystem[targetPath]) {
-              setCurrentDir(targetPath);
+            if (fileSystemRef.current[targetPath]) {
+              updateCurrentDir(targetPath);
             } else {
               output = `bash: cd: ${path}: No such file or directory`;
             }
@@ -1218,7 +1254,7 @@ export const Terminal: React.FC<TerminalProps> = ({
           } else if (sub === 'get') {
             const resource = args[2];
             if (resource === 'nodes' || resource === 'node') {
-              output = 'NAME            STATUS   ROLES                  AGE   VERSION\ncontrol-plane   Ready    control-plane,master   12d   v1.29.0\nworker-01       Ready    <none>                 12d   v1.29.0\nworker-02       Ready    <none>                 12d   v1.29.0';
+              output = 'NAME             STATUS   ROLES                  AGE   VERSION\nrealcloud-cp-1   Ready    control-plane,master   12d   v1.29.0\nrealcloud-w-1    Ready    <none>                 12d   v1.29.0\nrealcloud-w-2    Ready    <none>                 12d   v1.29.0';
             } else if (resource === 'ns' || resource === 'namespace' || resource === 'namespaces') {
               const specificNs = args[3];
               if (specificNs) {
@@ -1249,22 +1285,63 @@ export const Terminal: React.FC<TerminalProps> = ({
             } else {
               output = `${what || 'resource'}/${name || 'resource'} created`;
             }
+          } else if (sub === 'apply') {
+            const fIdx = args.findIndex(a => a === '-f' || a === '--filename');
+            const target = fIdx >= 0 && args[fIdx + 1] ? args[fIdx + 1] : '';
+            const baseTarget = target.substring(target.lastIndexOf('/') + 1).replace('.yaml', '').replace('.yml', '');
+            if (baseTarget) {
+              output = `deployment.apps/${baseTarget} created\nservice/${baseTarget}-service created`;
+            } else {
+              output = `deployment.apps/app created\nservice/app-service created`;
+            }
+          } else if (sub === 'delete') {
+            const what = args[2] || 'deployment';
+            const name = args[3] || 'app';
+            output = `${what} "${name}" deleted`;
+          } else if (sub === 'expose') {
+            const name = args[3] || 'app';
+            output = `service/${name} exposed`;
           } else {
-            output = `Command "kubectl ${sub}" executed successfully.`;
+            output = `Command "kubectl ${sub}" completed.`;
           }
           break;
         }
-        case 'git':
-          if (!args[1]) {
-            output = 'usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]';
-          } else if (args[1] === 'status') {
+        case 'git': {
+          const sub = args[1];
+          if (!sub) {
+            output = 'usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n\nThese are common Git commands used in various situations:\n   init      Create an empty Git repository or reinitialize an existing one\n   add       Add file contents to the index\n   commit    Record changes to the repository\n   push      Update remote refs along with associated objects\n   status    Show the working tree status\n   log       Show commit logs';
+          } else if (sub === 'init') {
+            const currentDir = currentDirRef.current;
+            if (fileSystemRef.current[currentDir]) {
+              const nextFS = {
+                ...fileSystemRef.current,
+                [currentDir]: fileSystemRef.current[currentDir].includes('.git') 
+                  ? fileSystemRef.current[currentDir] 
+                  : [...fileSystemRef.current[currentDir], '.git']
+              };
+              updateFileSystem(nextFS);
+            }
+            output = `Initialized empty Git repository in ${currentDir === '/' ? '' : currentDir}/.git/`;
+          } else if (sub === 'status') {
             output = 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nnothing to commit, working tree clean';
-          } else if (args[1] === 'log') {
-            output = 'commit 8e9e05f5 (HEAD -> main, origin/main)\nAuthor: Engineer <dev@realcloud.io>\nDate:   Fri May 1 12:00:00 2026 +0000\n\n    feat: implement high-fidelity simulations';
+          } else if (sub === 'add') {
+            output = ''; // silent success
+          } else if (sub === 'commit') {
+            const mIdx = args.indexOf('-m');
+            const msg = mIdx !== -1 && args[mIdx + 1] ? args[mIdx + 1].replace(/['"]/g, '') : 'Initial commit';
+            output = `[main abc1234] ${msg}\n 1 file changed, 1 insertion(+)\n create mode 100644 index.js`;
+          } else if (sub === 'push') {
+            output = 'Enumerating objects: 3, done.\nCounting objects: 100% (3/3), done.\nDelta compression using up to 8 threads\nCompressing objects: 100% (2/2), done.\nWriting objects: 100% (3/3), 320 bytes | 320.00 KiB/s, done.\nTotal 3 (delta 1), reused 0 (delta 0), pack-reused 0\nTo github.com:user/repository.git\n   abc1234..def5678  main -> main';
+          } else if (sub === 'log') {
+            output = 'commit def5678 (HEAD -> main, origin/main)\nAuthor: Cloud Engineer <dev@realcloud.io>\nDate:   Mon Jun 29 12:00:00 2026 +0000\n\n    feat: implement high-fidelity simulations\n\ncommit abc1234\nAuthor: Cloud Engineer <dev@realcloud.io>\nDate:   Mon Jun 29 11:30:00 2026 +0000\n\n    Initial commit';
+          } else if (sub === 'checkout') {
+            const target = args[2] || 'main';
+            output = `Switched to branch '${target}'`;
           } else {
-            output = `Command "git ${args[1]}" executed successfully.`;
+            output = `Command "git ${sub}" completed.`;
           }
           break;
+        }
         case 'go':
           if (args[1] === 'version') {
             output = 'go version go1.18.1 linux/amd64';
@@ -1393,27 +1470,27 @@ export const Terminal: React.FC<TerminalProps> = ({
       }
       
       if (isRedirecting) {
-        const resolvedPath = redirectFile.startsWith('/') ? redirectFile : (currentDir === '/' ? `/${redirectFile}` : `${currentDir}/${redirectFile}`);
+        const resolvedPath = redirectFile.startsWith('/') ? redirectFile : (currentDirRef.current === '/' ? `/${redirectFile}` : `${currentDirRef.current}/${redirectFile}`);
         const parentDir = resolvedPath.substring(0, resolvedPath.lastIndexOf('/')) || '/';
         const baseName = resolvedPath.substring(resolvedPath.lastIndexOf('/') + 1);
 
-        if (fileSystem[parentDir]) {
-          if (!fileSystem[parentDir].includes(baseName)) {
-            setFileSystem(prev => ({
-              ...prev,
-              [parentDir]: [...(prev[parentDir] || []), baseName]
-            }));
-          }
-          setVirtualFiles(prev => {
-            const currentContent = prev[resolvedPath] || '';
-            const newContent = redirectMode === 'append'
-              ? (currentContent ? currentContent + '\n' + output : output)
-              : output;
-            return {
-              ...prev,
-              [resolvedPath]: newContent
+        if (fileSystemRef.current[parentDir]) {
+          if (!fileSystemRef.current[parentDir].includes(baseName)) {
+            const nextFS = {
+              ...fileSystemRef.current,
+              [parentDir]: [...(fileSystemRef.current[parentDir] || []), baseName]
             };
-          });
+            updateFileSystem(nextFS);
+          }
+          const currentContent = virtualFilesRef.current[resolvedPath] || '';
+          const newContent = redirectMode === 'append'
+            ? (currentContent ? currentContent + '\n' + output : output)
+            : output;
+          const nextFiles = {
+            ...virtualFilesRef.current,
+            [resolvedPath]: newContent
+          };
+          updateVirtualFiles(nextFiles);
           output = '';
         } else {
           output = `bash: ${redirectFile}: No such file or directory`;
