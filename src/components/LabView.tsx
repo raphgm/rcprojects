@@ -371,6 +371,17 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [newTag, setNewTag] = useState<Comment['tag']>('general');
   const earnedXp = lab.xpReward ?? 250;
 
+  // Reset progress when lab ID changes to prevent out-of-bounds crashes
+  useEffect(() => {
+    setCurrentStepIndex(0);
+    setCompletedSteps([]);
+    setIsStarted(false);
+    setIsConnecting(false);
+    setConnectionProgress(0);
+    setConnectionStatus('');
+    setProgressPercentage(0);
+  }, [lab.projectId]);
+
   const [selectedOS, setSelectedOS] = useState<'macos' | 'windows' | 'linux'>('linux');
   const [runCommandTrigger, setRunCommandTrigger] = useState<{ command: string; timestamp: number } | null>(null);
   const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
