@@ -51,7 +51,7 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
           Hands-on Practice
         </motion.div>
         <h1 className="text-5xl md:text-7xl font-bold text-zinc-900 mb-8 tracking-tight leading-[0.95]">
-          Master Cloud with <br />
+          Master Cloud & DevOps <br />
           <span className="text-zinc-400 font-mono font-medium tracking-tight">Real-World</span> Projects
         </h1>
         <p className="text-zinc-500 text-xl max-w-2xl mx-auto leading-relaxed">
