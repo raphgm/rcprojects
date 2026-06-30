@@ -333,7 +333,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ onStartCourse, onStartLab,
             <PathCard 
               path={path} 
               onClick={() => setSelectedPath(path)}
-              isLocked={path.id !== 'linux' && path.id !== 'devops' && !path.id.startsWith('k8s-') && path.id !== 'kubernetes'}
+              isLocked={path.id !== 'kubernetes' && path.id !== 'docker' && !path.id.startsWith('kubernetes-') && !path.id.startsWith('docker-') && !path.title.toLowerCase().includes('kubernetes') && !path.title.toLowerCase().includes('docker')}
             />
             {enrolledPaths.includes(path.id) && (
               <div className="absolute top-4 right-4 bg-brand-blue text-white p-1 rounded-full shadow-lg">

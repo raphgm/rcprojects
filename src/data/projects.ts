@@ -4,7 +4,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science' | 'Python' | 'Excel';
+  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science' | 'Python' | 'Excel' | 'SAP' | 'Power BI';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   duration: string;
   tags: string[];
@@ -12,6 +12,1256 @@ export interface Project {
 }
 
 const staticProjects: Project[] = [
+  {
+    id: 'esp-intro',
+    title: 'Introduction to Security Awareness',
+    description: 'Learn to identify business threat vectors, understand social engineering traps, and reduce enterprise risks.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '1 hour',
+    tags: ['Security', 'Social Engineering', 'Threat Landscape', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-passwords',
+    title: 'Password Security & Multi-Factor Authentication',
+    description: 'Master credential protection strategies, construct secure passwords, and activate Multi-Factor Authentication (MFA).',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '1 hour',
+    tags: ['Security', 'MFA', 'Passwords', 'Identity'],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-phishing',
+    title: 'Phishing & Social Engineering Vectors',
+    description: 'Detect phishing email signatures, check spoofed mail headers, flag Business Email Compromise (BEC), and report threats.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '1.5 hours',
+    tags: ['Security', 'Phishing', 'Business Email Compromise', 'Social Engineering'],
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-browsing',
+    title: 'Safe Browsing & Mobile Device Security',
+    description: 'Inspect URL domains, spot lookalike threat sites, prevent malware downloads, and secure mobile platforms.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '1.5 hours',
+    tags: ['Security', 'Phishing', 'Social Engineering', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-privacy',
+    title: 'Data Privacy & PII Classification',
+    description: 'Protect sensitive corporate files, classify customer PII records, and maintain GDPR compliance regulations.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '1 hour',
+    tags: ['Security', 'MFA', 'Clean Desk Policy', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-150751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-physical',
+    title: 'Physical Security & Workspace Clean Desk',
+    description: 'Enforce Clean Desk policies, secure exposed passwords notes, badges, files, and lock screens.',
+    category: 'Security',
+    difficulty: 'Beginner',
+    duration: '1 hour',
+    tags: ['Security', 'Clean Desk Policy', 'Social Engineering', 'Identity'],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-remote',
+    title: 'Working Remotely & Public Wi-Fi Security',
+    description: 'Secure home router access, activate corporate VPN channels, and protect laptops in public workspaces.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '1.5 hours',
+    tags: ['Security', 'MFA', 'Passwords', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-incident',
+    title: 'Incident Reporting & Enterprise Response',
+    description: 'Identify cyber incidents indicators, alert security operations centers, and execute containment loops.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '2 hours',
+    tags: ['Security', 'Phishing', 'Social Engineering', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-insider',
+    title: 'Insider Threats & Ethical Workspaces',
+    description: 'Recognize insider risks signatures, protect intellectual IP properties, and monitor compliance rules.',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    duration: '1.5 hours',
+    tags: ['Security', 'Clean Desk Policy', 'Social Engineering', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-ai',
+    title: 'Generative AI Security & Safe Prompts',
+    description: 'Prevent leakage of source codes or PII into public LLM platforms, and understand AI deepfakes.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '1.5 hours',
+    tags: ['Security', 'Social Engineering', 'Passwords', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-project-phishing',
+    title: 'Capstone: Phishing & BEC Assessment',
+    description: 'Flag advanced invoice spoofings and gift card CEO impersonations in a live simulated mail client.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '2 hours',
+    tags: ['Security', 'Phishing', 'Business Email Compromise', 'Social Engineering'],
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-project-mfa',
+    title: 'Capstone: Password Guardian Enforcement',
+    description: 'Secure corporate account profiles, define complex passphrase criteria, and enforce MFA tokens.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '2 hours',
+    tags: ['Security', 'MFA', 'Passwords', 'Identity'],
+    image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-project-physical',
+    title: 'Capstone: Clean Desk Physical Audit',
+    description: 'Audit simulated workspace office rooms to flag badges exposure, password notes, and unlocked screens.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '2 hours',
+    tags: ['Security', 'Clean Desk Policy', 'Social Engineering', 'Identity'],
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-project-remote',
+    title: 'Capstone: Secure Remote Work Setup',
+    description: 'Audit home office routers, encrypt public Wi-Fi tunnels using VPN keys, and prevent data leakage.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '2 hours',
+    tags: ['Security', 'MFA', 'Passwords', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'esp-project-incident',
+    title: 'Capstone: Enterprise Incident Response Orchestration',
+    description: 'Review alert log headers, report host domain threats, and execute breach containment steps.',
+    category: 'Security',
+    difficulty: 'Advanced',
+    duration: '3 hours',
+    tags: ['Security', 'Phishing', 'Social Engineering', 'Best Practices'],
+    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-intro',
+    title: 'Introduction to Business Intelligence',
+    description: 'Learn the Power BI architecture ecosystem, install Desktop, explore views navigation, and publish a report.',
+    category: 'Power BI',
+    difficulty: 'Beginner',
+    duration: '1.5 hours',
+    tags: ['Power BI', 'Power Query', 'DAX', 'Star Schema', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-desktop',
+    title: 'Power BI Desktop Fundamentals',
+    description: 'Master views layouts, templates, importing datasets parameters, and workspace options.',
+    category: 'Power BI',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Power BI', 'Power Query', 'DAX', 'Star Schema', 'VertiPaq'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-getdata',
+    title: 'Getting Data Ingestion',
+    description: 'Connect to external files, SQL databases, SharePoint lists, web APIs, and resolve connection errors.',
+    category: 'Power BI',
+    difficulty: 'Beginner',
+    duration: '2.5 hours',
+    tags: ['Power BI', 'Power Query', 'Dataflows', 'Lakehouse', 'Microsoft Fabric'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-pq-fund',
+    title: 'Power Query Fundamentals',
+    description: 'Use Query Editor applied steps and M language to clean column headers, merge, and load datasets.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Power Query', 'Dataflows', 'Lakehouse', 'Microsoft Fabric', 'Power BI'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-clean',
+    title: 'Power Query Data Cleaning',
+    description: 'Handle empty nulls, replace columns, split strings, pivot, and unpivot messy sales rows.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Power Query', 'Dataflows', 'Lakehouse', 'Microsoft Fabric', 'Power BI'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-pq-adv',
+    title: 'Advanced Power Query ETL',
+    description: 'Build query parameters, write custom M functions, merge queries, and append tables.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['Power Query', 'Dataflows', 'Lakehouse', 'Microsoft Fabric', 'Power BI'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-modeling',
+    title: 'Data Modeling Star Schema',
+    description: 'Structure dimensions and central numerical fact tables, configure cardinality, and table relationships.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Star Schema', 'VertiPaq', 'Power BI', 'DAX', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-modeling-adv',
+    title: 'Advanced Data Modeling',
+    description: 'Model many-to-many joins, active filters, aggregations, and optimize card schemas.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Star Schema', 'VertiPaq', 'Power BI', 'DAX', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-dax-fund',
+    title: 'DAX Measures Fundamentals',
+    description: 'Declare calculated columns, variables, measures, and compute business KPIs.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['DAX', 'VertiPaq', 'Power BI', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-dax-funcs',
+    title: 'DAX Logical Functions',
+    description: 'Use SWITCH and IF statements, format text columns, and compile dates calculations.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['DAX', 'VertiPaq', 'Power BI', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-dax-adv',
+    title: 'Advanced DAX Context Filters',
+    description: 'Shift filter evaluations using CALCULATE, ALL, ALLEXCEPT, and selected values.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['DAX', 'VertiPaq', 'Power BI', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-dax-time',
+    title: 'DAX Time Intelligence',
+    description: 'Compute Year-To-Date (YTD), same period last year (SPLY), and rolling averages.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['DAX', 'VertiPaq', 'Power BI', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-visuals',
+    title: 'Power BI Standard Visuals',
+    description: 'Assemble executive dashboards with standard visuals: tables, matrices, line graphs, and cards.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Power BI', 'Power BI Service', 'DAX', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-visuals-adv',
+    title: 'Power BI Advanced Visuals',
+    description: 'Deploy decomposition analytics trees, maps, key influencers, and waterfall charts.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['Power BI', 'Power BI Service', 'DAX', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-interactive',
+    title: 'Power BI Interactive Reports',
+    description: 'Configure report bookmarks, dynamic navigation buttons, tooltips, and slicers parameters.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Power BI', 'Power BI Service', 'DAX', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-service',
+    title: 'Power BI Service Workspaces',
+    description: 'Manage workspaces, publish reports dashboards, create apps, and coordinate collaboration shares.',
+    category: 'Power BI',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Power BI Service', 'Row-Level Security', 'Power BI', 'Microsoft Fabric', 'Dataflows'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-refresh',
+    title: 'Scheduled Refreshes & Gateways',
+    description: 'Configure data gateways connections, schedule automatic updates, and manage pipelines.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI Service', 'Row-Level Security', 'Power BI', 'Microsoft Fabric', 'Dataflows'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-security',
+    title: 'Power BI Security (RLS)',
+    description: 'Enforce Row Level Security (RLS), manage workspace roles, and configure Microsoft Entra ID groups.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Row-Level Security', 'Power BI Service', 'Power BI', 'Microsoft Fabric', 'VertiPaq'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-optimize',
+    title: 'Power BI Performance Optimization',
+    description: 'Speed up reports calculations using DAX Studio, analyze performance, and compress tables.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['VertiPaq', 'DAX', 'Star Schema', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-fabric',
+    title: 'Microsoft Fabric Fundamentals',
+    description: 'Provision a Fabric workspace, map capacity allocations, and construct OneLake folders.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Microsoft Fabric', 'Lakehouse', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-lakehouse',
+    title: 'Fabric Lakehouse Architecture',
+    description: 'Configure lakehouse folders files, Delta Tables structures, and run SQL analytics.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Lakehouse', 'Microsoft Fabric', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-warehouse',
+    title: 'Fabric SQL Warehouse',
+    description: 'Ingest rows to a Synapse Data Warehouse, configure table schemas, and execute SQL queries.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['Lakehouse', 'Microsoft Fabric', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-factory',
+    title: 'Fabric Data Factory Pipelines',
+    description: 'Build ingestion pipelines copy activities, schedule schedules, and deploy Dataflows Gen2.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Microsoft Fabric', 'Lakehouse', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-realtime',
+    title: 'Real-Time Intelligence',
+    description: 'Stream real-time Event Streams, run KQL database queries, and build analytical monitors.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['Microsoft Fabric', 'Lakehouse', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-ai',
+    title: 'Power BI AI Visuals & Copilot',
+    description: 'Apply smart narratives descriptions, forecast trends, detect anomalies, and query Copilot.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'Microsoft Fabric', 'DAX', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-admin',
+    title: 'Tenant Settings & Governance',
+    description: 'Manage tenant capacities parameters, audit log queues, and configure metadata governance.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Power BI Service', 'Row-Level Security', 'Microsoft Fabric', 'Power BI', 'VertiPaq'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-automate',
+    title: 'Power BI Automation APIs',
+    description: 'Integrate Power Automate actions, write PowerShell scripts, and configure XMLA endpoints.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['Power BI Service', 'Microsoft Fabric', 'Power BI', 'Dataflows', 'Row-Level Security'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-embed',
+    title: 'Power BI Embedded Analytics',
+    description: 'Configure Azure AD app registrations, token generations, and JS SDK script elements.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Power BI Service', 'Row-Level Security', 'Power BI', 'Microsoft Fabric', 'VertiPaq'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-paginated',
+    title: 'Power BI Paginated Reports',
+    description: 'Build printable multi-page reports in Report Builder, parameters, and layout tables.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['Power BI Service', 'Power BI', 'DAX', 'Star Schema', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-enterprise',
+    title: 'Enterprise Semantic Architecture',
+    description: 'Design Medallion semantic architectures, model version controls, and configure CI/CD pipelines.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '6.5 hours',
+    tags: ['Star Schema', 'VertiPaq', 'Power BI Service', 'Microsoft Fabric', 'Row-Level Security'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-solutions',
+    title: 'Industry Analytics Solutions',
+    description: 'Configure packaged dashboards templates for retail sales, P&L accounts, and rosters.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-sales',
+    title: 'Capstone: Executive Sales Analytics',
+    description: 'Construct sales semantic dashboards, model tables joins, build drillthroughs, and role security.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-finance',
+    title: 'Capstone: Financial Reporting Suite',
+    description: 'Build financial profit and loss (P&L) templates, balance sheets statements, and cash flows.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-supply',
+    title: 'Capstone: Supply Chain Analytics',
+    description: 'Analyze logistics datasets, inventory capacities limits, and forecast procurement needs.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-hr',
+    title: 'Capstone: HR Analytics',
+    description: 'Design employee retention rates formulas, recruitment funnels metrics, and comp reviews.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-mfg',
+    title: 'Capstone: Manufacturing Analytics',
+    description: 'Track equipment downtime anomalies, throughput metrics, and calculate OEE coefficients.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-healthcare',
+    title: 'Capstone: Healthcare Analytics',
+    description: 'Map patient ER wait times, hospital bed occupancy sheets, and clinic outcomes.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-banking',
+    title: 'Capstone: Banking Risk Analytics',
+    description: 'Model loan portfolios defaults metrics, customer risk classifications, and fraud indexes.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-marketing',
+    title: 'Capstone: Marketing & Customer Analytics',
+    description: 'Track marketing campaign spends, compute CAC ratios, and calculate churn life values.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Power BI', 'DAX', 'Star Schema', 'Power Query', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-fabric',
+    title: 'Capstone: Fabric E2E Solution',
+    description: 'Ingest logs to OneLake using Data Factory pipelines, execute transformations, and publish dashboard.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Microsoft Fabric', 'Lakehouse', 'Dataflows', 'Power BI', 'Power BI Service'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'pbi-project-enterprise',
+    title: 'Capstone: Enterprise BI Platform',
+    description: 'Provision tenant governance policies, deploy automated CI/CD releases, and configure RLS rules.',
+    category: 'Power BI',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Star Schema', 'VertiPaq', 'Power BI Service', 'Microsoft Fabric', 'Row-Level Security'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-intro',
+    title: 'Introduction to SAP',
+    description: 'Learn ERP vs S/4HANA, landscapes, GUI vs Fiori navigation, client separations, and transport route basics.',
+    category: 'SAP',
+    difficulty: 'Beginner',
+    duration: '1.5 hours',
+    tags: ['SAP', 'S/4HANA', 'Enterprise', 'ERP'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-install',
+    title: 'SAP Installation & Server Session',
+    description: 'Install SAP GUI client, establish router gateway handshakes, configure user accounts, and pin favorites.',
+    category: 'SAP',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['SAP', 'Server', 'Installation'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-navigation',
+    title: 'SAP GUI Command Field Navigation',
+    description: 'Master T-Codes, active session monitors, variants setups, layouts formatting, and F4 search helpers.',
+    category: 'SAP',
+    difficulty: 'Beginner',
+    duration: '2.5 hours',
+    tags: ['SAP', 'T-Codes', 'Navigation'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-security',
+    title: 'SAP Security Basics',
+    description: 'Create user master records (SU01), assign roles (SAP_ALL), set passwords, and inspect failed check logs (SU53).',
+    category: 'SAP',
+    difficulty: 'Beginner',
+    duration: '3 hours',
+    tags: ['SAP', 'Security', 'SU01'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-finance',
+    title: 'Finance (FI) Operations',
+    description: 'Configure company codes, General Ledger postings (FB50), COA structures, invoices, and bank reconciliations.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['SAP', 'Accounting', 'Finance', 'FI'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-controlling',
+    title: 'Controlling (CO)',
+    description: 'Define cost and profit centers, assign internal order budgets, compute cost allocations, and run margin reports.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['SAP', 'Controlling', 'CO'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-sales',
+    title: 'Sales & Distribution (SD)',
+    description: 'Create customer masters, sales orders (VA01), delivery routines, warehouse packaging, and billing invoices.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['SAP', 'SD', 'Sales', 'VA01'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-materials',
+    title: 'Materials Management (MM)',
+    description: 'Examine material masters, purchase orders (ME21N), goods receipts (MIGO), and invoice verifications (MIRO).',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['SAP', 'MM', 'Procurement', 'ME21N'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-warehouse',
+    title: 'Warehouse Management',
+    description: 'Examine storage locations, put-away routing strategies, stock picks, and transfer orders.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '2.5 hours',
+    tags: ['SAP', 'Warehouse', 'Inventory'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-production',
+    title: 'Production Planning (PP)',
+    description: 'Structure Bill of Materials (BOM), work centers, routes, MRP runs, and capacity bottlenecks.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '4.5 hours',
+    tags: ['SAP', 'PP', 'SAP Manufacturing'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-quality',
+    title: 'Quality Management (QM)',
+    description: 'Queue inspection lots, report defects in quality notifications, and post stock release usage decisions.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '2 hours',
+    tags: ['SAP', 'Quality', 'QM'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-plant',
+    title: 'Plant Maintenance (PM)',
+    description: 'Track equipment functional locations, schedule preventive maintenance, and dispatch work orders.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['SAP', 'Maintenance', 'PM'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-hcm',
+    title: 'Human Capital Management (HCM)',
+    description: 'Manage employee infotypes, payroll calculations, organizational departments, and rosters.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['SAP', 'HR', 'HCM', 'Payroll'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-s4hana-fund',
+    title: 'SAP S/4HANA Fundamentals',
+    description: 'Understand Universal Journal (ACDOCA) advantages, Business Partner merges, and Fiori dashboard access.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['SAP', 'S/4HANA', 'ACDOCA'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-fiori',
+    title: 'SAP Fiori Administration',
+    description: 'Configure Fiori Launchpad tiles, catalogs, tile groups, spaces, and layout pages.',
+    category: 'SAP',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['SAP', 'Fiori', 'Launchpad'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-hana',
+    title: 'SAP HANA Database',
+    description: 'Examine HANA Studio interfaces, column in-memory performance, calculation views, and SQL querying.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'HANA', 'Database', 'SQL'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-basis',
+    title: 'SAP Basis Administration',
+    description: 'Inspect architecture instances, kernel releases, client separations, and active work processes.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'Basis', 'SysAdmin'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-basis-user',
+    title: 'SAP Basis User Administration',
+    description: 'Maintain mass user creations (SU10), role profiles tables, and security password policies.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Basis', 'Security'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-basis-transport',
+    title: 'SAP Basis Transport Management',
+    description: 'Configure STMS transport routes, release changes queues, and import updates into QA clients.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['SAP', 'STMS', 'Basis'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-basis-monitor',
+    title: 'SAP Basis Performance Monitoring',
+    description: 'Debug work processes (SM50), system logs (SM21), jobs status (SM37), and ABAP dump logs (ST22).',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'Basis', 'Monitoring'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-basis-backup',
+    title: 'SAP Basis Backup & Recovery',
+    description: 'Run database backups, verify data restores, copy clients, and copy landscapes configurations.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Basis', 'Backup'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-basics',
+    title: 'ABAP Development Basics',
+    description: 'Write custom variables, primitive data types, program loops, and internal tables buffering.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'ABAP', 'Coding'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-prog',
+    title: 'ABAP Program Structures',
+    description: 'modularize code subroutines, trigger function modules, declare OO classes, and handle exceptions.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'ABAP', 'OOP'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-reports',
+    title: 'ABAP Reports Development',
+    description: 'Design classical report printouts, grid ALV lists, and dynamic interactive reports.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['SAP', 'ABAP', 'ALV'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-dict',
+    title: 'ABAP Data Dictionary (SE11)',
+    description: 'Manage Transparent Tables, configure domains and elements, search helps, and lock objects.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'ABAP', 'SE11'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-forms',
+    title: 'Smart Forms & Adobe Forms',
+    description: 'Design layouts in Smart Forms, export PDFs in Adobe Forms, and write driver print scripts.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'ABAP', 'Forms'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-abap-enh',
+    title: 'SAP Enhancements (BADI)',
+    description: 'Configure BADI implementations (SE19), customer exits (SMOD), and custom user exits.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['SAP', 'ABAP', 'BADI'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-integration-api',
+    title: 'SAP API Integrations',
+    description: 'Build OData gateway services (SEGW), REST endpoints, SOAP XML paths, and SM59 RFC links.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['SAP', 'APIs', 'OData', 'SEGW'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-integration-suite',
+    title: 'SAP Integration Suite (CPI)',
+    description: 'Configure Cloud Integration flows, deploy API proxies, and queue Event Mesh notifications.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'Cloud', 'Integration'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-integration-po',
+    title: 'SAP PI/PO Configuration',
+    description: 'Examine message mappings schemas, design directories, and audit communication logs.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['SAP', 'PI/PO', 'Orchestration'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-analytics-sac',
+    title: 'SAP Analytics Cloud (SAC)',
+    description: 'Build executive dashboards, layout reports stories, plan budgets, and run forecast trends.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'SAC', 'Analytics'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-analytics-bw',
+    title: 'SAP BW/4HANA Warehousing',
+    description: 'Deploy warehousing, configure ETL load runs, design InfoProviders, and execute analytical queries.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['SAP', 'BW/4HANA', 'BI'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-cloud-btp',
+    title: 'SAP BTP Administration',
+    description: 'Configure subaccounts networks, Cloud Foundry hostings, destinations records, and Kyma.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'BTP', 'Cloud'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-cloud-ai',
+    title: 'SAP AI Core & AI Hub',
+    description: 'Train ML models in AI Core, query Generative AI Hub APIs, and configure Launchpad dashboards.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['SAP', 'AI', 'Machine Learning'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-cloud-auto',
+    title: 'SAP Build Automation',
+    description: 'Assemble Build Apps interfaces, design workflow approvals, and run process automation bots.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['SAP', 'SAP Automation', 'Build'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-devops',
+    title: 'DevOps for SAP (gCTS)',
+    description: 'Integrate Git versions, automate transport CTS+ queues, and run Jenkins pipelines.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['SAP', 'DevOps', 'SAP CI/CD'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-enterprise-infra',
+    title: 'SAP Enterprise Infrastructure',
+    description: 'Configure high availability failover nodes, disaster recovery locations, and size database RAM.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '6.5 hours',
+    tags: ['SAP', 'Infrastructure', 'Scale'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-enterprise-cloud',
+    title: 'SAP Cloud Deployments (AWS/Azure/GCP)',
+    description: 'Deploy S/4HANA on AWS instances, configure Azure networking, and verify GCP VPC tunnels.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['SAP', 'Cloud', 'SAP AWS', 'GCP'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-enterprise-migrations',
+    title: 'SAP Cloud Migrations',
+    description: 'Automate migrations datasets transfers, configure execution logs, and monitor migrations statuses.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['SAP', 'Migration', 'Cloud'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-project-p2p',
+    title: 'Capstone: Procure-to-Pay (P2P)',
+    description: 'Complete the entire P2P lifecycle: Setup vendor account, requisition, purchase order, goods receipt, and verification.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Capstone', 'P2P', 'Procurement'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-project-o2c',
+    title: 'Capstone: Order-to-Cash (O2C)',
+    description: 'Complete the entire O2C cycle: Customer master cards setup, sales order processing, pick/pack shipping, billing, and accounting.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Capstone', 'O2C', 'Sales'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-project-r2r',
+    title: 'Capstone: Record-to-Report (R2R)',
+    description: 'Complete month-end closing procedures: Post General Ledger journal adjustments, run trial balances, and verify CO-PA reports.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Capstone', 'R2R', 'Finance'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-project-h2r',
+    title: 'Capstone: Hire-to-Retire (H2R)',
+    description: 'Execute HR management sequences: Onboard employees, run payroll taxes, configure leave schedules, and handle exit separations.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['SAP', 'Capstone', 'H2R', 'HR'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'sap-project-p2p-mfg',
+    title: 'Capstone: Plan-to-Produce (P2P Manufacturing)',
+    description: 'Execute shop floor routing: Material calculations, production orders, goods receipt posting, and quality checks.',
+    category: 'SAP',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['SAP', 'Capstone', 'SAP Manufacturing'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-fundamentals',
+    title: 'Excel Fundamentals',
+    description: 'Learn spreadsheet design, Ribbons, cells navigation, ranges, formulas, and auto-fills inside our interactive grid.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Excel', 'Spreadsheet', 'Data Science', 'Data Analytics'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-formatting',
+    title: 'Excel Data Entry & Formatting',
+    description: 'Master cell layout, number formats, date aggregations, text alignments, cell borders, presets, and color fills.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '2.5 hours',
+    tags: ['Excel', 'Spreadsheet', 'Data Entry', 'Formatting'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-worksheets',
+    title: 'Working with Worksheets',
+    description: 'Insert, delete, rename, move, hide, protect, group, freeze panes, and split sheets in Excel.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '1.5 hours',
+    tags: ['Excel', 'Worksheets', 'Design'],
+    image: 'https://images.unsplash.com/photo-1542744094-3a31f103e35f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-basic-formulas',
+    title: 'Excel Basic Formulas',
+    description: 'Master cell references (relative, absolute, mixed), formula auditing, AutoSum, and basic math calculations.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Excel', 'Formulas', 'Math'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-essential-functions',
+    title: 'Essential Functions',
+    description: 'Master mathematical, logical (IF, IFS, AND, OR), text, and date & time function suites.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Excel', 'Functions', 'Logic'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-lookup-reference',
+    title: 'Lookup & Reference Functions',
+    description: 'Master VLOOKUP, HLOOKUP, XLOOKUP, INDEX, MATCH, OFFSET, and CHOOSE references.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '3.5 hours',
+    tags: ['Excel', 'Lookups', 'Data Science'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-dynamic-arrays',
+    title: 'Dynamic Array Functions',
+    description: 'Learn modern Excel dynamic arrays: FILTER, SORT, UNIQUE, SEQUENCE, TAKE, and DROP.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '3 hours',
+    tags: ['Excel', 'Dynamic Arrays', 'Modern'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-tables',
+    title: 'Excel Tables',
+    description: 'Create tables, format layouts, use structured references, sort, filter, and apply slicers.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Excel', 'Tables', 'Data Organization'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-charts',
+    title: 'Charts & Visualization',
+    description: 'Create column, bar, pie, line, area, combo, and sparkline charts for dashboards.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Excel', 'Charts', 'Visualization'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-pivottables',
+    title: 'PivotTables & PivotCharts',
+    description: 'Group data, create calculated fields, apply slicers, and refresh data source tables.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Excel', 'PivotTables', 'Analytics'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-data-analysis',
+    title: 'Data Analysis Toolkit',
+    description: 'Learn duplicates removal, text-to-columns, Goal Seek, Solver, and scenario manager What-Ifs.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '4.5 hours',
+    tags: ['Excel', 'What-If', 'Solver'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-data-validation',
+    title: 'Data Validation',
+    description: 'Configure drop-down lists, custom validation limits, input tips, and error alerts.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '2 hours',
+    tags: ['Excel', 'Validation', 'Forms'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-conditional-formatting',
+    title: 'Conditional Formatting',
+    description: 'Define highlight rules, data bars, color scales, icon sets, and formula rules.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '2.5 hours',
+    tags: ['Excel', 'Styles', 'Formatting'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-power-query',
+    title: 'Power Query',
+    description: 'Import data, clean records, merge queries, append tables, and transform sources.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Excel', 'ETL', 'Power Query'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-power-pivot',
+    title: 'Power Pivot',
+    description: 'Design Data Models, create table relationships, write DAX measures, and calculated columns.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '5.5 hours',
+    tags: ['Excel', 'Data Modeling', 'DAX'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-financial',
+    title: 'Financial Functions',
+    description: 'Compute amortization (PMT), net present value (NPV), IRR, FV, and PV formulas.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Excel', 'Finance', 'Modeling'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-statistical',
+    title: 'Statistical Functions',
+    description: 'Learn MEDIAN, MODE, standard deviations, percentiles, rankings, and correlations.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '3 hours',
+    tags: ['Excel', 'Statistics', 'Math'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-advanced-formulas',
+    title: 'Advanced Formulas',
+    description: 'Write nested IF operations, LAMBDA and LET definitions, named ranges, and INDIRECT formulas.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '4 hours',
+    tags: ['Excel', 'LAMBDA', 'LET'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-automation',
+    title: 'VBA & Automation',
+    description: 'Record macros, edit scripts, write VBA procedures, loops, variables, and user forms.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Excel', 'Macros', 'VBA', 'Coding'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-collaboration',
+    title: 'Excel Collaboration',
+    description: 'Add comments, configure sharing rules, protect workbooks, and view version history.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '1.5 hours',
+    tags: ['Excel', 'Collaboration', 'Security'],
+    image: 'https://images.unsplash.com/photo-1542744094-3a31f103e35f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-import-export',
+    title: 'Import & Export',
+    description: 'Sync CSV, XML, PDF, Web Data, and SQL databases into your workbook pages.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '2.5 hours',
+    tags: ['Excel', 'CSV', 'Database'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-printing',
+    title: 'Workbook Printing',
+    description: 'Define print areas, add custom header titles, page setups, scaling, and breaks.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '1 hour',
+    tags: ['Excel', 'Formatting', 'Print'],
+    image: 'https://images.unsplash.com/photo-1542744095-2918e2f7f941?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-dashboards',
+    title: 'Interactive Dashboards',
+    description: 'Design executive dashboards with slicers, timelines, dynamic charts, and KPIs.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '5 hours',
+    tags: ['Excel', 'Dashboards', 'KPIs'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-business-apps',
+    title: 'Business Applications',
+    description: 'Build enterprise expense trackers, budgets, inventory pages, and payrolls.',
+    category: 'Excel',
+    difficulty: 'Intermediate',
+    duration: '4 hours',
+    tags: ['Excel', 'Budgets', 'HR', 'Finance'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    id: 'excel-advanced-analytics',
+    title: 'Advanced Data Analytics',
+    description: 'Run linear regressions, trend analysis, forecasts, and Monte Carlo simulations.',
+    category: 'Excel',
+    difficulty: 'Advanced',
+    duration: '6 hours',
+    tags: ['Excel', 'Regression', 'Analytics', 'Math'],
+    image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=800&auto=format&fit=crop'
+  },
   {
     id: '1',
     title: 'Linux Web Server Setup & Security',
@@ -49,7 +1299,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '3 hours',
-    tags: ['Bash', 'Automation', 'Cron', 'Linux', 'DevOps Deep Dive'],
+    tags: ['Bash', 'SAP Automation', 'Cron', 'Linux', 'DevOps Deep Dive'],
     image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2000&auto=format&fit=crop'
   },
   {
@@ -59,7 +1309,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '2 hours',
-    tags: ['GitHub Actions', 'Docker', 'CI/CD', 'DevOps Deep Dive'],
+    tags: ['GitHub Actions', 'Docker', 'SAP CI/CD', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/github-actions/800/600'
   },
   {
@@ -89,7 +1339,7 @@ const staticProjects: Project[] = [
     category: 'Security',
     difficulty: 'Intermediate',
     duration: '1.5 hours',
-    tags: ['Prowler', 'Compliance', 'AWS', 'Security', 'DevOps Deep Dive'],
+    tags: ['Prowler', 'Compliance', 'SAP AWS', 'Security', 'DevOps Deep Dive'],
     image: 'https://picsum.photos/seed/aws-security-audit/800/600'
   },
   {
@@ -179,7 +1429,7 @@ const staticProjects: Project[] = [
     category: 'Kubernetes',
     difficulty: 'Advanced',
     duration: '5 hours',
-    tags: ['Operator', 'Go', 'SDK', 'Automation'],
+    tags: ['Operator', 'Go', 'SDK', 'SAP Automation'],
     image: 'https://picsum.photos/seed/kubernetes-automation/800/600'
   },
   {
@@ -229,7 +1479,7 @@ const staticProjects: Project[] = [
     category: 'Azure',
     difficulty: 'Beginner',
     duration: '1 hour',
-    tags: ['Logic Apps', 'Automation', 'Serverless', 'Azure'],
+    tags: ['Logic Apps', 'SAP Automation', 'Serverless', 'Azure'],
     image: 'https://picsum.photos/seed/azure-logic-apps/800/600'
   },
   {
@@ -419,7 +1669,7 @@ const staticProjects: Project[] = [
     category: 'Azure',
     difficulty: 'Intermediate',
     duration: '3 hours',
-    tags: ['Azure DevOps', 'CI/CD', 'Pipelines', 'Azure'],
+    tags: ['Azure DevOps', 'SAP CI/CD', 'Pipelines', 'Azure'],
     image: 'https://picsum.photos/seed/azure-devops-pipeline/800/600'
   },
   {
@@ -469,7 +1719,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2.5 hours',
-    tags: ['Jenkins', 'Groovy', 'CI/CD', 'Automation'],
+    tags: ['Jenkins', 'Groovy', 'SAP CI/CD', 'SAP Automation'],
     image: 'https://picsum.photos/seed/jenkins-pipeline/800/600'
   },
   {
@@ -479,7 +1729,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '1.5 hours',
-    tags: ['Ansible', 'Automation', 'Configuration', 'Linux'],
+    tags: ['Ansible', 'SAP Automation', 'Configuration', 'Linux'],
     image: 'https://picsum.photos/seed/ansible-automation/800/600'
   },
   {
@@ -489,7 +1739,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '3 hours',
-    tags: ['Puppet', 'Automation', 'IaC', 'Configuration'],
+    tags: ['Puppet', 'SAP Automation', 'IaC', 'Configuration'],
     image: 'https://picsum.photos/seed/puppet-infrastructure/800/600'
   },
   {
@@ -499,7 +1749,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2.5 hours',
-    tags: ['Chef', 'Automation', 'IaC', 'Ruby'],
+    tags: ['Chef', 'SAP Automation', 'IaC', 'Ruby'],
     image: 'https://picsum.photos/seed/chef-automation/800/600'
   },
   {
@@ -519,7 +1769,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '1 hour',
-    tags: ['Vagrant', 'Virtualization', 'Development', 'Automation'],
+    tags: ['Vagrant', 'Virtualization', 'Development', 'SAP Automation'],
     image: 'https://picsum.photos/seed/vagrant-environment/800/600'
   },
   {
@@ -529,7 +1779,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2 hours',
-    tags: ['Packer', 'Images', 'IaC', 'Automation'],
+    tags: ['Packer', 'Images', 'IaC', 'SAP Automation'],
     image: 'https://picsum.photos/seed/packer-machine-images/800/600'
   },
   {
@@ -559,7 +1809,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2 hours',
-    tags: ['GitLab', 'CI/CD', 'Pipelines', 'DevOps'],
+    tags: ['GitLab', 'SAP CI/CD', 'Pipelines', 'DevOps'],
     image: 'https://picsum.photos/seed/gitlab-ci-cd/800/600'
   },
   {
@@ -569,7 +1819,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '1.5 hours',
-    tags: ['Bitbucket', 'CI/CD', 'Pipelines', 'Atlassian'],
+    tags: ['Bitbucket', 'SAP CI/CD', 'Pipelines', 'Atlassian'],
     image: 'https://picsum.photos/seed/bitbucket-pipelines/800/600'
   },
   {
@@ -579,7 +1829,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2 hours',
-    tags: ['CircleCI', 'CI/CD', 'Automation', 'DevOps'],
+    tags: ['CircleCI', 'SAP CI/CD', 'SAP Automation', 'DevOps'],
     image: 'https://picsum.photos/seed/circleci-automation/800/600'
   },
   {
@@ -589,7 +1839,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Beginner',
     duration: '1 hour',
-    tags: ['Travis CI', 'CI/CD', 'Open Source', 'Automation'],
+    tags: ['Travis CI', 'SAP CI/CD', 'Open Source', 'SAP Automation'],
     image: 'https://picsum.photos/seed/travis-ci/800/600'
   },
   {
@@ -639,7 +1889,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Advanced',
     duration: '3.5 hours',
-    tags: ['Tekton', 'Kubernetes', 'CI/CD', 'Cloud Native'],
+    tags: ['Tekton', 'Kubernetes', 'SAP CI/CD', 'Cloud Native'],
     image: 'https://picsum.photos/seed/tekton-pipelines/800/600'
   },
   {
@@ -649,7 +1899,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2.5 hours',
-    tags: ['FluxCD', 'GitOps', 'Kubernetes', 'Automation'],
+    tags: ['FluxCD', 'GitOps', 'Kubernetes', 'SAP Automation'],
     image: 'https://picsum.photos/seed/fluxcd-gitops/800/600'
   },
   {
@@ -679,7 +1929,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '2 hours',
-    tags: ['Skaffold', 'Kubernetes', 'Development', 'Automation'],
+    tags: ['Skaffold', 'Kubernetes', 'Development', 'SAP Automation'],
     image: 'https://picsum.photos/seed/skaffold-workflow/800/600'
   },
   {
@@ -1129,7 +2379,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '4 hours',
-    tags: ['Terraform', 'IaC', 'K8s', 'Automation'],
+    tags: ['Terraform', 'IaC', 'K8s', 'SAP Automation'],
     image: 'https://picsum.photos/seed/terraform-k8s/800/600'
   },
   {
@@ -1809,7 +3059,7 @@ const staticProjects: Project[] = [
     category: 'Data Science',
     difficulty: 'Beginner',
     duration: '4 hours',
-    tags: ['Decision Tree', 'Finance', 'Automation'],
+    tags: ['Decision Tree', 'Finance', 'SAP Automation'],
     image: 'https://picsum.photos/seed/loan-ds/800/600'
   },
   {
@@ -1939,7 +3189,7 @@ const staticProjects: Project[] = [
     category: 'Data Science',
     difficulty: 'Advanced',
     duration: '10 hours',
-    tags: ['NLP', 'spaCy', 'NER', 'Automation'],
+    tags: ['NLP', 'spaCy', 'NER', 'SAP Automation'],
     image: 'https://picsum.photos/seed/resume-parser-ds/800/600'
   },
   {
@@ -2469,7 +3719,7 @@ const staticProjects: Project[] = [
     category: 'DevOps',
     difficulty: 'Intermediate',
     duration: '5 hours',
-    tags: ['Docker', 'CI/CD', 'GitHub Actions'],
+    tags: ['Docker', 'SAP CI/CD', 'GitHub Actions'],
     image: 'https://picsum.photos/seed/docker-cicd/800/600'
   },
   {
@@ -2519,7 +3769,7 @@ const staticProjects: Project[] = [
     category: 'Python',
     difficulty: 'Intermediate',
     duration: '5 hours',
-    tags: ['Python', 'Discord.py', 'API', 'Automation'],
+    tags: ['Python', 'Discord.py', 'API', 'SAP Automation'],
     image: 'https://picsum.photos/seed/discord-bot/800/600'
   },
   {
@@ -2611,16 +3861,6 @@ const staticProjects: Project[] = [
     duration: '6 hours',
     tags: ['Python', 'Regex', 'Cloud', 'Logs'],
     image: 'https://picsum.photos/seed/py-logs/800/600'
-  },
-  {
-    id: 'excel-fundamentals',
-    title: 'Excel Fundamentals',
-    description: 'Learn spreadsheet design, Ribbons, cells navigation, ranges, formulas, and auto-fills inside our interactive grid.',
-    category: 'Excel',
-    difficulty: 'Beginner',
-    duration: '2 hours',
-    tags: ['Excel', 'Spreadsheet', 'Data Science', 'Data Analytics'],
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
   }
 ];
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Terminal, Zap, GitBranch, Box } from 'lucide-react';
 
-const ROTATING_WORDS = ['Linux', 'Kubernetes', 'Azure', 'AWS', 'DevOps', 'Docker'];
+const ROTATING_WORDS = ['Linux', 'Kubernetes', 'Azure', 'AWS', 'DevOps', 'Docker', 'Data', 'FinOps'];
 
 const TERMINAL_LINES = [
   { delay: 0,    text: '$ realcloud init --env production',        type: 'cmd' },

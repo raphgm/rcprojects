@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Bell, User, Menu, LogOut, Sparkle } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, logout } from '../firebase';
-import { AuthModal } from './AuthModal';
+import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
   activeTab: 'projects' | 'learn';
@@ -10,16 +8,9 @@ interface NavbarProps {
   xp?: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }) => {
-  const [user, loading] = useAuthState(auth);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
+  const { user, xp, loginRedirect, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
-  const openAuth = (mode: 'login' | 'signup') => {
-    setAuthMode(mode);
-    setIsAuthModalOpen(true);
-  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-zinc-200">
@@ -87,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
                 <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">{xp} XP</span>
               </div>
             )}
-            {!loading && (
+            {true && (
               <>
                 {user ? (
                   <div className="relative">
@@ -95,8 +86,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-100 transition-colors"
                     >
-                      {user.photoURL ? (
-                        <img src={user.photoURL} alt={user.displayName || 'User'} className="w-8 h-8 rounded-full border border-zinc-200" referrerPolicy="no-referrer" />
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.name || 'User'} className="w-8 h-8 rounded-full border border-zinc-200" referrerPolicy="no-referrer" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
                           <User className="w-4 h-4 text-zinc-500" />
@@ -107,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
                     {isUserMenuOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-2xl shadow-2xl py-2 z-[60]">
                         <div className="px-4 py-2 border-b border-zinc-100 mb-2">
-                          <p className="text-xs font-bold text-zinc-900 truncate">{user.displayName || 'User'}</p>
+                          <p className="text-xs font-bold text-zinc-900 truncate">{user.name || 'User'}</p>
                           <p className="text-[10px] text-zinc-400 truncate">{user.email}</p>
                         </div>
                         <button 
@@ -123,13 +114,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
                 ) : (
                   <>
                     <button 
-                      onClick={() => openAuth('login')}
+                      onClick={loginRedirect}
                       className="hidden sm:block text-sm font-bold text-zinc-600 hover:text-zinc-900 px-4 py-2 transition-colors"
                     >
                       Log in
                     </button>
                     <button 
-                      onClick={() => openAuth('signup')}
+                      onClick={loginRedirect}
                       className="bg-brand-blue text-white text-sm font-bold px-5 py-2 rounded-lg hover:bg-brand-blue/90 transition-all shadow-lg shadow-brand-blue/10"
                     >
                       Sign up
@@ -145,11 +136,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange, xp = 0 }
         </div>
       </div>
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        mode={authMode} 
-      />
     </nav>
   );
 };

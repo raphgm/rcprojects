@@ -124,3 +124,18 @@
   pointer-events: none;
 }
 
+@keyframes pulse-active {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(0, 102, 255, 0);
+  }
+}
+
+.animate-pulse-active {
+  animation: pulse-active 2s infinite ease-in-out;
+}
+

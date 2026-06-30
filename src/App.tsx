@@ -13,11 +13,13 @@ import { HowItWorks } from './components/HowItWorks';
 import { Testimonials } from './components/Testimonials';
 import { AboutUs } from './components/AboutUs';
 import { Blog } from './components/Blog';
+import { Layers, Terminal as TerminalIcon, ShieldCheck } from 'lucide-react';
+import { Sparkle, SquigglyArrow, ZigZag, DoodleWrapper } from './components/Doodles';
 import { StatsBar } from './components/StatsBar';
 import { Community } from './components/Community';
 import { StaticPage } from './components/StaticPage';
 import type { FooterTab } from './components/Footer';
-import { AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { courseContents } from './data/courseContent';
 import { cloudLabs } from './data/cloudLabs';
 import { learningPaths } from './data/learningPaths';
@@ -28,44 +30,19 @@ import { db } from './firebase';
 import { doc, getDocFromServer } from 'firebase/firestore';
 import { projects } from './data/projects';
 import { generateFallbackLab } from './data/labGenerator';
+import { useAuth } from './context/AuthContext';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<FooterTab>('projects');
   const [activeLesson, setActiveLesson] = useState<{ courseId: string, lessons: Lesson[], title: string } | null>(null);
   const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
-  const [completedLabs, setCompletedLabs] = useState<string[]>([]);
+  const { user, xp, completedLabs, completeLab, loginRedirect, logout } = useAuth();
   const [linuxFlavor, setLinuxFlavor] = useState<LinuxFlavor>('ubuntu');
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>('azure');
-  const [xp, setXp] = useState<number>(0);
-
-  useEffect(() => {
-    // Load XP and completed labs from local storage if needed
-    const savedXp = localStorage.getItem('realcloud_xp');
-    const savedLabs = localStorage.getItem('realcloud_completed_labs');
-    if (savedXp) setXp(parseInt(savedXp));
-    if (savedLabs) setCompletedLabs(JSON.parse(savedLabs));
-  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [activeTab]);
-
-  const completeLab = (projectId: string, xpReward?: number) => {
-    if (!completedLabs.includes(projectId)) {
-      setCompletedLabs(prev => {
-        const newCompleted = [...prev, projectId];
-        localStorage.setItem('realcloud_completed_labs', JSON.stringify(newCompleted));
-        return newCompleted;
-      });
-      
-      const addedXp = xpReward || 250;
-      setXp(currentXp => {
-        const newXp = currentXp + addedXp;
-        localStorage.setItem('realcloud_xp', newXp.toString());
-        return newXp;
-      });
-    }
-  };
 
   const startCourse = (courseId: string, courseTitle: string) => {
     setActiveLab(null); // Clear active lab
@@ -199,39 +176,60 @@ export default function App() {
     };
   };
 
-  const startLab = (projectId: string, projectTitle: string) => {
+  const startLab = (projectId: string, projectTitle: string, pushHistory = true) => {
     setActiveLesson(null); // Clear active lesson
     const content = cloudLabs.find(l => l.projectId === projectId);
+    let chosenLab;
     if (content) {
-      setActiveLab({ lab: configureKubernetesLab(content), title: projectTitle });
+      chosenLab = configureKubernetesLab(content);
     } else {
-      // Find category for specific fallback
       let category = inferCategoryFromTitle(projectTitle);
       const project = projects.find(p => p.id === projectId);
       if (project) category = project.category;
-
-      setActiveLab({
-        lab: configureKubernetesLab(generateFallbackLab(projectId, projectTitle, category)),
-        title: projectTitle
-      });
+      chosenLab = configureKubernetesLab(generateFallbackLab(projectId, projectTitle, category));
+    }
+    
+    setActiveLab({ lab: chosenLab, title: projectTitle });
+    
+    if (pushHistory) {
+      window.history.pushState({ labId: projectId }, '', `?lab=${encodeURIComponent(projectId)}`);
     }
   };
 
   useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const labId = params.get('lab');
+      if (labId) {
+        const project = projects.find(p => p.id === labId);
+        if (project) {
+          const staticLab = cloudLabs.find(l => l.projectId === labId);
+          setActiveLab({
+            lab: staticLab ? configureKubernetesLab(staticLab) : configureKubernetesLab(generateFallbackLab(labId, project.title, project.category)),
+            title: project.title
+          });
+        }
+      } else {
+        setActiveLab(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
     const params = new URLSearchParams(window.location.search);
     const labId = params.get('lab');
     if (labId) {
-      const staticLab = cloudLabs.find(l => l.projectId === labId);
-      if (staticLab) {
-        const projTitle = projects.find(p => p.id === labId)?.title || 'Interactive Lab';
-        startLab(labId, projTitle);
-      } else {
-        const project = projects.find(p => p.id === labId);
-        if (project) {
-          startLab(labId, project.title);
-        }
+      const project = projects.find(p => p.id === labId);
+      if (project) {
+        const staticLab = cloudLabs.find(l => l.projectId === labId);
+        setActiveLab({
+          lab: staticLab ? configureKubernetesLab(staticLab) : configureKubernetesLab(generateFallbackLab(labId, project.title, project.category)),
+          title: project.title
+        });
       }
     }
+
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
 
@@ -258,9 +256,91 @@ export default function App() {
               completedLabs={completedLabs}
               xp={xp}
             />
-            <div className="max-w-6xl mx-auto px-6 pb-24 relative z-10">
-              <div className="border-t border-zinc-800/40 pt-16">
-                <h2 className="text-xs font-bold tracking-widest text-cyan-400 mb-8 uppercase">ALL LAB MISSION DIRECTORY</h2>
+
+            {/* Onboarding Steps: From Zero to Expert */}
+            <div className="bg-[#fcfbf9] text-zinc-900 py-24 border-y border-zinc-200/80 relative z-10 overflow-hidden">
+              {/* background doodles */}
+              <DoodleWrapper className="top-12 left-10 text-zinc-200 w-24 h-24 rotate-12">
+                <ZigZag className="w-full h-full" />
+              </DoodleWrapper>
+              <DoodleWrapper className="bottom-8 right-16 text-zinc-200 w-32 h-32 -rotate-12">
+                <SquigglyArrow className="w-full h-full" />
+              </DoodleWrapper>
+
+              <div className="max-w-6xl mx-auto px-6 relative">
+                <div className="mb-14 relative inline-block">
+                  <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-zinc-900 mb-2 font-sans flex items-center gap-3">
+                    From zero to expert.
+                    <Sparkle className="w-8 h-8 text-amber-500 animate-pulse shrink-0" />
+                  </h2>
+                  <p className="text-2xl font-bold text-zinc-400 font-sans">
+                    Three steps.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                  {/* Step 1 */}
+                  <motion.div 
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className="bg-white border border-zinc-200 rounded-3xl p-8 relative overflow-hidden shadow-sm hover:shadow-xl hover:border-zinc-300 transition-all duration-300 cursor-default"
+                  >
+                    <div className="absolute top-6 right-8 text-6xl font-black text-zinc-100 select-none font-mono">01</div>
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+                      <Layers className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-extrabold text-zinc-900 mb-3 font-sans">Pick a skill path</h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed font-medium">
+                      Choose from 28 paths across Linux, Cloud, DevOps, Data, FinOps, and Security. Filter by level — beginner to advanced.
+                    </p>
+                  </motion.div>
+
+                  {/* Step 2 */}
+                  <motion.div 
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className="bg-white border border-zinc-200 rounded-3xl p-8 relative overflow-hidden shadow-sm hover:shadow-xl hover:border-zinc-300 transition-all duration-300 cursor-default"
+                  >
+                    <div className="absolute top-6 right-8 text-6xl font-black text-zinc-100 select-none font-mono">02</div>
+                    <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 shadow-sm border border-purple-100">
+                      <TerminalIcon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-extrabold text-zinc-900 mb-3 font-sans">Launch your sandbox</h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed font-medium">
+                      A private, pre-configured environment spins up in seconds. No installs, no config — just start building.
+                    </p>
+                  </motion.div>
+
+                  {/* Step 3 */}
+                  <motion.div 
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className="bg-white border border-zinc-200 rounded-3xl p-8 relative overflow-hidden shadow-sm hover:shadow-xl hover:border-zinc-300 transition-all duration-300 cursor-default"
+                  >
+                    <div className="absolute top-6 right-8 text-6xl font-black text-zinc-100 select-none font-mono">03</div>
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-sm border border-emerald-100">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-extrabold text-zinc-900 mb-3 font-sans">Verify & earn XP</h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed font-medium">
+                      Run `realcloud verify` and our engine checks your work automatically. Pass → XP and badges. Fail → a hint.
+                    </p>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+
+            {/* Project Grid Container with White Background */}
+            <div className="bg-white text-zinc-900 pt-8 pb-24 relative z-10 border-t border-zinc-200 overflow-hidden">
+              {/* Engineering Grid / Wire Mesh Background stretched up to include ALL LAB MISSION DIRECTORY */}
+              <div 
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-screen h-[580px] pointer-events-none opacity-[0.55] z-0"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                  maskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)',
+                  WebkitMaskImage: 'linear-gradient(to bottom, black 65%, transparent 100%)'
+                }}
+              />
+              <div className="max-w-6xl mx-auto px-6 relative z-10">
+                <h2 className="text-xs font-black tracking-widest text-zinc-400 mb-8 uppercase relative z-10">ALL LAB MISSION DIRECTORY</h2>
                 <ProjectGrid onStartLab={startLab} completedLabs={completedLabs} />
               </div>
             </div>
@@ -349,7 +429,7 @@ export default function App() {
             lab={activeLab.lab}
             projectTitle={activeLab.title}
             currentXp={xp}
-            onClose={() => setActiveLab(null)}
+            onClose={() => { setActiveLab(null); window.history.pushState({}, '', window.location.pathname); }}
             onComplete={(xpReward) => completeLab(activeLab.lab.projectId, xpReward)}
           />
         )}

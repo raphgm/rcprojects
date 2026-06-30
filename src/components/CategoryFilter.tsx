@@ -18,7 +18,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition-all whitespace-nowrap ${
           activeCategory === 'All'
             ? 'bg-cyan-500 text-zinc-950 shadow-[0_0_8px_rgba(6,182,212,0.4)]'
-            : 'bg-zinc-950/40 border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+            : 'bg-zinc-50 border border-zinc-200 text-zinc-650 hover:bg-zinc-100 hover:text-zinc-800 hover:border-zinc-300'
         }`}
       >
         All Projects
@@ -30,7 +30,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
           className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition-all whitespace-nowrap ${
             activeCategory === category
               ? 'bg-cyan-500 text-zinc-950 shadow-[0_0_8px_rgba(6,182,212,0.4)]'
-              : 'bg-zinc-950/40 border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+              : 'bg-zinc-50 border border-zinc-200 text-zinc-650 hover:bg-zinc-100 hover:text-zinc-800 hover:border-zinc-300'
           }`}
         >
           {category}

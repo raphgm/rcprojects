@@ -10,6 +10,9 @@ import {
 import { LabContent, LabStep } from '../types/content';
 import { Terminal } from './Terminal';
 import { ExcelGrid } from './ExcelGrid';
+import { SapSandbox } from './SapSandbox';
+import { PowerBiSandbox } from './PowerBiSandbox';
+import { EspSandbox } from './EspSandbox';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
 import { projects } from '../data/projects';
 import { conceptDictionary } from '../data/conceptDictionary';
@@ -359,6 +362,35 @@ const TAG_STYLES: Record<Comment['tag'], string> = {
   general:        'bg-zinc-50 text-zinc-500 border-zinc-100',
 };
 
+const getExcelHint = (check: string, currentStep?: any): string => {
+  if (currentStep?.instruction) return currentStep.instruction;
+  switch (check) {
+    // Excel Fundamentals Hints
+    case 'check_a1': return 'Click cell A1, type 100, and press Enter or click "Check Formula Progress".';
+    case 'check_b1': return 'Click cell B1, type 50, and press Enter.';
+    case 'check_c1': return 'Click cell C1, type "=A1+B1" and press Enter to sum A1 and B1.';
+    case 'check_range_sum': return 'Fill cell A2 with 10, A3 with 20, and A4 with 30.';
+    case 'check_sum_a1_a4': return 'Click cell B2, type "=SUM(A1:A4)" and press Enter.';
+    case 'check_row5': return 'Fill cell A5 with 5 and B5 with 5.';
+    case 'check_c5': return 'Click cell C5, type "=A5+B5" and press Enter.';
+    case 'check_d1_e1': return 'Enter 100 in cell D1 and 50 in cell E1.';
+    case 'check_undo': return 'Click the "Undo" button in the green ribbon of the spreadsheet to revert the last edit.';
+
+    // Excel Formatting Hints
+    case 'format_bold_a1': return 'Select cell A1, type "Sales Report", press Enter, then click the Bold (B) icon in the formatting toolbar.';
+    case 'format_number_a2': return 'Select cell A2, type "1500", press Enter, and choose "Number" from the Format dropdown in the toolbar.';
+    case 'format_date_a3': return 'Select cell A3, type "2026-06-30", press Enter, and choose "Short Date" from the Format dropdown in the toolbar.';
+    case 'format_currency_a4': return 'Select cell A4, type "250", press Enter, and choose "Currency" from the Format dropdown in the toolbar.';
+    case 'format_italic_b1': return 'Select cell B1, type "Q2 Summary", press Enter, and click the Italic (I) icon in the formatting toolbar.';
+    case 'format_align_b1': return 'Select B1 and click the Center Align button in the toolbar.';
+    case 'format_border_a1': return 'Select A1 and click the Grid border icon in the formatting toolbar to enable dark borders.';
+    case 'format_style_a1': return 'Select A1 and choose "Heading 1" from the Style preset dropdown in the toolbar.';
+    case 'format_color_a4': return 'Select A4 and click the Palette color icon in the toolbar to fill it with green.';
+    case 'format_theme_b1': return 'Select B1 and choose "Accent Fill" from the Style preset dropdown in the toolbar.';
+    default: return 'Review instructions carefully to edit spreadsheet cells and apply correct styles.';
+  }
+};
+
 export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, projectTitle, currentXp = 0 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -378,7 +410,14 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
   const [isCheckingProgress, setIsCheckingProgress] = useState(false);
   const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [activeParticles, setActiveParticles] = useState<{ id: number; x: number; y: number; color: string; scale: number; rotation: number }[]>([]);
+  const [floatingXp, setFloatingXp] = useState<{ id: number; amount: number; x: number; y: number } | null>(null);
   const earnedXp = lab.xpReward ?? 250;
+
+  useEffect(() => {
+    setShowHint(false);
+  }, [currentStepIndex]);
 
   const [prevProjectId, setPrevProjectId] = useState(lab.projectId);
   if (lab.projectId !== prevProjectId) {
@@ -433,11 +472,40 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleVerifyExcelStep = (gridData: { [key: string]: string }, lastAction: string): boolean => {
+  const triggerConfettiAndXp = (amount = 25) => {
+    const colors = ['#107c41', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+    const newParticles = Array.from({ length: 45 }).map((_, i) => ({
+      id: Date.now() + i,
+      x: 50 + (Math.random() - 0.5) * 80,
+      y: 35 + (Math.random() - 0.5) * 40,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      scale: Math.random() * 0.8 + 0.4,
+      rotation: Math.random() * 360,
+    }));
+    setActiveParticles(newParticles);
+    
+    setFloatingXp({
+      id: Date.now(),
+      amount,
+      x: 50,
+      y: 50
+    });
+    
+    setTimeout(() => {
+      setActiveParticles([]);
+    }, 2000);
+    
+    setTimeout(() => {
+      setFloatingXp(null);
+    }, 1500);
+  };
+
+  const handleVerifyExcelStep = (gridData: { [key: string]: string }, formats: { [key: string]: any } = {}, lastAction = ''): boolean => {
     const step = lab.steps[currentStepIndex];
     if (!step) return false;
     
     switch (step.checkCommand) {
+      // Excel Fundamentals validations
       case 'check_a1':
         return gridData['A1'] === '100';
       case 'check_b1':
@@ -458,9 +526,248 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
         return gridData['D1'] === '100' && gridData['E1'] === '50';
       case 'check_undo':
         return lastAction === 'undo' && (!gridData['D1'] || gridData['D1'] === '0' || gridData['D1'] === '');
+
+      // Excel Formatting validations
+      case 'format_bold_a1':
+        return gridData['A1']?.trim().toLowerCase() === 'sales report' && Boolean(formats['A1']?.bold);
+      case 'format_number_a2':
+        return gridData['A2'] === '1500' && formats['A2']?.numberFormat === 'number';
+      case 'format_date_a3':
+        return gridData['A3'] === '2026-06-30' && formats['A3']?.numberFormat === 'date';
+      case 'format_currency_a4':
+        return gridData['A4'] === '250' && formats['A4']?.numberFormat === 'currency';
+      case 'format_italic_b1':
+        return gridData['B1']?.trim().toLowerCase() === 'q2 summary' && Boolean(formats['B1']?.italic);
+      case 'format_align_b1':
+        return formats['B1']?.align === 'center';
+      case 'format_border_a1':
+        return Boolean(formats['A1']?.border);
+      case 'format_style_a1':
+        return formats['A1']?.style === 'heading';
+      case 'format_color_a4':
+        return formats['A4']?.color === '#e1f0e7';
+      case 'format_theme_b1':
+        return formats['B1']?.style === 'accent';
+      // Worksheets & Formulas
+      case 'sheet_rename':
+        return gridData['A1'] === 'Sheet Renamed';
+      case 'ref_relative':
+        return gridData['A1']?.replace(/\s/g, '') === '=B1+C1';
+      case 'func_average':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=AVERAGE(A2:A5)';
+      case 'func_vlookup':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=VLOOKUP(B1,C1:D3,2,FALSE)';
+      case 'func_filter':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=FILTER(B1:B5,C1:C5=1)';
+      case 'table_header':
+        return gridData['A1'] === 'Table Header';
+      case 'chart_title':
+        return gridData['A1'] === 'Chart Title';
+      case 'pivot_source':
+        return gridData['A1'] === 'Pivot Source';
+      case 'unique_list':
+        return gridData['A1'] === 'Unique List';
+      case 'valid_option':
+        return gridData['A1'] === 'Valid Option';
+      case 'highlight_rules':
+        return gridData['A1'] === 'Highlight';
+      case 'data_source':
+        return gridData['A1'] === 'Data Source';
+      case 'dax_measure':
+        return gridData['A1'] === 'DAX Measure';
+      case 'func_pmt':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=PMT(0.05/12,60,-15000)';
+      case 'func_median':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=MEDIAN(A2:A5)';
+      case 'func_lambda':
+        return gridData['A1']?.replace(/\s/g, '').toUpperCase() === '=LAMBDA(X,X+1)';
+      case 'macro_run':
+        return gridData['A1'] === 'Macro Run';
+      case 'review_done':
+        return gridData['A1'] === 'Review Done';
+      case 'csv_data':
+        return gridData['A1'] === 'csv_data';
+      case 'page_title':
+        return gridData['A1'] === 'Page Title';
+      case 'kpi_score':
+        return gridData['A1'] === '98%';
+      case 'budget_total':
+        return gridData['A1'] === '1200';
+      case 'regression_r2':
+        return gridData['A1'] === '0.95';
       default:
         return false;
     }
+  };
+
+  const handleVerifySapStep = (
+    action: string,
+    inputs: { [key: string]: string },
+    currentTCode: string,
+    environment: 'gui' | 'fiori'
+  ): boolean => {
+    const step = lab.steps[currentStepIndex];
+    if (!step) return false;
+
+    const expected = step.expectedOutput?.trim();
+    const check = step.checkCommand?.trim();
+
+    if (action === 'check_progress') {
+      if (check === 'sap_fiori_gui') {
+        return environment === 'fiori';
+      }
+      if (check === 'sap_nav_menu' || check === 'sap_menus' || check === 'sap_easy_access') {
+        return currentTCode === 'EASY_ACCESS';
+      }
+      if (check === 'sap_login' || check === 'sap_tcode_su01' || check === 'sec_su01_tcode' || check === 'tr_req') {
+        return currentTCode === 'SU01' || currentTCode === 'STMS';
+      }
+      if (check === 'sap_profiles' || check === 'sec_user') {
+        return inputs.username?.toUpperCase() === expected?.toUpperCase();
+      }
+      if (check === 'sec_role') {
+        return inputs.roleName?.toUpperCase() === expected?.toUpperCase();
+      }
+      if (check === 'sec_password') {
+        return inputs.password === expected;
+      }
+      if (check === 'sd_sales_orders') {
+        return currentTCode === 'VA01' && inputs.soldTo === '100240' && inputs.material === 'MAT-01';
+      }
+      if (check === 'mm_po' || check === 'cap_p2p_po') {
+        return currentTCode === 'ME21N' && inputs.vendor === 'VEND-01' && inputs.purchOrg === '1000';
+      }
+      if (check === 'cap_o2c_order') {
+        return currentTCode === 'VA01' && inputs.soldTo === '100240' && inputs.material === 'MAT-01';
+      }
+      
+      if (check && currentTCode === expected) {
+        return true;
+      }
+      if (check && inputs.validationRule === expected) {
+        return true;
+      }
+      return false;
+    }
+
+    if (action === 'save_su01' && (check === 'sec_su01_save' || check === 'sec_su01_basics')) {
+      return inputs.username !== '' && inputs.password !== '';
+    }
+    if (action === 'save_va01' && check === 'sd_sales_orders') {
+      return inputs.soldTo === '100240' && inputs.material === 'MAT-01';
+    }
+    if (action === 'save_me21n' && (check === 'mm_po' || check === 'cap_p2p_po')) {
+      return inputs.vendor === 'VEND-01' && inputs.purchOrg === '1000';
+    }
+    if (action === 'run_abap' && (check?.startsWith('ab_') || check?.startsWith('ap_') || check?.startsWith('rep_'))) {
+      return true;
+    }
+    if (action === 'release_tr' && (check === 'tr_release' || check === 'cap_p2p_release')) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const handleVerifyPowerBiStep = (
+    action: string,
+    inputs: { [key: string]: string },
+    currentView: 'report' | 'data' | 'model',
+    daxFormula: string
+  ): boolean => {
+    const step = lab.steps[currentStepIndex];
+    if (!step) return false;
+
+    const expected = step.expectedOutput?.trim();
+    const check = step.checkCommand?.trim();
+
+    if (action === 'check_progress') {
+      if (check === 'pbi_install' || check === 'pbi_template') {
+        return inputs.dataSourceType === expected;
+      }
+      if (check === 'pbi_view_report' || check === 'pbi_view_data' || check === 'pbi_view_model') {
+        return currentView === expected;
+      }
+      if (check === 'pbi_connect') {
+        return inputs.dataSourceType === expected;
+      }
+      if (check === 'pbi_etl') {
+        return inputs.etlStep === expected;
+      }
+      if (check === 'pbi_relationship') {
+        return inputs.relationshipType === expected;
+      }
+      if (check === 'pbi_dax') {
+        return daxFormula.replace(/\s/g, '').toUpperCase() === expected?.replace(/\s/g, '').toUpperCase();
+      }
+      return false;
+    }
+
+    if (action === 'apply_dax' && check === 'pbi_dax') {
+      return daxFormula.replace(/\s/g, '').toUpperCase() === expected?.replace(/\s/g, '').toUpperCase();
+    }
+    if (action === 'apply_etl' && check === 'pbi_etl') {
+      return inputs.etlStep === expected;
+    }
+    if (action === 'connect_source' && check === 'pbi_connect') {
+      return inputs.dataSourceType === expected;
+    }
+    if (action === 'save_relationship' && check === 'pbi_relationship') {
+      return inputs.relationshipType === expected;
+    }
+    if (action === 'refresh_data' && (check === 'pbi_refresh' || check === 'pbi_gateway')) {
+      return true;
+    }
+    if (action === 'publish_report' && (check === 'pbi_publish' || check.startsWith('pbi_publish_'))) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const handleVerifyEspStep = (
+    action: string,
+    inputs: { [key: string]: string },
+    currentTab: 'inbox' | 'mfa' | 'desk' | 'url',
+    score: number
+  ): boolean => {
+    const step = lab.steps[currentStepIndex];
+    if (!step) return false;
+
+    const expected = step.expectedOutput?.trim();
+    const check = step.checkCommand?.trim();
+
+    if (action === 'check_progress') {
+      if (check === 'esp_action_inbox') {
+        return currentTab === 'inbox' && inputs.selectedAction === 'report_phishing';
+      }
+      if (check === 'esp_action_mfa') {
+        return currentTab === 'mfa' && inputs.mfaInputToken === '124056';
+      }
+      if (check === 'esp_action_desk') {
+        return currentTab === 'desk' && inputs.stickyPasswordSecure === 'true' && inputs.laptopLockSecure === 'true';
+      }
+      if (check === 'esp_action_url') {
+        return currentTab === 'url' && (inputs.reportedDomain === 'microsoft-security-auth.net' || inputs.reportedDomain.includes('microsoft-security'));
+      }
+      return false;
+    }
+
+    if (action === 'report_phishing' && check === 'esp_action_inbox') {
+      inputs.selectedAction = 'report_phishing';
+      return true;
+    }
+    if (action === 'setup_mfa' && check === 'esp_action_mfa') {
+      return inputs.mfaInputToken === '124056';
+    }
+    if (action === 'secure_desk' && check === 'esp_action_desk') {
+      return inputs.stickyPasswordSecure === 'true' && inputs.laptopLockSecure === 'true';
+    }
+    if (action === 'verify_url' && check === 'esp_action_url') {
+      return inputs.reportedDomain === 'microsoft-security-auth.net' || inputs.reportedDomain.includes('microsoft-security');
+    }
+
+    return false;
   };
 
   const startLabSession = () => {
@@ -595,9 +902,9 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                 )}
                 <button
                   onClick={() => setCurrentStepIndex(idx)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 shrink-0 transition-all ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 shrink-0 transition-all cursor-pointer hover:scale-110 ${
                     isActive
-                      ? 'bg-brand-blue border-brand-blue text-white shadow-[0_0_12px_rgba(59,130,246,0.4)]'
+                      ? 'bg-brand-blue border-brand-blue text-white shadow-[0_0_12px_rgba(59,130,246,0.4)] animate-pulse-active'
                       : isCompleted
                       ? 'bg-emerald-500 border-emerald-500 text-white'
                       : 'bg-white border-zinc-200 text-zinc-400 hover:border-zinc-300'
@@ -679,30 +986,32 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
         <div className="flex-1 flex flex-row overflow-hidden">
           {/* Left Column: Guide */}
           <div className="w-[45%] min-w-[360px] max-w-[55%] border-r border-zinc-200 bg-[#f8fafc] h-full overflow-y-auto flex flex-col scrollbar-thin scrollbar-thumb-zinc-200">
+            {/* Top Navigation Row */}
+            <div className="flex justify-between items-center px-6 py-4 bg-zinc-950 border-b border-zinc-800 shrink-0">
+              <button 
+                onClick={onClose}
+                className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 text-zinc-400" />
+                Exit Lab
+              </button>
+              
+              <button 
+                onClick={handleShare}
+                className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <Share2 className="w-3.5 h-3.5 text-zinc-400" />
+                {shareText}
+              </button>
+            </div>
+
             {/* Header Card */}
-            <div className="bg-[#101935] text-white px-6 pb-6 pt-3.5 m-6 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden">
+            <div className="bg-[#101935] text-white px-6 pb-6 pt-6 m-6 mt-4 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden">
               {/* Decorative background glow */}
               <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -left-16 -top-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative z-10">
-                {/* Header Buttons */}
-                <div className="flex justify-between items-center mb-5">
-                  <button 
-                    onClick={onClose}
-                    className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98]"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    All Labs
-                  </button>
-                  <button 
-                    onClick={handleShare}
-                    className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-white/90 border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-[0.98]"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                    {shareText}
-                  </button>
-                </div>
 
                 {/* Mission Info & Title */}
                 <div className="flex justify-between items-end gap-4">
@@ -808,34 +1117,36 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
             )}
 
             {/* OS Selector Card */}
-            <div className="px-6 mb-6">
-              <div className="bg-white border border-zinc-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500 shrink-0">
-                    <Monitor className="w-4 h-4" />
+            {!['excel-', 'sap-', 'pbi-', 'esp-'].some(prefix => lab.projectId.startsWith(prefix)) && (
+              <div className="px-6 mb-6">
+                <div className="bg-white border border-zinc-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500 shrink-0">
+                      <Monitor className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-zinc-900">Select Your Operating System</h4>
+                      <p className="text-[10px] text-zinc-400 mt-0.5">Commands and terminal syntax will adapt to your platform.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-zinc-900">Select Your Operating System</h4>
-                    <p className="text-[10px] text-zinc-400 mt-0.5">Commands and terminal syntax will adapt to your platform.</p>
+                  <div className="flex bg-zinc-100 p-0.5 rounded-lg border border-zinc-200 self-start sm:self-auto">
+                    {(['macos', 'windows', 'linux'] as const).map((os) => (
+                      <button
+                        key={os}
+                        onClick={() => setSelectedOS(os)}
+                        className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                          selectedOS === os 
+                            ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/30'
+                            : 'text-zinc-400 hover:text-zinc-600'
+                        }`}
+                      >
+                        {os}
+                      </button>
+                    ))}
                   </div>
-                </div>
-                <div className="flex bg-zinc-100 p-0.5 rounded-lg border border-zinc-200 self-start sm:self-auto">
-                  {(['macos', 'windows', 'linux'] as const).map((os) => (
-                    <button
-                      key={os}
-                      onClick={() => setSelectedOS(os)}
-                      className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
-                        selectedOS === os 
-                          ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/30'
-                          : 'text-zinc-400 hover:text-zinc-600'
-                      }`}
-                    >
-                      {os}
-                    </button>
-                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Implementation Guide */}
             <div className="px-6 mb-8 flex-1">
@@ -844,7 +1155,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
               </div>
 
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-brand-blue/10 text-brand-blue flex items-center justify-center font-bold text-sm shrink-0 border border-brand-blue/20">
+                <div className="w-8 h-8 rounded-full bg-brand-blue text-white flex items-center justify-center font-bold text-sm shrink-0 border border-brand-blue/30 shadow-[0_0_12px_rgba(59,130,246,0.5)] animate-pulse-active transition-all cursor-default">
                   {currentStepIndex + 1}
                 </div>
                 <div className="flex-1 min-w-0 space-y-4">
@@ -859,6 +1170,79 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                     <p className="text-zinc-600 text-sm leading-relaxed">
                       {currentStep.summary || currentStep.instruction}
                     </p>
+                  </div>
+
+                  {/* Excel Assignment Guide */}
+                  {lab.projectId.startsWith('excel-') && (
+                    <div className="bg-[#e1f0e7]/40 border border-[#107c41]/20 rounded-2xl p-4 shadow-sm">
+                      <h4 className="text-[10px] font-black text-[#107c41] uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                        <Monitor className="w-3.5 h-3.5 text-[#107c41]" />
+                        Excel Assignment Guide
+                      </h4>
+                      <p className="text-zinc-700 text-xs leading-relaxed font-semibold">
+                        {getExcelHint(currentStep.checkCommand, currentStep)}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* SAP Assignment Guide */}
+                  {lab.projectId.startsWith('sap-') && (
+                    <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4 shadow-sm">
+                      <h4 className="text-[10px] font-black text-sky-700 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                        <Monitor className="w-3.5 h-3.5 text-sky-650" />
+                        SAP Assignment Guide
+                      </h4>
+                      <p className="text-zinc-700 text-xs leading-relaxed font-semibold">
+                        {currentStep.instruction}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Power BI Assignment Guide */}
+                  {lab.projectId.startsWith('pbi-') && (
+                    <div className="bg-amber-50/50 border border-amber-200/40 rounded-2xl p-4 shadow-sm">
+                      <h4 className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                        <Monitor className="w-3.5 h-3.5 text-amber-600" />
+                        Power BI Assignment Guide
+                      </h4>
+                      <p className="text-zinc-700 text-xs leading-relaxed font-semibold">
+                        {currentStep.instruction}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ESP Assignment Guide */}
+                  {lab.projectId.startsWith('esp-') && (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 shadow-sm">
+                      <h4 className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                        <Monitor className="w-3.5 h-3.5 text-emerald-650" />
+                        ESP Assignment Guide
+                      </h4>
+                      <p className="text-zinc-700 text-xs leading-relaxed font-semibold">
+                        {currentStep.instruction}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Hint Section */}
+                  <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                        Need a Hint?
+                      </h4>
+                      <button 
+                        onClick={() => setShowHint(prev => !prev)}
+                        className="px-2.5 py-1 bg-white border border-amber-200 text-amber-700 hover:text-amber-800 hover:bg-amber-100/50 rounded-lg text-[9px] font-bold transition-all cursor-pointer"
+                      >
+                        {showHint ? 'Hide Hint' : 'Reveal Hint'}
+                      </button>
+                    </div>
+                    {showHint && (
+                      <p className="text-zinc-600 text-xs mt-3 leading-relaxed border-t border-amber-100/50 pt-2 font-mono">
+                        {getExcelHint(currentStep.checkCommand, currentStep)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Why It's Needed */}
@@ -969,33 +1353,80 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
             </div>
           </div>
 
-          {/* Right Column: Terminal */}
-          <div className="flex-1 bg-zinc-900 p-6 flex flex-col h-full overflow-hidden">
-            <Terminal 
-              initialMessage={`Connected to ${lab.environment} instance... Ready for lab: ${projectTitle}`}
-              hideSidebar={true}
-              runCommandTrigger={runCommandTrigger}
-              checkProgressTrigger={checkProgressTrigger}
-              onCheckingProgressChange={(checking, progress) => {
-                setIsCheckingProgress(checking);
-                setProgressPercentage(progress);
-              }}
-              currentStep={currentStep}
-              allSteps={lab.steps}
-              currentStepIndex={currentStepIndex}
-              onNext={nextStep}
-              onPrev={prevStep}
-              isFirstStep={isFirstStep}
-              isLastStep={isLastStep}
-              onStepComplete={(stepId) => {
-                if (!completedSteps.includes(stepId)) {
-                  setCompletedSteps(prev => [...prev, stepId]);
-                }
-              }}
-              onComplete={handleLabComplete}
-              xpReward={lab.xpReward || 250}
-              flavor="ubuntu"
-            />
+          {/* Right Column: Terminal or Excel Grid */}
+          <div className={(lab.projectId.startsWith('excel-') || lab.projectId.startsWith('sap-') || lab.projectId.startsWith('pbi-') || lab.projectId.startsWith('esp-')) ? "flex-1 bg-white flex flex-col h-full overflow-hidden" : "flex-1 bg-zinc-900 p-6 flex flex-col h-full overflow-hidden justify-center"}>
+            {lab.projectId.startsWith('excel-') ? (
+              <ExcelGrid 
+                currentStepIndex={currentStepIndex}
+                onVerifyStep={handleVerifyExcelStep}
+                onStepSuccess={() => {
+                  if (!completedSteps.includes(currentStep.id)) {
+                    setCompletedSteps(prev => [...prev, currentStep.id]);
+                    triggerConfettiAndXp(25);
+                  }
+                }}
+              />
+            ) : lab.projectId.startsWith('sap-') ? (
+              <SapSandbox 
+                currentStepIndex={currentStepIndex}
+                onVerifyStep={handleVerifySapStep}
+                onStepSuccess={() => {
+                  if (!completedSteps.includes(currentStep.id)) {
+                    setCompletedSteps(prev => [...prev, currentStep.id]);
+                    triggerConfettiAndXp(25);
+                  }
+                }}
+              />
+            ) : lab.projectId.startsWith('pbi-') ? (
+              <PowerBiSandbox 
+                currentStepIndex={currentStepIndex}
+                onVerifyStep={handleVerifyPowerBiStep}
+                onStepSuccess={() => {
+                  if (!completedSteps.includes(currentStep.id)) {
+                    setCompletedSteps(prev => [...prev, currentStep.id]);
+                    triggerConfettiAndXp(25);
+                  }
+                }}
+              />
+            ) : lab.projectId.startsWith('esp-') ? (
+              <EspSandbox 
+                currentStepIndex={currentStepIndex}
+                onVerifyStep={handleVerifyEspStep}
+                onStepSuccess={() => {
+                  if (!completedSteps.includes(currentStep.id)) {
+                    setCompletedSteps(prev => [...prev, currentStep.id]);
+                    triggerConfettiAndXp(25);
+                  }
+                }}
+              />
+            ) : (
+              <Terminal 
+                initialMessage={`Connected to ${lab.environment} instance... Ready for lab: ${projectTitle}`}
+                hideSidebar={true}
+                runCommandTrigger={runCommandTrigger}
+                checkProgressTrigger={checkProgressTrigger}
+                onCheckingProgressChange={(checking, progress) => {
+                  setIsCheckingProgress(checking);
+                  setProgressPercentage(progress);
+                }}
+                currentStep={currentStep}
+                allSteps={lab.steps}
+                currentStepIndex={currentStepIndex}
+                onNext={nextStep}
+                onPrev={prevStep}
+                isFirstStep={isFirstStep}
+                isLastStep={isLastStep}
+                onStepComplete={(stepId) => {
+                  if (!completedSteps.includes(stepId)) {
+                    setCompletedSteps(prev => [...prev, stepId]);
+                    triggerConfettiAndXp(25);
+                  }
+                }}
+                onComplete={handleLabComplete}
+                xpReward={lab.xpReward || 250}
+                flavor="ubuntu"
+              />
+            )}
           </div>
         </div>
       )}
@@ -1003,7 +1434,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
       {/* Footer */}
       <footer className="bg-white border-t border-zinc-200 px-8 py-3 shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
-          <div>{(lab?.environment || 'LINUX').toUpperCase()} ENVIRONMENT READY</div>
+          <div>{lab.projectId.startsWith('excel-') ? 'EXCEL SANDBOX READY' : lab.projectId.startsWith('sap-') ? 'SAP SANDBOX READY' : lab.projectId.startsWith('pbi-') ? 'POWER BI SANDBOX READY' : lab.projectId.startsWith('esp-') ? 'ESP WORKSTATION READY' : `${(lab?.environment || 'LINUX').toUpperCase()} ENVIRONMENT READY`}</div>
           <div className="flex items-center gap-4">
             <span className={isStarted ? "text-emerald-500" : "text-zinc-300"}>
               {isStarted ? "● LIVE SESSION ACTIVE" : "○ SESSION IDLE"}
@@ -1092,6 +1523,40 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Floating XP Success Badge */}
+      <AnimatePresence>
+        {floatingXp && (
+          <motion.div
+            initial={{ opacity: 0, y: 100, scale: 0.5, x: '-50%' }}
+            animate={{ opacity: 1, y: -100, scale: 1.2, x: '-50%' }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="fixed top-1/2 left-1/2 -translate-y-1/2 z-[100] bg-emerald-500 text-white font-black px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 border-2 border-emerald-400"
+          >
+            <Sparkle className="w-5 h-5 text-amber-300 animate-spin" />
+            +{floatingXp.amount} XP SUCCESS!
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confetti Explosion particles */}
+      {activeParticles.map(p => (
+        <motion.div
+          key={p.id}
+          initial={{ opacity: 1, scale: 0, x: '50vw', y: '50vh' }}
+          animate={{
+            opacity: [1, 1, 0],
+            scale: p.scale,
+            x: `calc(${p.x}vw)`,
+            y: `calc(${p.y}vh + 200px)`,
+            rotate: p.rotation + 720
+          }}
+          transition={{ duration: 1.8, ease: "easeOut" }}
+          className="fixed w-2.5 h-3 z-[99] pointer-events-none rounded-sm"
+          style={{ backgroundColor: p.color }}
+        />
+      ))}
     </motion.div>
   );
 };
