@@ -77,7 +77,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ pageId, onTabChange }) =
           {/* Cover Image Background */}
           <div 
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url("/enterprise-hero.jpg")' }}
+            style={{ backgroundImage: 'url("enterprise-hero.jpg")' }}
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/75 to-transparent" />
@@ -129,6 +129,15 @@ export const StaticPage: React.FC<StaticPageProps> = ({ pageId, onTabChange }) =
         {/* Luxoft Cards Section */}
         <section className="py-20 md:py-24 bg-zinc-50 border-b border-zinc-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-black text-zinc-950 tracking-tight mb-3">
+                Training Built for ROI
+              </h2>
+              <p className="text-sm text-zinc-500 max-w-lg mx-auto">
+                Stop relying on passive video libraries. Start building real skills.
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Card 1 */}
               <motion.div 
@@ -193,25 +202,34 @@ export const StaticPage: React.FC<StaticPageProps> = ({ pageId, onTabChange }) =
               <p className="text-sm text-zinc-300 leading-relaxed mb-6">
                 From onboarding junior devs to upskilling seniors in Cloud Native architecture. Choose from our catalog or let us build a bespoke program.
               </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <span className="text-sm font-bold text-white/95">Cloud & DevOps (AWS, Azure, Kubernetes)</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <span className="text-sm font-bold text-white/95">Modern Frontend (React, Next.js, TypeScript)</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <span className="text-sm font-bold text-white/95">Backend Microservices (Node.js, Python, Go)</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <span className="text-sm font-bold text-white/95">Data Engineering & AI</span>
+                </div>
+              </div>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm font-bold text-white/95">Cloud & DevOps (AWS, Azure, Kubernetes)</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm font-bold text-white/95">Modern Frontend (React, Next.js, TypeScript)</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm font-bold text-white/95">Backend Microservices (Node.js, Python, Go)</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm font-bold text-white/95">Data Engineering & AI</span>
-              </div>
+            {/* Redesigned Image Column */}
+            <div className="relative h-[340px] md:h-[420px] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+              <img 
+                src="enterprise-hero.jpg" 
+                alt="Engineering Team Collaboration"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </section>
