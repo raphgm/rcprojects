@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
+import { SreCommandCenter } from './components/SreCommandCenter';
 import { ProjectGrid } from './components/ProjectGrid';
+import { Hero } from './components/Hero';
 import { LearnView } from './components/LearnView';
 import { LessonView } from './components/LessonView';
 import { LabView } from './components/LabView';
@@ -236,7 +237,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-white font-sans selection:bg-zinc-900 selection:text-white">
+      <div className={`min-h-screen font-sans selection:bg-cyan-500/30 selection:text-cyan-400 transition-colors duration-300 ${activeTab === 'projects' ? 'bg-[#07090e]' : 'bg-white'}`}>
       <Navbar
         activeTab={activeTab === 'projects' || activeTab === 'learn' ? activeTab : 'projects'}
         onTabChange={(tab) => setActiveTab(tab)}
@@ -244,40 +245,31 @@ export default function App() {
       />
       <main>
         {activeTab === 'projects' && (
-          <Hero 
-            onStart={() => {
-              const element = document.getElementById('projects-section');
-              element?.scrollIntoView({ behavior: 'smooth' });
-            }} 
-            onViewSkillTrees={() => setActiveTab('learn')}
-          />
-        )}
-        
-        {activeTab === 'projects' && <TrustedBy />}
-
-        {activeTab === 'projects' && <StatsBar />}
-        
-        {activeTab === 'projects' && <HowItWorks />}
-        
-        {activeTab === 'projects' && (
-          <div id="projects-section" className="py-24">
-            <ProjectGrid onStartLab={startLab} completedLabs={completedLabs} />
-          </div>
+          <>
+            <Hero 
+              onStart={() => {
+                const element = document.getElementById('tycoon-section');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }} 
+              onViewSkillTrees={() => setActiveTab('learn')}
+            />
+            <SreCommandCenter 
+              onStartLab={startLab}
+              completedLabs={completedLabs}
+              xp={xp}
+            />
+            <div className="max-w-6xl mx-auto px-6 pb-24 relative z-10">
+              <div className="border-t border-zinc-800/40 pt-16">
+                <h2 className="text-xs font-bold tracking-widest text-cyan-400 mb-8 uppercase">ALL LAB MISSION DIRECTORY</h2>
+                <ProjectGrid onStartLab={startLab} completedLabs={completedLabs} />
+              </div>
+            </div>
+          </>
         )}
 
         {activeTab === 'learn' && (
           <LearnView onStartCourse={startCourse} onStartLab={startLab} completedLabs={completedLabs} />
         )}
-
-        {activeTab === 'projects' && <Features />}
-
-        {activeTab === 'projects' && <Testimonials />}
-
-        {activeTab === 'projects' && <Community onStart={() => { const el = document.getElementById('projects-section'); el?.scrollIntoView({ behavior: 'smooth' }); }} />}
-
-        {activeTab === 'projects' && <AboutUs />}
-
-        {activeTab === 'projects' && <Blog />}
 
         {activeTab === 'about' && (
           <div className="pt-12">

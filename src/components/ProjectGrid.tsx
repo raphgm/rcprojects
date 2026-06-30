@@ -4,7 +4,7 @@ import { projects } from '../data/projects';
 import { ProjectCard } from './ProjectCard';
 import { CategoryFilter } from './CategoryFilter';
 import { Rocket, Search } from 'lucide-react';
-import { SquigglyArrow, ZigZag, DoodleWrapper } from './Doodles';
+import { SquigglyArrow, ZigZag, DoodleWrapper, Sparkle, HandCircle } from './Doodles';
 
 interface ProjectGridProps {
   onStartLab: (id: string, title: string) => void;
@@ -28,50 +28,57 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ onStartLab, completedL
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
       {/* Doodles */}
-      <DoodleWrapper className="-top-10 left-0 text-zinc-200 w-32 h-32 -rotate-12">
+      <DoodleWrapper className="-top-10 -left-12 text-cyan-400/30 w-32 h-32 -rotate-12">
         <SquigglyArrow />
       </DoodleWrapper>
-      <DoodleWrapper className="top-1/2 -right-10 text-zinc-100 w-48 h-12 rotate-90">
+      <DoodleWrapper className="top-1/2 -right-16 text-blue-400/35 w-48 h-12 rotate-12">
         <ZigZag />
       </DoodleWrapper>
-      <DoodleWrapper className="bottom-0 left-1/4 text-zinc-100 w-24 h-24 rotate-45">
+      <DoodleWrapper className="-bottom-10 left-1/4 text-cyan-400/30 w-24 h-24 rotate-45">
         <SquigglyArrow />
       </DoodleWrapper>
 
       <div className="mb-20 text-center max-w-3xl mx-auto relative">
-        <DoodleWrapper className="-top-4 -right-8 text-indigo-500/20 w-16 h-16 rotate-12">
-          <ZigZag />
+        <DoodleWrapper className="-top-8 -right-12 text-cyan-400/70 w-10 h-10 rotate-12 animate-pulse">
+          <Sparkle />
+        </DoodleWrapper>
+        <DoodleWrapper className="-top-12 left-10 text-blue-400/60 w-14 h-14 -rotate-45">
+          <HandCircle />
+        </DoodleWrapper>
+        <DoodleWrapper className="bottom-0 -left-16 text-cyan-400/50 w-16 h-16 rotate-90">
+          <SquigglyArrow />
         </DoodleWrapper>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-zinc-200"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/20 text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-cyan-500/20"
         >
-          <Rocket className="w-3 h-3 text-zinc-600" />
+          <Rocket className="w-3 h-3 text-cyan-400" />
           Hands-on Practice
         </motion.div>
-        <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 mb-8 tracking-tight leading-tight">
-          Master Cloud & DevOps with <br />
-          <span className="text-zinc-400 font-mono font-medium tracking-tight">Real-World</span> Projects
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
+          Master Cloud, DevOps & <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-mono font-medium tracking-tight">Data Technologies</span> with <br />
+          Real-World Projects
         </h1>
-        <p className="text-zinc-500 text-xl max-w-2xl mx-auto leading-relaxed">
+        <p className="text-zinc-400 text-base max-w-2xl mx-auto leading-relaxed">
           Deploy production-grade infrastructure and applications. Filter by technology stack to find your next challenge.
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-16 bg-zinc-50 p-8 rounded-[2.5rem] border border-zinc-100">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-10 bg-[#0a0d14]/45 p-2 rounded-full border border-cyan-500/10">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
           <input 
             type="text" 
-            placeholder="Search projects, tools, or tags..."
+            placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
+            className="w-full pl-9 pr-3 py-1.5 bg-zinc-950/60 border border-zinc-800/80 rounded-full text-xs text-zinc-300 focus:outline-none focus:border-cyan-500 transition-all placeholder:text-zinc-600"
           />
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-6">
-          <div className="hidden sm:block h-8 w-px bg-zinc-200"></div>
+        <div className="flex items-center gap-3">
+          <div className="hidden md:block h-5 w-px bg-zinc-800"></div>
           <CategoryFilter 
             categories={categories} 
             activeCategory={activeCategory} 

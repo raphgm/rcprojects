@@ -6059,5 +6059,25 @@ export const cloudLabs: LabContent[] = [
       { id: '2', title: 'Authorize App Traffic', instruction: 'Create a policy that allows the web frontend to communicate only with the API backend.', summary: 'Least-privilege routing.', whyNeeded: 'Restricting service communication to known dependencies reduces the internal attack surface of the cluster.', pillarConnection: 'Security',
         commands: [ { text: 'kubectl apply -f - <<EOF\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: allow-web-to-api\nspec:\n  podSelector:\n    matchLabels:\n      app: api-backend\n  ingress:\n  - from:\n    - podSelector:\n        matchLabels:\n          app: web-frontend\nEOF', explanation: 'Explicitly allows traffic from the frontend to the backend.' } ], checkCommand: 'kubectl get netpol allow-web-to-api', expectedOutput: 'allow-web-to-api' }
     ]
+  },
+  {
+    projectId: 'excel-fundamentals',
+    environment: 'linux',
+    description: 'Learn spreadsheet design, Ribbons, cells navigation, ranges, formulas, and auto-fills inside our interactive grid.',
+    objective: 'Complete the Excel Fundamentals roadmap by populating grid values, applying SUM formulas, copying ranges, and testing Undos.',
+    missionNumber: 1,
+    totalMissions: 1,
+    xpReward: 250,
+    steps: [
+      { id: '1', title: 'Introduction to Excel', instruction: 'Familiarize yourself with the ribbon and select cell A1. Enter "100" in cell A1.', summary: 'Populate starting data.', whyNeeded: 'Every workbook begins by loading raw constants.', pillarConnection: 'Data Analysis', commands: [], checkCommand: 'check_a1', expectedOutput: '100' },
+      { id: '2', title: 'Excel Interface (Ribbon, Worksheets)', instruction: 'Select B1 and enter "50".', summary: 'Populate comparison node.', whyNeeded: 'A secondary constant is required to test formula logic.', pillarConnection: 'Data Analysis', commands: [], checkCommand: 'check_b1', expectedOutput: '50' },
+      { id: '3', title: 'Rows, Columns, and Cells', instruction: 'Select C1 and enter "=A1+B1" to sum A1 and B1.', summary: 'Add formula.', whyNeeded: 'Dynamic referencing automatically recalculates spreadsheet sums.', pillarConnection: 'Operational Excellence', commands: [], checkCommand: 'check_c1', expectedOutput: '150' },
+      { id: '4', title: 'Creating and saving workbooks', instruction: 'Enter "10" in A2, "20" in A3, and "30" in A4.', summary: 'Prepare range sums.', whyNeeded: 'Defining vertically aligned records allows testing multi-row ranges.', pillarConnection: 'Data Analysis', commands: [], checkCommand: 'check_range_sum', expectedOutput: 'true' },
+      { id: '5', title: 'Navigating worksheets', instruction: 'Select B2 and enter "=SUM(A1:A4)" to sum the entire range.', summary: 'Apply SUM range.', whyNeeded: 'Range sum operations are the primary aggregate mechanism in Excel.', pillarConnection: 'Operational Excellence', commands: [], checkCommand: 'check_sum_a1_a4', expectedOutput: '160' },
+      { id: '6', title: 'Selecting cells and ranges', instruction: 'Fill A5 with "5" and B5 with "5".', summary: 'Add secondary range items.', whyNeeded: 'Preparing cells allows testing auto-fill and copying.', pillarConnection: 'Data Analysis', commands: [], checkCommand: 'check_row5', expectedOutput: 'true' },
+      { id: '7', title: 'AutoFill and Flash Fill', instruction: 'Verify B5 is set to "5". Fill C5 with "=A5+B5" to get "10".', summary: 'Verify Row 5 sum.', whyNeeded: 'Confirming calculations on row boundaries checks validation logic.', pillarConnection: 'Operational Excellence', commands: [], checkCommand: 'check_c5', expectedOutput: '10' },
+      { id: '8', title: 'Copy, Cut, Paste', instruction: 'Set D1 to "100" and E1 to "50" representing the copy operation.', summary: 'Move data.', whyNeeded: 'Pasting data replicates cell structures in different column scopes.', pillarConnection: 'Data Analysis', commands: [], checkCommand: 'check_d1_e1', expectedOutput: 'true' },
+      { id: '9', title: 'Undo and Redo', instruction: 'Clear D1 to "0" or empty using the Undo button or edits to complete.', summary: 'Revert adjustments.', whyNeeded: 'Reverting actions is essential to correct formula mistakes.', pillarConnection: 'Operational Excellence', commands: [], checkCommand: 'check_undo', expectedOutput: 'true' }
+    ]
   }
 ];

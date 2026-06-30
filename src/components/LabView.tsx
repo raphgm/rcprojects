@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { LabContent, LabStep } from '../types/content';
 import { Terminal } from './Terminal';
+import { ExcelGrid } from './ExcelGrid';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
 import { projects } from '../data/projects';
 import { conceptDictionary } from '../data/conceptDictionary';
@@ -370,6 +371,13 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [comments, setComments] = useState<Comment[]>(SEED_COMMENTS);
   const [newComment, setNewComment] = useState('');
   const [newTag, setNewTag] = useState<Comment['tag']>('general');
+  const [progressPercentage, setProgressPercentage] = useState(0);
+  const [selectedOS, setSelectedOS] = useState<'macos' | 'windows' | 'linux'>('linux');
+  const [shareText, setShareText] = useState('Share Lab');
+  const [runCommandTrigger, setRunCommandTrigger] = useState<{ command: string; timestamp: number } | null>(null);
+  const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
+  const [isCheckingProgress, setIsCheckingProgress] = useState(false);
+  const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
   const earnedXp = lab.xpReward ?? 250;
 
   const [prevProjectId, setPrevProjectId] = useState(lab.projectId);
@@ -384,9 +392,6 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     setProgressPercentage(0);
   }
 
-  const [selectedOS, setSelectedOS] = useState<'macos' | 'windows' | 'linux'>('linux');
-  const [shareText, setShareText] = useState('Share Lab');
-
   const handleShare = () => {
     const url = `${window.location.origin}${window.location.pathname}?lab=${encodeURIComponent(lab.projectId)}`;
     navigator.clipboard.writeText(url)
@@ -398,11 +403,6 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
         console.error('Failed to copy share link:', err);
       });
   };
-  const [runCommandTrigger, setRunCommandTrigger] = useState<{ command: string; timestamp: number } | null>(null);
-  const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
-  const [isCheckingProgress, setIsCheckingProgress] = useState(false);
-  const [progressPercentage, setProgressPercentage] = useState(0);
-  const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
 
   const submitComment = () => {
     const text = newComment.trim();
@@ -431,6 +431,36 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleVerifyExcelStep = (gridData: { [key: string]: string }, lastAction: string): boolean => {
+    const step = lab.steps[currentStepIndex];
+    if (!step) return false;
+    
+    switch (step.checkCommand) {
+      case 'check_a1':
+        return gridData['A1'] === '100';
+      case 'check_b1':
+        return gridData['B1'] === '50';
+      case 'check_c1':
+        const c1Val = gridData['C1']?.replace(/\s/g, '').toUpperCase() || '';
+        return c1Val === '=A1+B1' || c1Val === '=B1+A1' || c1Val === '150';
+      case 'check_range_sum':
+        return gridData['A2'] === '10' && gridData['A3'] === '20' && gridData['A4'] === '30';
+      case 'check_sum_a1_a4':
+        return gridData['B2']?.replace(/\s/g, '').toUpperCase() === '=SUM(A1:A4)';
+      case 'check_row5':
+        return gridData['A5'] === '5' && gridData['B5'] === '5';
+      case 'check_c5':
+        const c5Val = gridData['C5']?.replace(/\s/g, '').toUpperCase() || '';
+        return c5Val === '=A5+B5' || c5Val === '=B5+A5' || c5Val === '10';
+      case 'check_d1_e1':
+        return gridData['D1'] === '100' && gridData['E1'] === '50';
+      case 'check_undo':
+        return lastAction === 'undo' && (!gridData['D1'] || gridData['D1'] === '0' || gridData['D1'] === '');
+      default:
+        return false;
+    }
   };
 
   const startLabSession = () => {
@@ -733,9 +763,11 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                               <Sparkle className="w-3.5 h-3.5 text-brand-blue" />
                               {concept.title}
                             </h5>
-                            <Markdown className="text-zinc-600 text-[11px] leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-headings:text-xs prose-headings:font-bold prose-headings:mt-2 prose-headings:mb-1 prose-ul:my-1 prose-li:my-0.5">
-                              {concept.description}
-                            </Markdown>
+                            <div className="text-zinc-600 text-[11px] leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-headings:text-xs prose-headings:font-bold prose-headings:mt-2 prose-headings:mb-1 prose-ul:my-1 prose-li:my-0.5">
+                              <Markdown>
+                                {concept.description}
+                              </Markdown>
+                            </div>
                           </div>
                         ))}
 

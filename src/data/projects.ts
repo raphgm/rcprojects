@@ -4,7 +4,7 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science' | 'Python';
+  category: 'Azure' | 'Kubernetes' | 'DevOps' | 'Security' | 'Data Science' | 'Python' | 'Excel';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   duration: string;
   tags: string[];
@@ -2611,6 +2611,16 @@ const staticProjects: Project[] = [
     duration: '6 hours',
     tags: ['Python', 'Regex', 'Cloud', 'Logs'],
     image: 'https://picsum.photos/seed/py-logs/800/600'
+  },
+  {
+    id: 'excel-fundamentals',
+    title: 'Excel Fundamentals',
+    description: 'Learn spreadsheet design, Ribbons, cells navigation, ranges, formulas, and auto-fills inside our interactive grid.',
+    category: 'Excel',
+    difficulty: 'Beginner',
+    duration: '2 hours',
+    tags: ['Excel', 'Spreadsheet', 'Data Science', 'Data Analytics'],
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
   }
 ];
 
