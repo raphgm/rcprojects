@@ -198,5 +198,9 @@ export const conceptDictionary: Record<string, { title: string; description: str
   'Containers': {
     title: 'Containerization',
     description: 'Containers are lightweight, portable packages that include everything an application needs to run. They isolate software from its environment, ensuring it works consistently regardless of where it is deployed.'
+  },
+  'kubectl config current-context': {
+    title: 'kubectl config current-context',
+    description: 'Shows you which Kubernetes cluster and user your kubectl commands are currently targeting.\n\n### Think of it like this:\nYour computer may know about multiple Kubernetes clusters (development, staging, production, etc.). A context is a saved configuration that tells kubectl:\n- Which cluster to connect to\n- Which user/credentials to use\n- Which default namespace (optional) to use\n\n### Example:\nSuppose your kubeconfig contains these contexts:\n- `dev-cluster`\n- `staging-cluster`\n- `production-cluster`\n\nIf you run `kubectl config current-context`, you might get `production-cluster`. That means every command like `kubectl get pods` or `kubectl apply -f deployment.yaml` will be executed against the production cluster.\n\n### Why is this important?\nImagine you intended to deploy to your development environment but your current context is production. Running `kubectl apply -f deployment.yaml` could accidentally deploy to production. That\'s why many Kubernetes engineers check their current context before making changes.\n\n### How to see all available contexts:\n`kubectl config get-contexts`\nThe active context is prefixed by a `*` symbol in the `CURRENT` column.\n\n### How to switch contexts:\n`kubectl config use-context development`\n\n### Where are contexts stored?\nThey are usually stored in your kubeconfig file: `~/.kube/config`.'
   }
 };

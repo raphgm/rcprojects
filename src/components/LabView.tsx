@@ -12,6 +12,7 @@ import { Terminal } from './Terminal';
 import { SquigglyArrow, Sparkle, DoodleWrapper } from './Doodles';
 import { projects } from '../data/projects';
 import { conceptDictionary } from '../data/conceptDictionary';
+import Markdown from 'react-markdown';
 
 const getOSCommand = (cmd: string, os: 'macos' | 'windows' | 'linux'): string => {
   if (os === 'linux') return cmd;
@@ -521,11 +522,21 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     .filter((c): c is { title: string; description: string } => 
       Boolean(c && typeof c === 'object' && 'title' in c && 'description' in c)
     );
+
+  const stepCommands = currentStep?.commands || [];
+
+  // Dynamically inject command-specific concept notes
+  stepCommands.forEach(cmd => {
+    if (cmd.text.includes('kubectl config current-context')) {
+      const c = conceptDictionary['kubectl config current-context'];
+      if (c) concepts.push(c);
+    }
+  });
+
   const uniqueConcepts = Array.from(
     new Map(concepts.map(c => [c.title, c])).values()
   );
 
-  const stepCommands = currentStep?.commands || [];
   const stepBreakdowns = stepCommands.map(cmd => getCommandBreakdown(cmd.text)).filter(b => b.length > 0);
   const hasBreakdown = stepBreakdowns.length > 0;
   const hasQuickRefContent = uniqueConcepts.length > 0 || hasBreakdown;
@@ -722,9 +733,9 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                               <Sparkle className="w-3.5 h-3.5 text-brand-blue" />
                               {concept.title}
                             </h5>
-                            <p className="text-zinc-600 text-[11px] leading-relaxed">
+                            <Markdown className="text-zinc-600 text-[11px] leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-headings:text-xs prose-headings:font-bold prose-headings:mt-2 prose-headings:mb-1 prose-ul:my-1 prose-li:my-0.5">
                               {concept.description}
-                            </p>
+                            </Markdown>
                           </div>
                         ))}
 
