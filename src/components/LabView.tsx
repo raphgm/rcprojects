@@ -525,6 +525,11 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     new Map(concepts.map(c => [c.title, c])).values()
   );
 
+  const stepCommands = currentStep?.commands || [];
+  const stepBreakdowns = stepCommands.map(cmd => getCommandBreakdown(cmd.text)).filter(b => b.length > 0);
+  const hasBreakdown = stepBreakdowns.length > 0;
+  const hasQuickRefContent = uniqueConcepts.length > 0 || hasBreakdown;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -682,7 +687,8 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
             </div>
 
             {/* Quick Reference Notes */}
-            {uniqueConcepts.length > 0 && (
+            {/* Quick Reference Notes */}
+            {hasQuickRefContent && (
               <div className="px-6 mb-6">
                 <div className="border border-amber-200/60 bg-amber-50/30 rounded-2xl overflow-hidden shadow-sm">
                   <button 
@@ -695,12 +701,12 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                       </div>
                       <div>
                         <span className="font-black text-amber-900 text-xs tracking-wider block">QUICK REFERENCE NOTES</span>
-                        <span className="text-[10px] text-amber-700 font-medium">Learn key architectural concepts for this lab</span>
+                        <span className="text-[10px] text-amber-700 font-medium">Learn key architectural concepts and command syntax</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="bg-amber-200/60 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                        {uniqueConcepts.length} concepts
+                        {uniqueConcepts.length + stepBreakdowns.length} items
                       </span>
                       <span className={`transition-transform duration-200 ${isQuickRefOpen ? 'rotate-185' : ''}`}>
                         <ChevronDown className="w-4 h-4 text-amber-600" />
@@ -710,7 +716,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   {isQuickRefOpen && (
                     <div className="px-4 pb-4 border-t border-amber-100 bg-white">
                       <div className="space-y-4 pt-4">
-                        {uniqueConcepts.map((concept, idx) => (
+                        {uniqueConcepts.length > 0 && uniqueConcepts.map((concept, idx) => (
                           <div key={idx} className="border-b border-zinc-100 last:border-0 pb-3 last:pb-0">
                             <h5 className="text-xs font-bold text-zinc-900 mb-1 flex items-center gap-2">
                               <Sparkle className="w-3.5 h-3.5 text-brand-blue" />
@@ -722,14 +728,14 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                           </div>
                         ))}
 
-                        {currentStep?.commands && currentStep.commands.length > 0 && (
-                          <div className="pt-4 border-t border-zinc-200 mt-4">
+                        {hasBreakdown && (
+                          <div className={`pt-4 ${uniqueConcepts.length > 0 ? 'border-t border-zinc-200 mt-4' : ''}`}>
                             <h5 className="text-[10px] font-black text-amber-900 uppercase tracking-widest mb-3 flex items-center gap-2">
                               <Monitor className="w-3.5 h-3.5 text-amber-700" />
                               Command Syntax Breakdown
                             </h5>
                             <div className="space-y-3">
-                              {currentStep.commands.map((cmd, cIdx) => {
+                              {stepCommands.map((cmd, cIdx) => {
                                 const breakdown = getCommandBreakdown(cmd.text);
                                 if (breakdown.length === 0) return null;
                                 return (
