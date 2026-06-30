@@ -1608,7 +1608,7 @@ export const learningPaths: LearningPath[] = [
     id: 'k8s-docker',
     title: 'Kubernetes + Docker',
     icon: 'Ship',
-    skills: 40,
+    skills: 48,
     coursesCount: 2,
     projectsCount: 20,
     description: 'Master container orchestration from the ground up. You\'ll build and optimise Docker images, push them to a registry, deploy them onto a Kubernetes cluster, manage rolling updates, and operate the full container lifecycle — the essential foundation every cloud-native engineer needs before touching anything else.',
