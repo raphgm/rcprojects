@@ -22,6 +22,10 @@ fi
 : "${FTP_REMOTE_DIR:=public_html}"
 
 echo "→ Running fresh build..."
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+# shellcheck disable=SC1091
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+nvm use 20
 npm run build
 
 echo "→ Deploying dist/ to ftp://$FTP_HOST:$FTP_PORT/$FTP_REMOTE_DIR ..."
