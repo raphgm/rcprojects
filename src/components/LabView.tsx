@@ -441,6 +441,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const [checkProgressTrigger, setCheckProgressTrigger] = useState<number>(0);
   const [isCheckingProgress, setIsCheckingProgress] = useState(false);
   const [isQuickRefOpen, setIsQuickRefOpen] = useState(false);
+  const [isQuestBriefOpen, setIsQuestBriefOpen] = useState(true);
   const [showHint, setShowHint] = useState(false);
   const [activeParticles, setActiveParticles] = useState<{ id: number; x: number; y: number; color: string; scale: number; rotation: number }[]>([]);
   const [floatingXp, setFloatingXp] = useState<{ id: number; amount: number; x: number; y: number } | null>(null);
@@ -460,6 +461,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
     setConnectionProgress(0);
     setConnectionStatus('');
     setProgressPercentage(0);
+    setIsQuestBriefOpen(true);
   }
 
   const handleShare = () => {
@@ -1084,13 +1086,32 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
 
             {questTheme && (
               <div className="px-6 mb-6">
-                <div className={`rounded-2xl border ${activeAccentBorder} ${activeAccentBg} p-4 shadow-sm`}>
-                  <div className="flex items-start gap-3">
+                <div className={`rounded-2xl border ${activeAccentBorder} ${activeAccentBg} overflow-hidden shadow-sm`}>
+                  <button
+                    type="button"
+                    onClick={() => setIsQuestBriefOpen(prev => !prev)}
+                    className="w-full flex items-center justify-between gap-3 p-4 text-left hover:bg-white/30 transition-colors cursor-pointer"
+                    aria-expanded={isQuestBriefOpen}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-white/70 border border-white/60 flex items-center justify-center text-xl shrink-0">
+                        {questTheme.icon}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${activeAccentText}`}>Quest Briefing</h3>
+                        <p className="text-[10px] text-zinc-500 font-bold truncate">{isQuestBriefOpen ? 'Hide mission context' : questTheme.callsign}</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 ${activeAccentText} transition-transform duration-200 ${isQuestBriefOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isQuestBriefOpen && (
+                    <div className="flex items-start gap-3 px-4 pb-4 border-t border-white/40">
                     <div className="w-10 h-10 rounded-xl bg-white/70 border border-white/60 flex items-center justify-center text-xl shrink-0">
                       {questTheme.icon}
                     </div>
                     <div className="min-w-0">
-                      <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${activeAccentText} mb-1`}>Quest Briefing</h3>
+                      <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${activeAccentText} mb-1 pt-4`}>Mission Context</h3>
                       <p className="text-zinc-700 text-xs leading-relaxed font-semibold mb-3">{questTheme.briefing}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
                         <div className="bg-white/70 border border-white/60 rounded-xl p-3">
@@ -1103,7 +1124,8 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                         </div>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
