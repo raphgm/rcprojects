@@ -8,11 +8,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
+FTP_REMOTE_DIR_OVERRIDE="${FTP_REMOTE_DIR:-}"
+
 if [ -f .env ]; then
   set -o allexport
   # shellcheck disable=SC1091
   source .env
   set +o allexport
+fi
+
+if [ -n "$FTP_REMOTE_DIR_OVERRIDE" ]; then
+  FTP_REMOTE_DIR="$FTP_REMOTE_DIR_OVERRIDE"
 fi
 
 : "${FTP_HOST:?FTP_HOST not set}"

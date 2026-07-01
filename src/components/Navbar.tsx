@@ -9,7 +9,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
-  const { user, xp, loginRedirect, logout } = useAuth();
+  const { user, xp, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   return (
@@ -30,13 +30,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           </div>
 
           <div className="hidden md:flex items-center gap-8 ml-12">
-            <button 
+            <button
               onClick={() => onTabChange('learn')}
               className={`text-sm font-bold transition-colors ${activeTab === 'learn' ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-900'}`}
             >
               Skill Trees
             </button>
-            <button 
+            <button
               onClick={() => onTabChange('projects')}
               className={`text-sm font-bold transition-colors ${activeTab === 'projects' ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-900'}`}
             >
@@ -78,56 +78,37 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
                 <span className="text-[10px] font-black text-amber-600 uppercase tracking-wider">{xp} XP</span>
               </div>
             )}
-            {true && (
-              <>
-                {user ? (
-                  <div className="relative">
-                    <button 
-                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                      className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-100 transition-colors"
+            {user && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-100 transition-colors"
+                >
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name || 'User'} className="w-8 h-8 rounded-full border border-zinc-200" referrerPolicy="no-referrer" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
+                      <User className="w-4 h-4 text-zinc-500" />
+                    </div>
+                  )}
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-2xl shadow-2xl py-2 z-[60]">
+                    <div className="px-4 py-2 border-b border-zinc-100 mb-2">
+                      <p className="text-xs font-bold text-zinc-900 truncate">{user.name || 'User'}</p>
+                      <p className="text-[10px] text-zinc-400 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => { logout(); setIsUserMenuOpen(false); }}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-bold"
                     >
-                      {user.avatar ? (
-                        <img src={user.avatar} alt={user.name || 'User'} className="w-8 h-8 rounded-full border border-zinc-200" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
-                          <User className="w-4 h-4 text-zinc-500" />
-                        </div>
-                      )}
+                      <LogOut className="w-4 h-4" />
+                      Log out
                     </button>
-                    
-                    {isUserMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-2xl shadow-2xl py-2 z-[60]">
-                        <div className="px-4 py-2 border-b border-zinc-100 mb-2">
-                          <p className="text-xs font-bold text-zinc-900 truncate">{user.name || 'User'}</p>
-                          <p className="text-[10px] text-zinc-400 truncate">{user.email}</p>
-                        </div>
-                        <button 
-                          onClick={() => { logout(); setIsUserMenuOpen(false); }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-bold"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          Log out
-                        </button>
-                      </div>
-                    )}
                   </div>
-                ) : (
-                  <>
-                    <button 
-                      onClick={loginRedirect}
-                      className="hidden sm:block text-sm font-bold text-zinc-600 hover:text-zinc-900 px-4 py-2 transition-colors"
-                    >
-                      Log in
-                    </button>
-                    <button 
-                      onClick={loginRedirect}
-                      className="bg-brand-blue text-white text-sm font-bold px-5 py-2 rounded-lg hover:bg-brand-blue/90 transition-all shadow-lg shadow-brand-blue/10"
-                    >
-                      Sign up
-                    </button>
-                  </>
                 )}
-              </>
+              </div>
             )}
             <button className="md:hidden p-2 text-zinc-500 hover:text-zinc-900 transition-colors">
               <Menu className="w-5 h-5" />

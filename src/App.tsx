@@ -36,7 +36,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<FooterTab>('projects');
   const [activeLesson, setActiveLesson] = useState<{ courseId: string, lessons: Lesson[], title: string } | null>(null);
   const [activeLab, setActiveLab] = useState<{ lab: LabContent, title: string } | null>(null);
-  const { user, xp, completedLabs, completeLab, loginRedirect, logout } = useAuth();
+  const { xp, completedLabs, completeLab } = useAuth();
   const [linuxFlavor, setLinuxFlavor] = useState<LinuxFlavor>('ubuntu');
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>('azure');
 
