@@ -32,6 +32,7 @@ export function SreCommandCenter({ onStartLab, completedLabs, xp }: SreCommandCe
   const [clickCount, setClickCount] = useState(0);
   const [shake, setShake] = useState(false);
   const [activeQuestIndex, setActiveQuestIndex] = useState(0);
+  const [activeDataQuestIndex, setActiveDataQuestIndex] = useState(0);
 
   // Live Terminal Logs
   const [logs, setLogs] = useState<string[]>([
@@ -278,10 +279,26 @@ export function SreCommandCenter({ onStartLab, completedLabs, xp }: SreCommandCe
     }
   ];
 
+  const dataQuests = [
+    { id: 'excel-fundamentals', title: 'Spreadsheet Launchpad', labTitle: 'Excel Fundamentals', signal: 'Ops needs clean formulas before the first dashboard can ship.', reward: '+ analysis accuracy', accent: 'emerald' },
+    { id: 'excel-formatting', title: 'Executive Report Polish', labTitle: 'Excel Formatting', signal: 'The sales report works, but leadership cannot scan it quickly.', reward: '+ report clarity', accent: 'cyan' },
+    { id: 'excel-basic-formulas', title: 'Formula Control Room', labTitle: 'Excel Basic Formulas', signal: 'Manual calculations are slowing every handoff in the finance queue.', reward: '+ calculation speed', accent: 'amber' },
+    { id: 'excel-essential-functions', title: 'Function Arsenal', labTitle: 'Excel Essential Functions', signal: 'Analysts need IF, text, date, and aggregate logic in one workbook.', reward: '+ workbook power', accent: 'purple' },
+    { id: 'pbi-intro', title: 'BI Command Briefing', labTitle: 'Introduction to Business Intelligence', signal: 'Stakeholders need their first published report before the next review.', reward: '+ dashboard reach', accent: 'cyan' },
+    { id: 'pbi-getdata', title: 'Connector Scramble', labTitle: 'Getting Data Ingestion', signal: 'Data is split across files, databases, and APIs with stale refreshes.', reward: '+ source coverage', accent: 'emerald' },
+    { id: 'pbi-modeling', title: 'Star Schema Forge', labTitle: 'Data Modeling Star Schema', signal: 'Fact tables and dimensions need clean relationships before DAX scales.', reward: '+ model trust', accent: 'amber' },
+    { id: 'pbi-dax-fund', title: 'KPI Engine Room', labTitle: 'DAX Fundamentals', signal: 'The dashboard needs reliable measures instead of static totals.', reward: '+ KPI velocity', accent: 'purple' }
+  ];
+
   const activeQuest = devOpsQuests[activeQuestIndex];
+  const activeDataQuest = dataQuests[activeDataQuestIndex];
   const completedQuestCount = devOpsQuests.filter(quest => completedLabs.includes(quest.id)).length;
+  const completedDataQuestCount = dataQuests.filter(quest => completedLabs.includes(quest.id)).length;
   const browseQuest = (direction: -1 | 1) => {
     setActiveQuestIndex((currentIndex) => (currentIndex + direction + devOpsQuests.length) % devOpsQuests.length);
+  };
+  const browseDataQuest = (direction: -1 | 1) => {
+    setActiveDataQuestIndex((currentIndex) => (currentIndex + direction + dataQuests.length) % dataQuests.length);
   };
   const accentClasses: Record<string, { border: string; text: string; bg: string; button: string; glow: string }> = {
     cyan: { border: 'border-cyan-500/40', text: 'text-cyan-400', bg: 'bg-cyan-950/20', button: 'bg-cyan-500 hover:bg-cyan-400', glow: 'shadow-cyan-500/20' },
@@ -684,6 +701,112 @@ export function SreCommandCenter({ onStartLab, completedLabs, xp }: SreCommandCe
                 className={`w-full py-2.5 ${accentClasses[activeQuest.accent].button} text-zinc-950 rounded-xl text-xs font-black hover:shadow-lg ${accentClasses[activeQuest.accent].glow} transition-all flex items-center justify-center gap-1 cursor-pointer uppercase tracking-wider`}
               >
                 Launch Selected Quest <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Data Quests */}
+            <div className="border border-emerald-500/10 bg-[#0a0d14]/75 rounded-2xl p-6 backdrop-blur-md overflow-hidden">
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <Database className="w-4 h-4 text-emerald-400" /> EXCEL & POWER BI QUESTS
+                  </h3>
+                  <div className="text-[9px] text-zinc-500 mt-1 uppercase tracking-wider">Choose an analytics mission card</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[9px] text-zinc-500 uppercase font-bold">Cleared</div>
+                  <div className="text-xs font-black text-emerald-400">{completedDataQuestCount}/{dataQuests.length}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <button type="button" onClick={() => browseDataQuest(-1)} className="h-9 w-9 rounded-xl border border-zinc-800 bg-zinc-950/80 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors flex items-center justify-center cursor-pointer" aria-label="Previous analytics quest card">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <div className="flex-1 text-center">
+                  <div className="text-[9px] text-zinc-500 uppercase font-black tracking-wider">Browsing Data Quest</div>
+                  <div className="text-xs text-zinc-200 font-black">{activeDataQuestIndex + 1} / {dataQuests.length}</div>
+                </div>
+                <button type="button" onClick={() => browseDataQuest(1)} className="h-9 w-9 rounded-xl border border-zinc-800 bg-zinc-950/80 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors flex items-center justify-center cursor-pointer" aria-label="Next analytics quest card">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="relative mb-4">
+                <div className="relative min-h-61.25 mb-4">
+                  {[3, 2, 1].map((depth) => (
+                    <div key={depth} className="absolute left-3 right-3 h-full rounded-2xl border border-emerald-500/10 bg-zinc-950/50" style={{ top: `${depth * 8}px`, transform: `scale(${1 - depth * 0.025})`, opacity: 0.35 - depth * 0.07, zIndex: 3 - depth }} />
+                  ))}
+
+                  <AnimatePresence mode="wait">
+                    <motion.div key={activeDataQuest.id} initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12, scale: 0.98 }} transition={{ duration: 0.18 }} className={`relative z-10 rounded-2xl border p-5 min-h-61.25 ${accentClasses[activeDataQuest.accent].border} ${accentClasses[activeDataQuest.accent].bg} shadow-2xl ${accentClasses[activeDataQuest.accent].glow} ring-1 ring-emerald-400/20`}>
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-11 h-11 rounded-2xl border ${accentClasses[activeDataQuest.accent].border} ${accentClasses[activeDataQuest.accent].bg} flex items-center justify-center shrink-0`}>
+                            {completedLabs.includes(activeDataQuest.id) ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : <Activity className={`w-5 h-5 ${accentClasses[activeDataQuest.accent].text}`} />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className={`text-[10px] font-black uppercase tracking-wider ${accentClasses[activeDataQuest.accent].text}`}>Data Quest {activeDataQuestIndex + 1}</div>
+                            <div className="text-base font-black text-zinc-100 leading-tight">{activeDataQuest.title}</div>
+                          </div>
+                        </div>
+                        <span className={`text-[8px] uppercase font-black px-2 py-1 rounded-full border ${completedLabs.includes(activeDataQuest.id) ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/20' : 'border-zinc-700 text-zinc-500 bg-zinc-900/60'}`}>
+                          {completedLabs.includes(activeDataQuest.id) ? 'Cleared' : 'Open'}
+                        </span>
+                      </div>
+
+                      <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider mb-1">Target Lab</div>
+                      <div className="text-sm text-zinc-200 font-black leading-snug mb-4">{activeDataQuest.labTitle}</div>
+                      <p className="text-xs text-zinc-400 leading-relaxed mb-5">{activeDataQuest.signal}</p>
+
+                      <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Reward: <span className={accentClasses[activeDataQuest.accent].text}>{activeDataQuest.reward}</span></span>
+                        <span className="text-[9px] text-emerald-400 uppercase font-black">Selected</span>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                <div className="grid grid-cols-1 gap-2">
+                  {dataQuests.map((quest, index) => {
+                    const isActive = index === activeDataQuestIndex;
+                    const isCompleted = completedLabs.includes(quest.id);
+                    const accent = accentClasses[quest.accent];
+
+                    return (
+                      <button key={quest.id} type="button" onClick={() => setActiveDataQuestIndex(index)} aria-pressed={isActive} className={`text-left rounded-xl border px-3 py-2 transition-all duration-200 cursor-pointer ${isActive ? `${accent.border} bg-emerald-950/20` : 'border-zinc-800 bg-zinc-950/60 hover:border-emerald-500/25 hover:bg-zinc-900/80'}`}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-7 h-7 rounded-lg border ${accent.border} ${accent.bg} flex items-center justify-center shrink-0`}>
+                              {isCompleted ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <Activity className={`w-3.5 h-3.5 ${accent.text}`} />}
+                            </div>
+                            <div className="min-w-0">
+                              <div className={`text-[8px] font-black uppercase tracking-wider ${accent.text}`}>Data Quest {index + 1}</div>
+                              <div className="text-[10px] font-black text-zinc-200 truncate">{quest.title}</div>
+                            </div>
+                          </div>
+                          <span className={`text-[8px] uppercase font-black px-2 py-1 rounded-full border ${isCompleted ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/20' : 'border-zinc-700 text-zinc-500 bg-zinc-900/60'}`}>
+                            {isCompleted ? 'Cleared' : 'Open'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-1.5 mb-5">
+                {dataQuests.map((quest, index) => {
+                  const isActive = index === activeDataQuestIndex;
+                  const isCompleted = completedLabs.includes(quest.id);
+                  return (
+                    <button key={`${quest.id}-dot`} type="button" onClick={() => setActiveDataQuestIndex(index)} className={`h-2 rounded-full transition-all cursor-pointer ${isActive ? 'w-6 bg-emerald-400' : isCompleted ? 'w-2 bg-emerald-400/70 hover:bg-emerald-400' : 'w-2 bg-zinc-700 hover:bg-zinc-500'}`} aria-label={`Select analytics quest ${index + 1}`} />
+                  );
+                })}
+              </div>
+
+              <button onClick={() => onStartLab(activeDataQuest.id, activeDataQuest.labTitle)} className={`w-full py-2.5 ${accentClasses[activeDataQuest.accent].button} text-zinc-950 rounded-xl text-xs font-black hover:shadow-lg ${accentClasses[activeDataQuest.accent].glow} transition-all flex items-center justify-center gap-1 cursor-pointer uppercase tracking-wider`}>
+                Launch Analytics Quest <ArrowUpRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
