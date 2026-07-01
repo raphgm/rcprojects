@@ -362,6 +362,37 @@ const TAG_STYLES: Record<Comment['tag'], string> = {
   general:        'bg-zinc-50 text-zinc-500 border-zinc-100',
 };
 
+const QUEST_THEMES: Record<string, {
+  label: string;
+  callsign: string;
+  briefing: string;
+  winCondition: string;
+  icon: string;
+  accentText: string;
+  accentBg: string;
+  accentBorder: string;
+  headerBg: string;
+}> = {
+  '5': { label: 'DevOps Quest', callsign: 'Pipeline Fire Drill', briefing: 'Release traffic is backing up. Restore the CI/CD path before the deploy window closes.', winCondition: 'Ship a repeatable GitHub Actions workflow and prove the build path is green.', icon: '🚦', accentText: 'text-cyan-300', accentBg: 'bg-cyan-500/10', accentBorder: 'border-cyan-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.22),transparent_34%),linear-gradient(135deg,#06111f,#101935)]' },
+  '83': { label: 'DevOps Quest', callsign: 'Jenkins War Room', briefing: 'The controller is waiting for pipeline-as-code discipline. Turn the release room from manual clicks into versioned automation.', winCondition: 'Author the Jenkins pipeline flow and validate agent-ready delivery.', icon: '🧩', accentText: 'text-amber-300', accentBg: 'bg-amber-500/10', accentBorder: 'border-amber-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.24),transparent_34%),linear-gradient(135deg,#1c1206,#101935)]' },
+  '84': { label: 'DevOps Quest', callsign: 'Config Drift Hunt', briefing: 'The fleet is drifting. Bring every web node back under declarative control before small differences become outages.', winCondition: 'Apply Ansible configuration management and verify consistent service state.', icon: '🛰️', accentText: 'text-emerald-300', accentBg: 'bg-emerald-500/10', accentBorder: 'border-emerald-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.22),transparent_34%),linear-gradient(135deg,#061a14,#101935)]' },
+  '1': { label: 'DevOps Quest', callsign: 'Harden The Edge', briefing: 'Public traffic is touching an exposed web tier. Lock down the service before it becomes the easiest target in the stack.', winCondition: 'Stand up the Linux web server and apply the required security posture.', icon: '🛡️', accentText: 'text-rose-300', accentBg: 'bg-rose-500/10', accentBorder: 'border-rose-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,113,133,0.22),transparent_34%),linear-gradient(135deg,#220914,#101935)]' },
+  '4': { label: 'DevOps Quest', callsign: 'Backup Blackout', briefing: 'The restore path is untrusted. Build the automation that turns backup panic into operational muscle memory.', winCondition: 'Create the backup workflow and prove the routine can be repeated safely.', icon: '💾', accentText: 'text-purple-300', accentBg: 'bg-purple-500/10', accentBorder: 'border-purple-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.22),transparent_34%),linear-gradient(135deg,#170b25,#101935)]' },
+  '10': { label: 'DevOps Quest', callsign: 'GitOps Takeover', briefing: 'The cluster should obey Git, not shell history. Move desired state into a controller-driven deployment loop.', winCondition: 'Connect GitOps workflow controls and verify the target state converges.', icon: '🔁', accentText: 'text-cyan-300', accentBg: 'bg-cyan-500/10', accentBorder: 'border-cyan-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.22),transparent_34%),linear-gradient(135deg,#06111f,#101935)]' },
+  'docker-swarm-cluster': { label: 'DevOps Quest', callsign: 'Swarm Surge', briefing: 'Traffic is about to spike. Give container services a resilient swarm before one host becomes the bottleneck.', winCondition: 'Build the swarm path and validate service resilience.', icon: '🌐', accentText: 'text-emerald-300', accentBg: 'bg-emerald-500/10', accentBorder: 'border-emerald-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.22),transparent_34%),linear-gradient(135deg,#061a14,#101935)]' },
+  'gitlab-ci-node': { label: 'DevOps Quest', callsign: 'Merge Train Express', briefing: 'Node builds need fast feedback before broken commits pile up. Wire the delivery lane and keep the train moving.', winCondition: 'Build the GitLab CI path and validate the Node delivery flow.', icon: '🚄', accentText: 'text-amber-300', accentBg: 'bg-amber-500/10', accentBorder: 'border-amber-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.24),transparent_34%),linear-gradient(135deg,#1c1206,#101935)]' },
+  'sonarqube-quality': { label: 'DevOps Quest', callsign: 'Quality Gate Lockdown', briefing: 'Risky code is slipping through the pipeline. Put a quality gate in front of production.', winCondition: 'Configure the scan path and confirm the gate can block bad releases.', icon: '🔎', accentText: 'text-rose-300', accentBg: 'bg-rose-500/10', accentBorder: 'border-rose-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,113,133,0.22),transparent_34%),linear-gradient(135deg,#220914,#101935)]' },
+  'grafana-dashboards': { label: 'DevOps Quest', callsign: 'Dashboard Command Post', briefing: 'The system is talking, but nobody can see the signal. Turn raw telemetry into an operating picture.', winCondition: 'Launch the dashboard path and surface useful infrastructure metrics.', icon: '📊', accentText: 'text-purple-300', accentBg: 'bg-purple-500/10', accentBorder: 'border-purple-400/30', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.22),transparent_34%),linear-gradient(135deg,#170b25,#101935)]' },
+  'excel-fundamentals': { label: 'Excel Quest', callsign: 'Spreadsheet Launchpad', briefing: 'The analytics team needs trustworthy workbook basics before dashboards can depend on the numbers.', winCondition: 'Enter the required values, formulas, and ranges to prove the workbook can calculate cleanly.', icon: '📗', accentText: 'text-emerald-700', accentBg: 'bg-emerald-50', accentBorder: 'border-emerald-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(16,124,65,0.25),transparent_34%),linear-gradient(135deg,#06351f,#101935)]' },
+  'excel-formatting': { label: 'Excel Quest', callsign: 'Executive Report Polish', briefing: 'The numbers are present, but the report is hard to read. Give the workbook structure, emphasis, and visual hierarchy.', winCondition: 'Apply the required formats so the report can be scanned under pressure.', icon: '🧾', accentText: 'text-cyan-700', accentBg: 'bg-cyan-50', accentBorder: 'border-cyan-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.2),transparent_34%),linear-gradient(135deg,#06313a,#101935)]' },
+  'excel-basic-formulas': { label: 'Excel Quest', callsign: 'Formula Control Room', briefing: 'Manual math is dragging the operation. Replace repeated calculations with reliable formulas.', winCondition: 'Build formula references that recalculate instead of relying on static values.', icon: '🧮', accentText: 'text-amber-700', accentBg: 'bg-amber-50', accentBorder: 'border-amber-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.22),transparent_34%),linear-gradient(135deg,#3a2506,#101935)]' },
+  'excel-essential-functions': { label: 'Excel Quest', callsign: 'Function Arsenal', briefing: 'The workbook needs real decision logic. Bring aggregate, text, date, and conditional functions online.', winCondition: 'Complete the function suite and unlock a more capable analysis workbook.', icon: '⚙️', accentText: 'text-purple-700', accentBg: 'bg-purple-50', accentBorder: 'border-purple-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.22),transparent_34%),linear-gradient(135deg,#24103f,#101935)]' },
+  'pbi-intro': { label: 'Power BI Quest', callsign: 'BI Command Briefing', briefing: 'Leadership needs a shared report, not another spreadsheet attachment. Stand up the first BI publishing path.', winCondition: 'Connect the Power BI workspace flow and publish the first usable report.', icon: '📈', accentText: 'text-cyan-700', accentBg: 'bg-cyan-50', accentBorder: 'border-cyan-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(242,200,17,0.24),transparent_34%),linear-gradient(135deg,#342a05,#101935)]' },
+  'pbi-getdata': { label: 'Power BI Quest', callsign: 'Connector Scramble', briefing: 'Data is scattered across sources. Bring ingestion under control before stale inputs corrupt the dashboard.', winCondition: 'Connect, refresh, and resolve the target source path.', icon: '🔌', accentText: 'text-emerald-700', accentBg: 'bg-emerald-50', accentBorder: 'border-emerald-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.22),transparent_34%),linear-gradient(135deg,#07301e,#101935)]' },
+  'pbi-modeling': { label: 'Power BI Quest', callsign: 'Star Schema Forge', briefing: 'The semantic model is the battlefield map. Shape facts and dimensions before measures become unreliable.', winCondition: 'Define the relationship model that gives reports trustworthy filter behavior.', icon: '🧱', accentText: 'text-amber-700', accentBg: 'bg-amber-50', accentBorder: 'border-amber-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.22),transparent_34%),linear-gradient(135deg,#3a2506,#101935)]' },
+  'pbi-dax-fund': { label: 'Power BI Quest', callsign: 'KPI Engine Room', briefing: 'Static totals are not enough. Build the DAX measure layer that powers live decisions.', winCondition: 'Create the target measure and validate the KPI calculation path.', icon: '📐', accentText: 'text-purple-700', accentBg: 'bg-purple-50', accentBorder: 'border-purple-200', headerBg: 'bg-[radial-gradient(circle_at_top_right,rgba(192,132,252,0.22),transparent_34%),linear-gradient(135deg,#24103f,#101935)]' },
+};
+
 const getExcelHint = (check: string, currentStep?: any): string => {
   if (currentStep?.instruction) return currentStep.instruction;
   switch (check) {
@@ -877,6 +908,10 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
   const stepBreakdowns = stepCommands.map(cmd => getCommandBreakdown(cmd.text)).filter(b => b.length > 0);
   const hasBreakdown = stepBreakdowns.length > 0;
   const hasQuickRefContent = uniqueConcepts.length > 0 || hasBreakdown;
+  const questTheme = QUEST_THEMES[String(lab.projectId)];
+  const activeAccentText = questTheme?.accentText || 'text-blue-300';
+  const activeAccentBg = questTheme?.accentBg || 'bg-brand-blue/10';
+  const activeAccentBorder = questTheme?.accentBorder || 'border-brand-blue/20';
 
   return (
     <motion.div
@@ -924,8 +959,14 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
 
       {/* 2. Main content split/unsplit based on isStarted */}
       {!isStarted ? (
-        <div className="flex-1 overflow-y-auto flex items-center justify-center p-8 bg-zinc-50/50">
-          <div className="bg-white max-w-2xl w-full rounded-3xl border border-zinc-200/80 shadow-xl p-10 text-center relative">
+        <div className={`flex-1 overflow-y-auto flex items-center justify-center p-8 ${questTheme ? 'bg-zinc-950 bg-grid-cyber' : 'bg-zinc-50/50'}`}>
+          <div className={`${questTheme ? 'bg-zinc-950/90 border-cyan-500/20 text-white shadow-cyan-950/40' : 'bg-white border-zinc-200/80'} max-w-2xl w-full rounded-3xl border shadow-xl p-10 text-center relative overflow-hidden`}>
+            {questTheme && (
+              <>
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              </>
+            )}
             <AnimatePresence mode="wait">
               {isConnecting ? (
                 <motion.div 
@@ -935,12 +976,12 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   exit={{ opacity: 0, scale: 1.1 }}
                   className="w-full max-w-sm mx-auto"
                 >
-                  <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mb-8 mx-auto relative">
+                  <div className={`w-20 h-20 ${questTheme ? activeAccentBg : 'bg-brand-blue/10'} rounded-full flex items-center justify-center mb-8 mx-auto relative`}>
                     <div className="absolute inset-0 rounded-full border-2 border-brand-blue/20 border-t-brand-blue animate-spin"></div>
                     <TerminalIcon className="w-8 h-8 text-brand-blue" />
                   </div>
-                  <h2 className="text-xl font-bold text-zinc-900 mb-4">
-                    Connecting to Cloud...
+                  <h2 className={`text-xl font-bold mb-4 ${questTheme ? 'text-white' : 'text-zinc-900'}`}>
+                    {questTheme ? `Loading ${questTheme.callsign}...` : 'Connecting to Cloud...'}
                   </h2>
                   <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden mb-4">
                     <motion.div 
@@ -961,21 +1002,26 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   exit={{ opacity: 0, y: -10 }}
                   className="flex flex-col items-center"
                 >
-                  <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mb-6 ring-1 border border-brand-blue/20">
-                    <Play className="w-10 h-10 text-brand-blue fill-brand-blue/20 ml-1" />
+                  <div className={`w-20 h-20 ${questTheme ? `${activeAccentBg} ${activeAccentBorder}` : 'bg-brand-blue/10 border-brand-blue/20'} rounded-full flex items-center justify-center mb-6 ring-1 border text-4xl`}>
+                    {questTheme ? questTheme.icon : <Play className="w-10 h-10 text-brand-blue fill-brand-blue/20 ml-1" />}
                   </div>
-                  <h2 className="text-2xl font-black text-zinc-900 mb-3 tracking-tight">
-                    Initialize Cloud Sandbox
+                  {questTheme && (
+                    <div className={`mb-3 px-3 py-1 rounded-full border ${activeAccentBorder} ${activeAccentBg} ${activeAccentText} text-[10px] font-black uppercase tracking-[0.2em]`}>
+                      {questTheme.label}
+                    </div>
+                  )}
+                  <h2 className={`text-2xl font-black mb-3 tracking-tight ${questTheme ? 'text-white' : 'text-zinc-900'}`}>
+                    {questTheme ? questTheme.callsign : 'Initialize Cloud Sandbox'}
                   </h2>
-                  <p className="text-zinc-500 text-sm max-w-md mb-8 leading-relaxed">
-                    This will provision a dedicated container with all required cloud tools and configuration pre-installed for this lab.
+                  <p className={`${questTheme ? 'text-zinc-300' : 'text-zinc-500'} text-sm max-w-md mb-8 leading-relaxed`}>
+                    {questTheme ? questTheme.briefing : 'This will provision a dedicated container with all required cloud tools and configuration pre-installed for this lab.'}
                   </p>
                   <button 
                     onClick={startLabSession}
                     className="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all shadow-2xl shadow-zinc-900/20 flex items-center gap-3 cursor-pointer"
                   >
                     <Play className="w-4 h-4 fill-current" />
-                    Start Lab Session
+                    {questTheme ? 'Accept Quest' : 'Start Lab Session'}
                   </button>
                 </motion.div>
               )}
@@ -1006,7 +1052,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
             </div>
 
             {/* Header Card */}
-            <div className="bg-[#101935] text-white px-6 pb-6 pt-6 m-6 mt-4 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden">
+            <div className={`${questTheme?.headerBg || 'bg-[#101935]'} text-white px-6 pb-6 pt-6 m-6 mt-4 rounded-2xl flex flex-col justify-between relative shadow-lg overflow-hidden`}>
               {/* Decorative background glow */}
               <div className="absolute -right-16 -bottom-16 w-48 h-48 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -left-16 -top-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -1016,14 +1062,14 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                 {/* Mission Info & Title */}
                 <div className="flex justify-between items-end gap-4">
                   <div className="min-w-0">
-                    <span className="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] block mb-1">
-                      MISSION {currentStepIndex + 1} OF {lab.steps.length}
+                    <span className={`text-[10px] font-black ${questTheme ? activeAccentText : 'text-blue-300'} uppercase tracking-[0.2em] block mb-1`}>
+                      {questTheme ? questTheme.label : 'Mission'} {currentStepIndex + 1} OF {lab.steps.length}
                     </span>
                     <h2 className="text-xl font-black tracking-tight leading-tight flex items-center gap-2 truncate">
-                      💻 {projectTitle}
+                      {questTheme ? questTheme.icon : '💻'} {questTheme?.callsign || projectTitle}
                     </h2>
                     <p className="text-white/70 text-xs mt-1 truncate">
-                      {currentStep.title}
+                      {questTheme ? projectTitle : currentStep.title}
                     </p>
                   </div>
                   {lab.xpReward && (
@@ -1035,6 +1081,32 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                 </div>
               </div>
             </div>
+
+            {questTheme && (
+              <div className="px-6 mb-6">
+                <div className={`rounded-2xl border ${activeAccentBorder} ${activeAccentBg} p-4 shadow-sm`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/70 border border-white/60 flex items-center justify-center text-xl shrink-0">
+                      {questTheme.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${activeAccentText} mb-1`}>Quest Briefing</h3>
+                      <p className="text-zinc-700 text-xs leading-relaxed font-semibold mb-3">{questTheme.briefing}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                        <div className="bg-white/70 border border-white/60 rounded-xl p-3">
+                          <div className="font-black text-zinc-400 uppercase tracking-wider mb-1">Win Condition</div>
+                          <div className="font-bold text-zinc-700 leading-snug">{questTheme.winCondition}</div>
+                        </div>
+                        <div className="bg-white/70 border border-white/60 rounded-xl p-3">
+                          <div className="font-black text-zinc-400 uppercase tracking-wider mb-1">Current Objective</div>
+                          <div className="font-bold text-zinc-700 leading-snug">{currentStep.title}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Quick Reference Notes */}
             {/* Quick Reference Notes */}
@@ -1151,7 +1223,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
             {/* Implementation Guide */}
             <div className="px-6 mb-8 flex-1">
               <div className="flex items-center gap-2 border-l-4 border-brand-blue pl-3 mb-6">
-                <h3 className="text-xs font-black text-zinc-900 uppercase tracking-widest">Implementation Guide</h3>
+                <h3 className="text-xs font-black text-zinc-900 uppercase tracking-widest">{questTheme ? 'Quest Playbook' : 'Implementation Guide'}</h3>
               </div>
 
               <div className="flex gap-4">
@@ -1165,7 +1237,7 @@ export const LabView: React.FC<LabViewProps> = ({ lab, onClose, onComplete, proj
                   <div className="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-sm">
                     <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
                       <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                      Instruction Summary
+                      {questTheme ? 'Mission Move' : 'Instruction Summary'}
                     </h4>
                     <p className="text-zinc-600 text-sm leading-relaxed">
                       {currentStep.summary || currentStep.instruction}
