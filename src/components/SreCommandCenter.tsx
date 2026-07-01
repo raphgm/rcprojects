@@ -578,14 +578,62 @@ export function SreCommandCenter({ onStartLab, completedLabs, xp }: SreCommandCe
                 </button>
               </div>
 
-              <div className="relative h-90 mb-4">
+              <div className="relative mb-4">
+                <div className="relative min-h-61.25 mb-4">
+                  {[3, 2, 1].map((depth) => (
+                    <div
+                      key={depth}
+                      className="absolute left-3 right-3 h-full rounded-2xl border border-cyan-500/10 bg-zinc-950/50"
+                      style={{
+                        top: `${depth * 8}px`,
+                        transform: `scale(${1 - depth * 0.025})`,
+                        opacity: 0.35 - depth * 0.07,
+                        zIndex: 3 - depth
+                      }}
+                    />
+                  ))}
+
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeQuest.id}
+                      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                      transition={{ duration: 0.18 }}
+                      className={`relative z-10 rounded-2xl border p-5 min-h-61.25 ${accentClasses[activeQuest.accent].border} ${accentClasses[activeQuest.accent].bg} shadow-2xl ${accentClasses[activeQuest.accent].glow} ring-1 ring-cyan-400/20`}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-11 h-11 rounded-2xl border ${accentClasses[activeQuest.accent].border} ${accentClasses[activeQuest.accent].bg} flex items-center justify-center shrink-0`}>
+                            {completedLabs.includes(activeQuest.id) ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : <GitBranch className={`w-5 h-5 ${accentClasses[activeQuest.accent].text}`} />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className={`text-[10px] font-black uppercase tracking-wider ${accentClasses[activeQuest.accent].text}`}>Quest {activeQuestIndex + 1}</div>
+                            <div className="text-base font-black text-zinc-100 leading-tight">{activeQuest.title}</div>
+                          </div>
+                        </div>
+                        <span className={`text-[8px] uppercase font-black px-2 py-1 rounded-full border ${completedLabs.includes(activeQuest.id) ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/20' : 'border-zinc-700 text-zinc-500 bg-zinc-900/60'}`}>
+                          {completedLabs.includes(activeQuest.id) ? 'Cleared' : 'Open'}
+                        </span>
+                      </div>
+
+                      <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider mb-1">Target Lab</div>
+                      <div className="text-sm text-zinc-200 font-black leading-snug mb-4">{activeQuest.labTitle}</div>
+                      <p className="text-xs text-zinc-400 leading-relaxed mb-5">{activeQuest.signal}</p>
+
+                      <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Reward: <span className={accentClasses[activeQuest.accent].text}>{activeQuest.reward}</span></span>
+                        <span className="text-[9px] text-cyan-400 uppercase font-black">Selected</span>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                <div className="grid grid-cols-1 gap-2">
                 {devOpsQuests.map((quest, index) => {
-                  const offset = index - activeQuestIndex;
                   const isActive = index === activeQuestIndex;
                   const isCompleted = completedLabs.includes(quest.id);
                   const accent = accentClasses[quest.accent];
-                  const normalizedOffset = offset < 0 ? offset + devOpsQuests.length : offset;
-                  const stackedOffset = Math.min(normalizedOffset, 6);
 
                   return (
                     <button
@@ -593,40 +641,26 @@ export function SreCommandCenter({ onStartLab, completedLabs, xp }: SreCommandCe
                       type="button"
                       onClick={() => setActiveQuestIndex(index)}
                       aria-pressed={isActive}
-                      className={`absolute left-0 right-0 text-left rounded-2xl border p-4 transition-all duration-300 cursor-pointer ${isActive ? `${accent.border} ${accent.bg} shadow-2xl ${accent.glow} ring-1 ring-cyan-400/20` : 'border-zinc-800 bg-zinc-950/80 hover:border-cyan-500/25'} ${normalizedOffset > 6 ? 'opacity-0 pointer-events-none' : ''}`}
-                      style={{
-                        top: `${stackedOffset * 34}px`,
-                        zIndex: devOpsQuests.length - stackedOffset,
-                        transform: `scale(${isActive ? 1 : 1 - stackedOffset * 0.025}) translateX(${isActive ? 0 : stackedOffset * 5}px)`,
-                        opacity: isActive ? 1 : Math.max(0.34, 0.84 - stackedOffset * 0.1)
-                      }}
+                      className={`text-left rounded-xl border px-3 py-2 transition-all duration-200 cursor-pointer ${isActive ? `${accent.border} bg-cyan-950/20` : 'border-zinc-800 bg-zinc-950/60 hover:border-cyan-500/25 hover:bg-zinc-900/80'}`}
                     >
-                      <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className={`w-8 h-8 rounded-xl border ${accent.border} ${accent.bg} flex items-center justify-center shrink-0`}>
-                            {isCompleted ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <GitBranch className={`w-4 h-4 ${accent.text}`} />}
+                          <div className={`w-7 h-7 rounded-lg border ${accent.border} ${accent.bg} flex items-center justify-center shrink-0`}>
+                            {isCompleted ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <GitBranch className={`w-3.5 h-3.5 ${accent.text}`} />}
                           </div>
                           <div className="min-w-0">
-                            <div className={`text-[10px] font-black uppercase tracking-wider ${accent.text}`}>Quest {index + 1}</div>
-                            <div className="text-xs font-black text-zinc-100 truncate">{quest.title}</div>
+                            <div className={`text-[8px] font-black uppercase tracking-wider ${accent.text}`}>Quest {index + 1}</div>
+                            <div className="text-[10px] font-black text-zinc-200 truncate">{quest.title}</div>
                           </div>
                         </div>
                         <span className={`text-[8px] uppercase font-black px-2 py-1 rounded-full border ${isCompleted ? 'border-emerald-500/30 text-emerald-400 bg-emerald-950/20' : 'border-zinc-700 text-zinc-500 bg-zinc-900/60'}`}>
                           {isCompleted ? 'Cleared' : 'Open'}
                         </span>
                       </div>
-
-                      <div className="text-[10px] text-zinc-300 font-bold mb-1 truncate">{quest.labTitle}</div>
-                      <p className="text-[10px] text-zinc-500 leading-relaxed line-clamp-2">{quest.signal}</p>
-                      {isActive && (
-                        <div className="mt-3 pt-3 border-t border-zinc-800 flex items-center justify-between">
-                          <span className="text-[9px] text-zinc-500 uppercase font-bold">Reward: <span className={accent.text}>{quest.reward}</span></span>
-                          <span className="text-[9px] text-cyan-400 uppercase font-black">Selected</span>
-                        </div>
-                      )}
                     </button>
                   );
                 })}
+                </div>
               </div>
 
               <div className="flex items-center justify-center gap-1.5 mb-5">
